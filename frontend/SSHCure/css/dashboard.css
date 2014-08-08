@@ -5,9 +5,11 @@
 }
 
 #incoming-attacks-plot-header {
-    height: 35px;
+    height: 40px;
+    padding-right: 13px;
 }
 
 #incoming-attacks-plot-legend {
     margin-left: 20px;
+    margin-top: 8px;
 }
