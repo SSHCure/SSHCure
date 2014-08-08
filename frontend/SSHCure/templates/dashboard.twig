@@ -1,0 +1,62 @@
+{% extends "base.twig" %}
+
+{% block page_title %}Dashboard{% endblock %}
+
+{% block head %}
+    {{ parent() }}
+
+    <link href="css/dashboard.css" rel="stylesheet">
+    <script src="js/dashboard.js"></script>
+{% endblock %}
+
+{% block main %}
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-12 col-md-12">
+                <div id="incoming-attacks" class="main-block">
+                    <h1>Incoming attacks</h1>
+                    <div id="incoming-attacks-plot-header" style="display: none;">
+                        <div id=incoming-attacks-plot-legend style="float: left;"></div>
+                        <div id=incoming-attacks-plot-selector style="float: right;">
+                            <div class="btn-group">
+                                <button class="btn">Left</button>
+                                <button class="btn">Middle</button>
+                                <button class="btn">Right</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="incoming-attacks-plot" style="display: none;"></div>
+                    <div class="loading"><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span>Loading...</div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-8 col-md-8">
+                <div id="incoming-attacks" class="main-block">
+                    <h1>Incoming attacks</h1>
+                    <div class="loading"><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span>Loading...</div>
+                </div>
+            </div>
+            <div class="col-sm-4 col-md-4">
+                <div id="top-targets-compromise" class="main-block">
+                    <h1>Top targets - Compromise</h1>
+                    <div class="loading"><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span>Loading...</div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-8 col-md-8">
+                <div id="outgoing-attacks" class="main-block">
+                    <h1>Outgoing attacks</h1>
+                    <p>Text...</p>
+                </div>
+            </div>
+            <div class="col-sm-4 col-md-4">
+                <div id="top-targets-bruteforce" class="main-block">
+                    <h1>Top targets - bruteforce</h1>
+                    <p>Text...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

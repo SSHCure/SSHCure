@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        {% block head %}
+            <title>SSHCure | {% block page_title %}{% endblock %}</title>
+            <meta charset="utf-8">
+            <meta http-equiv="X-UA-Compatible" content="IE=edge">
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+
+            <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+            <link href="lib/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+            <link href="css/base.css" rel="stylesheet">
+
+            <script src="lib/jquery/jquery.min.js"></script>
+            <script src="lib/flot/jquery.flot.min.js"></script>
+            <script src="lib/flot/jquery.flot.stack.min.js"></script>
+            <script src="lib/flot/jquery.flot.time.min.js"></script>
+        {% endblock %}
+
+        <script type="text/javascript">
+            $(window).load(function () {
+                {% block js %}
+                    $('ul.nav-sidebar a').click(function (e) {
+                        var sidebar_button_text = $(this).text();
+                        var formatted_action = sidebar_button_text.toLowerCase().replace(" ", "_");
+
+                        // Fetch head to include updated title and includes
+                        $('head').load("index.php?action=" + formatted_action + "&block=head", function () {
+                            // Fetch main page body
+                            $('div.main').load("index.php?action=" + formatted_action + "&block=main", function () {
+                                if (formatted_action == "dashboard") {
+                                    Dashboard = new Dashboard();
+                                    Dashboard.initialize();
+                                }
+                            });
+                        });
+
+                        // Change URL in address bar without reload (i.e., ignore 'block')
+                        window.history.replaceState({}, "SSHCure | " + sidebar_button_text, "index.php?action=" + formatted_action);
+
+                        // Remove 'active' class from previously selected sidebar element
+                        $('ul.nav-sidebar li').removeClass('active');
+
+                        // Add 'active' class to currently selected sidebar element
+                        var parent = $(this).parent();
+                        if (!parent.hasClass('active')) {
+                            parent.addClass('active');
+                        }
+
+                        e.preventDefault();
+                    });
+
+                    // Select 'Dashboard' in sidebar if nothing has been selected (i.e., when opening SSHCure)
+                    if ($('ul.nav-sidebar li:active').length == 0) {
+                        $('ul.nav-sidebar li a:contains(\"Dashboard\")').trigger('click');
+                    }
+                {% endblock %}
+            });
+        </script>
+    </head>
+    <body>
+        {% block body %}
+            <div class="navbar" role="navigation">
+                <span id="logo"><img src="img/sshcure_logo.png" /></span>
+                <span id="logo-text">Flow-based intrusion detection for SSH</span>
+            </div>
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-sm-3 col-md-2 sidebar" style="position: relative; height: 750px;">
+                        <ul class="nav nav-sidebar upper">
+                            <li><a href="#"><span class="glyphicon glyphicon-dashboard"></span>Dashboard</a></li>
+                            <li><a href="#"><span class="glyphicon glyphicon-exclamation-sign"></span>Incoming</a></li>
+                            <li><a href="#"><span class="glyphicon glyphicon-screenshot"></span>Outgoing</a></li>
+                            <li><a href="#"><span class="glyphicon glyphicon-user"></span>Hosts</a></li>
+                        </ul>
+                        <ul class="nav nav-sidebar lower" style="position: absolute; bottom: 0;">
+                            <li><a href="#"><span class="glyphicon glyphicon-search"></span>Search</a></li>
+                            <li><a href="#"><span class="glyphicon glyphicon-stats"></span>Status</a></li>
+                            <li><a href="#"><span class="glyphicon glyphicon-question-sign"></span>Help</a></li>
+                            <li><a href="#"><span class="glyphicon glyphicon-wrench"></span>Settings</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-sm-9 col-sm-offset-0 col-md-10 col-md-offset-0 main">
+                        {% block main %}
+                        {% endblock %}
+                    </div>
+                </div>
+            </div>
+        {% endblock %}
+    </body>
+</html>

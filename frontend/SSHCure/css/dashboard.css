@@ -1,0 +1,13 @@
+
+/* Incoming attacks plot */
+#incoming-attacks-plot {
+    height: 250px;
+}
+
+#incoming-attacks-plot-header {
+    height: 35px;
+}
+
+#incoming-attacks-plot-legend {
+    margin-left: 20px;
+}

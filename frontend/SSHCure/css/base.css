@@ -1,0 +1,121 @@
+
+/* General */
+* {
+    font-family: 'Roboto', sans-serif;
+}
+
+h1 {
+    font-size: 12pt;
+}
+
+.btn {
+    font-size: 10pt;
+    padding-top: 0px;
+}
+/*.btn-group {
+    padding: 0px;
+}*/
+
+/* Loading indicator */
+.loading {
+    text-align: center;
+}
+.loading span.glyphicon-refresh {
+    margin-right: 5px;
+}
+.glyphicon-refresh-animate {
+    -animation: spin .7s infinite linear;
+    -webkit-animation: spin2 .7s infinite linear;
+}
+@-webkit-keyframes spin2 {
+    from { -webkit-transform: rotate(0deg);}
+    to { -webkit-transform: rotate(360deg);}
+}
+@keyframes spin {
+    from { transform: scale(1) rotate(0deg);}
+    to { transform: scale(1) rotate(360deg);}
+}
+
+/* Page header */
+div.navbar {
+    background: linear-gradient(360deg, #dadada, white, #dadada);
+    border-bottom-color: #BE1517;
+    border-bottom-width: 4pt;
+    border-radius: 0px;
+    line-height: 80px;
+    margin-bottom: 0pt;
+    vertical-align: middle;
+}
+
+#logo {
+    float: left;
+    padding-left: 40px;
+}
+
+#logo img {
+    height: 40px;
+    width: auto;
+}
+
+#logo-text {
+    float: left;
+    color: #646464;
+    padding-left: 40px;
+}
+
+/* Sidebar */
+ul.nav-sidebar a span {
+    margin-right: 10px;
+    font-size: 1.75em;
+    vertical-align: middle;
+}
+
+div.sidebar {
+    background-color: #34363F;
+}
+
+div.sidebar a {
+    color: #939393;
+}
+
+div.sidebar li a:hover, div.sidebar li a:focus {
+    background-color: #20242F;
+    color: red;
+}
+
+div.sidebar li a:focus {
+    outline: 0;
+}
+
+div.sidebar li.active {
+    background-color: #20242F;
+}
+
+div.sidebar li.active a {
+    color: red;
+}
+
+div.sidebar ul.lower {
+    /*position: relative;*/
+    /*margin-top: -6em;*/
+}
+
+/* Main */
+div.main {
+    background: linear-gradient(360deg, #dadada, white, #dadada);
+}
+
+div.main-block {
+    background-color: white;
+}
+
+div.main-block h1 {
+    border-bottom-color: #CCCCCC;
+    border-bottom-style: solid;
+    border-bottom-width: 2.5pt;
+}
+
+div.main-block > h1, div.main-block > div, div.main-block > p {
+    padding: 8px;
+}
+
