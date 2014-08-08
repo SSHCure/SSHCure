@@ -13,3 +13,13 @@
     margin-left: 20px;
     margin-top: 8px;
 }
+
+#incoming-attacks-plot-legend .legendLabel span {
+    font-size: 10pt;
+    margin-left: 3px;
+    margin-right: 10px;
+}
+
+#incoming-attacks-plot-legend tr {
+    height: 20px;
+}
