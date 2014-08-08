@@ -3,11 +3,34 @@ var Dashboard = function () {
     var me = this;
 
     me.initialize = function () {
+        add_time_window_control_listeners();
         plot_incoming_attacks_plot();
     };
 
     return me;
 };
+
+function add_time_window_control_listeners () {
+    // Select 'Week' as default, i.e., if none has been selected
+    if ($('.btn.active').length == 0) {
+        $('.btn:contains(\"Week\")').addClass('active');
+    }
+
+    // General button handling
+    $('.btn-group .btn').click(function () {
+        // Check which button was selected before
+        var prev_button_text = $('.btn-group .btn.active').text();
+
+        // Do nothing if the already active button was clicked
+        if ($(this).text() == prev_button_text) return;
+
+        // Remove 'active' class from previously selected item(s)
+        $('.btn-group .btn').removeClass('active');
+
+        // Add 'active' class to newly selected item
+        $(this).addClass('active');
+    });
+}
 
 function plot_incoming_attacks_plot () {
     var url = "json/get_incoming_attacks_data.php";
@@ -70,7 +93,7 @@ function plot_incoming_attacks_plot () {
                 noColumns: 3,
                 // margin: [ 5, 2 ], // [x-margin, y-margin]
                 labelFormatter: function (label, series) {
-                    return "<span style=\"margin-left: 3px; margin-right: 10px;\">" + label + '</span>';
+                    return "<span>" + label + '</span>';
                 }
             },
             xaxis: {

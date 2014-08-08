@@ -20,11 +20,12 @@
         <script type="text/javascript">
             $(window).load(function () {
                 {% block js %}
+                    // Sidebar button handling
                     $('ul.nav-sidebar a').click(function (e) {
                         var sidebar_button_text = $(this).text();
                         var formatted_action = sidebar_button_text.toLowerCase().replace(" ", "_");
 
-                        // Fetch head to include updated title and includes
+                        // Fetch head to include template includes
                         $('head').load("index.php?action=" + formatted_action + "&block=head", function () {
                             // Fetch main page body
                             $('div.main').load("index.php?action=" + formatted_action + "&block=main", function () {
