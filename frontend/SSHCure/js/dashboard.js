@@ -30,6 +30,11 @@ function add_time_window_control_listeners () {
         // Add 'active' class to newly selected item
         $(this).addClass('active');
 
+        // Show loading message
+        $('#incoming-attacks-plot ~ div.loading').show();
+        $('#incoming-attacks-plot-header').hide();
+        $('#incoming-attacks-plot').hide();
+
         // Replot 'incoming attacks' plot based on newly selected time window
         plot_incoming_attacks_plot($(this).text().toLowerCase());
     });
@@ -98,16 +103,15 @@ function plot_incoming_attacks_plot (period) {
             },
             grid: {
                 hoverable: true, 
-                clickable: true
+                clickable: true,
+                borderWidth: 0
             },
             series: {
                 stack: true
             },
             legend: {
-            //     position: "nw",
                 container: $('#incoming-attacks-plot-legend'),
                 noColumns: 3,
-                // margin: [ 5, 2 ], // [x-margin, y-margin]
                 labelFormatter: function (label, series) {
                     return "<span>" + label + '</span>';
                 }
@@ -144,7 +148,8 @@ function plot_incoming_attacks_plot (period) {
                     }
                     
                     return label;
-                }
+                },
+                tickLength: 0
             },
             yaxis: {
                 min: 0,

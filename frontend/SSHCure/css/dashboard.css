@@ -2,6 +2,7 @@
 /* Incoming attacks plot */
 #incoming-attacks-plot {
     height: 250px;
+    margin: 10px 0px 10px 10px;
 }
 
 #incoming-attacks-plot-header {
@@ -15,7 +16,7 @@
 }
 
 #incoming-attacks-plot-legend .legendLabel span {
-    font-size: 10pt;
+    font-size: 9pt;
     margin-left: 3px;
     margin-right: 10px;
 }
