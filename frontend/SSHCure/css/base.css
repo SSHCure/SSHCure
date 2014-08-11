@@ -83,17 +83,18 @@ div.sidebar a {
     color: #939393;
 }
 
-div.sidebar li a:hover, div.sidebar li a:focus {
-    background-color: #20242F;
-    color: red;
-}
-
 div.sidebar li a:focus {
     outline: 0;
 }
 
-div.sidebar li.active {
-    background-color: #20242F;
+div.sidebar li {
+    border-top: 1px solid #4e505c;
+    border-bottom: 1px solid #242730;
+}
+
+div.sidebar li.active, div.sidebar li.active a:focus, div.sidebar li a:hover {
+    background: linear-gradient(180deg, #33363f, #1d212d);
+    color: red;
 }
 
 div.sidebar li.active a {
@@ -105,6 +106,10 @@ div.sidebar ul.lower {
     display: block;
     position: absolute;
     width: 100%;
+}
+
+div.sidebar ul {
+    border-bottom: 1px solid #4e505c;
 }
 
 /* Main */
