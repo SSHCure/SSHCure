@@ -29,14 +29,30 @@ function add_time_window_control_listeners () {
 
         // Add 'active' class to newly selected item
         $(this).addClass('active');
+
+        // Replot 'incoming attacks' plot based on newly selected time window
+        plot_incoming_attacks_plot($(this).text().toLowerCase());
     });
 }
 
-function plot_incoming_attacks_plot () {
+function plot_incoming_attacks_plot (period) {
+    if (typeof(period) === 'undefined') {
+        period = 'week';
+    }
+    
     var url = "json/get_incoming_attacks_data.php";
     var now = parseInt((new Date().getTime()) / 1000);
-    var min_start_time = now - (7 * 24 * 60 * 60);
     var max_start_time = now;
+
+    var min_start_time;
+    if (period == 'day') {
+        min_start_time = now - (24 * 60 * 60);
+    } else if (period == 'month') {
+        min_start_time = now - (30 * 24 * 60 * 60);
+    } else {
+        min_start_time = now - (7 * 24 * 60 * 60);
+    }
+
     var params = {
         'min_start_time': min_start_time, // Go 7 days back in time
         'max_start_time': max_start_time
@@ -146,8 +162,3 @@ function plot_incoming_attacks_plot () {
                 [ plot_scan_data, plot_bruteforce_data, plot_compromise_data ], options);
     });
 }
-
-$(window).load(function () {
-    Dashboard = new Dashboard();
-    Dashboard.initialize();
-});
