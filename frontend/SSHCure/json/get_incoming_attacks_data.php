@@ -31,7 +31,7 @@
 
     $time_range = $max_start_time - $min_start_time;
     if ($time_range >= 2592000) { // 30 days
-        $bin_size = 12 * 60 * 60; // 12 hours
+        $bin_size = 3 * 60 * 60; // 3 hours
     } else if ($time_range >= 176400) { // 7 days
         $bin_size = 60 * 60; // 1 hour
     } else if ($time_range >= 86400) { // 1 day
