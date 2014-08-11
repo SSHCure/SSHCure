@@ -1,0 +1,89 @@
+SSHCure -- A Flow-Based SSH Intrusion Detection System
+
+Please check the manual or readme for installation instructions.
+---
+
+Release notes [v3.0]:
+
+- [FEATURE] New front-end
+
+Release notes [v2.4.1]:
+
+- [BUGFIX]  Fixed a bug that could cause data model fields to be created automatically (and warning messages to be shown) due to Perl Autovivification
+
+Release notes [v2.4]:
+
+- [FEATURE] Added parallel processing capabilities
+- [FEATURE] Fully re-engineered compromise detection
+- [BUGFIX]  Fixed the Status page for setups in which the frontend has been installed in a non-default path
+
+Release notes [v2.3.2]:
+
+- [FEATURE] Extended database maintenance functionality with a ‘quick mode’ and ‘forced mode’ (see manual)
+- [BUGFIX]  The detection algorithm is more resilient against TCP retransmissions
+- [BUGFIX]  Fixed a problem that caused the detection of L3, L4 and L5 blocking mechanisms to fail
+- [BUGFIX]  Fixed a problem that caused the backend hostname resolution to always return the same result
+- [BUGFIX]  Various minor bug fixes and stability improvements
+
+Release notes [v2.3.1]:
+
+- [BUGFIX]  Fixed a bug that caused the attack profile plot to be incomplete in case of attacks with a large number of targets
+- [BUGFIX]  Improved compatibility with older versions of Perl (< v5.10)
+- [BUGFIX]  Various minor bug fixes and stability improvements
+
+Release notes [v2.3]:
+
+WARNING: Neither the configuration file, nor the database of previous versions is compatible with this release!
+
+- [FEATURE] Completely overhauled brute-force phase detection
+- [FEATURE] Completely overhauled notification mechanism (see Section 3.1.2 of manual)
+- [FEATURE] Major performance improvements for both frontend and backend
+- [FEATURE] Attack tool fingerprinting (experimental)
+- [FEATURE] New ‘Status’ page in frontend for monitoring backend operation
+- [BUGFIX]  Fixed a problem that caused the frontend to stop loading when NfSen was installed in a non-default location
+- [BUGFIX]  Fixed a problem that caused the frontend to always report that a target did not block an attack
+- [BUGFIX]  Various minor bug fixes and stability improvements
+
+Release notes [v2.2.1]:
+
+- [BUGFIX] Fixed a problem that causes the frontend to stop loading when the 'nfsen' frontend directory is part of the VHOST's document root
+- [BUGFIX] Fixed a problem with the installation script under FreeBSD
+- [BUGFIX] Fixed a problem that could cause SSHCure to incorrectly report that geolocation is disabled
+- [BUGFIX] Failing AJAX requests are now properly handled in frontend
+
+Release notes [v2.2]:
+
+- [FEATURE] New Dashboard listings
+- [FEATURE] Major frontend and backend performance improvements
+- [FEATURE] Backend performs version check on initialization
+- [FEATURE] FreeBSD support
+- [BUGFIX] Fixed a bug that caused a frontend error message to be shown in case multiple NfSen sources were specified using $OVERRIDE_SOURCES (config.pm)
+- [BUGFIX] Fixed an instability in situations where flow data was retrieved for ongoing attacks
+- [BUGFIX] Improved stability with respect to run lock handling
+- [BUGFIX] Various minor bug fixes and stability improvements
+
+Release notes [v2.1]:
+
+- [FEATURE] Various performance improvements, especially in frontend
+- [BUGFIX] Fixed a bug that caused the Search function not to find hosts that were solely detected in the role of attacker
+- [BUGFIX] Fixed a bug that could cause the Search function to crash if the result set was too large
+- [BUGFIX] Fixed a bug that could cause start and end times of attack to be calculated erroneously
+- [BUGFIX] Fixed a bug causing attack certainties to differ from the targets' certainties
+- [BUGFIX] Improved attack start time determination
+- [BUGFIX] Fixed FreeBSD support
+
+KNOWN BUGS:
+
+- Attack start time and target count can suffer from small inaccuracies; fix planned for v2.2
+
+Release notes [v2.0]:
+
+WARNING: Neither the configuration file, nor the database of previous versions is compatible with this release!
+
+- [FEATURE] Significant performance improvements
+- [FEATURE] Email notifications
+- [FEATURE] Maintenance routines for database cleanup and index rebuilding
+- [FEATURE] Usability improvements
+- [FEATURE] Separate database for maintaining anonymous usage statistics
+- [FEATURE] Improved support for various operating systems
+- [FEATURE] New manual with configuration examples and best-practice configurations
