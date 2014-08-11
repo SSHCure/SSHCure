@@ -100,11 +100,11 @@ div.sidebar li {
 
 div.sidebar li.active, div.sidebar li.active a:focus, div.sidebar li a:hover {
     background: linear-gradient(180deg, #33363f, #1d212d);
-    color: red;
+    color: #be1517;
 }
 
 div.sidebar li.active a {
-    color: red;
+    color: #be1517;
 }
 
 div.sidebar ul.lower {
