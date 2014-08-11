@@ -35,8 +35,8 @@ h1 {
 /* Page header */
 div.navbar {
     background: linear-gradient(360deg, #dadada, white, #dadada);
-    border-bottom-color: #BE1517;
-    border-bottom-width: 4pt;
+    border-width: 0 0 6px 0;
+    border-color: #be1517;
     border-radius: 0px;
     line-height: 80px;
     margin-bottom: 0pt;
