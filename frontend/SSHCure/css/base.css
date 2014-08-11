@@ -60,14 +60,23 @@ div.navbar {
 }
 
 /* Sidebar */
+
+div.sidebar {
+    background-color: #34363F;
+    padding: 0;
+    position: fixed;
+    overflow-y: auto;
+    top: 86px;
+    display: block;
+    bottom: 0;
+    z-index: 1000;
+    left: 0;
+}
+
 ul.nav-sidebar a span {
     margin-right: 10px;
     font-size: 1.75em;
     vertical-align: middle;
-}
-
-div.sidebar {
-    background-color: #34363F;
 }
 
 div.sidebar a {
@@ -92,8 +101,10 @@ div.sidebar li.active a {
 }
 
 div.sidebar ul.lower {
-    /*position: relative;*/
-    /*margin-top: -6em;*/
+    bottom: 0;
+    display: block;
+    position: absolute;
+    width: 100%;
 }
 
 /* Main */
