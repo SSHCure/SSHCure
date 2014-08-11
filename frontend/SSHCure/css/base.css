@@ -120,7 +120,7 @@ div.sidebar ul {
 
 /* Main */
 div.main {
-    background: linear-gradient(360deg, #dadada, white, #dadada);
+    background: #eee;
 }
 
 div.main-block {
