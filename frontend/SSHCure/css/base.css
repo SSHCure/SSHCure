@@ -143,3 +143,30 @@ div.main-block > h1, div.main-block > div, div.main-block > p {
     padding: 8px;
 }
 
+/* Phases */
+div.phases {
+    margin: 0 auto;
+    width: 60px;
+}
+div.phase {
+    border: 1px solid #CFCFCF;
+    float: left;
+    margin: 0 2px 0 2px;
+    height: 13px;
+    width: 13px;
+}
+
+div.phase.scan.on {
+    background-color: #1A96D4;
+    border: 0px solid;
+}
+
+div.phase.bruteforce.on {
+    background-color: #FA642D;
+    border: 0px solid;
+}
+
+div.phase.compromise.on {
+    background-color: #DC0008;
+    border: 0px solid;
+}
