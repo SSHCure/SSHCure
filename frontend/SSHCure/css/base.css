@@ -34,13 +34,16 @@ h1 {
 
 /* Page header */
 div.navbar {
-    background: linear-gradient(360deg, #dadada, white, #dadada);
+    background: linear-gradient(180deg, white, #d3d3d3);
     border-width: 0 0 6px 0;
     border-color: #be1517;
     border-radius: 0px;
-    line-height: 80px;
-    margin-bottom: 0pt;
-    vertical-align: middle;
+    margin-bottom: 0px;
+    height: 100px;
+    display: flex;
+    display: -webkit-flex;
+    align-items: center;
+    -webkit-align-items: center;
 }
 
 #logo {
@@ -48,16 +51,12 @@ div.navbar {
     padding-left: 40px;
 }
 
-#logo img {
-    height: 40px;
-    width: auto;
-}
-
 #logo-text {
     float: left;
-    color: #646464;
+    color: #787878;
+    font-size: 12px;
     padding-left: 40px;
-    display: none;
+    display: none; /* Only enabled in medium and large view */
 }
 
 /* Sidebar */
@@ -72,7 +71,7 @@ div.sidebar {
         position: fixed;
         overflow-y: auto;
         overflow-x: hidden;
-        top: 86px;
+        top: 100px;
         display: block;
         bottom: 0;
         z-index: 1000;
