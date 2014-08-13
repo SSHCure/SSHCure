@@ -5,6 +5,7 @@ var Dashboard = function () {
     me.initialize = function () {
         add_time_window_control_listeners();
         plot_incoming_attacks_plot();
+        load_incoming_attacks_table();
     };
 
     return me;
@@ -40,12 +41,48 @@ function add_time_window_control_listeners () {
     });
 }
 
+function load_incoming_attacks_table (period) {
+    var url = "json/get_incoming_attacks_data.php";
+    var params = {
+    };
+
+    $.getJSON(url, params, function (data, textStatus, jqXHR) {
+        var table = $('<table>');
+        var head = $('<thead>');
+        var body = $('<tbody>');
+        head.append(
+            $('<td>').text('Phases'),
+            $('<td>').text('Active'),
+            $('<td>').text('Attacker'),
+            $('<td>').text('Start time'),
+            $('<td>').text('Targets')
+        ).appendTo(head);
+        $.each(data.data, function () {
+            $('<tr>').append(
+                $('<td>').text(this.certainty),
+                $('<td>').html("<span class=\"glyphicon glyphicon-flash\"></span>"),
+                $('<td>').text(this.attacker),
+                $('<td>').text(this.start_time),
+                $('<td>').text(this.target_count)
+            ).appendTo(body);
+        });
+        head.appendTo(table);
+        body.appendTo(table);
+
+        // Hide loading message and show divs related to plot
+        $('#incoming-attacks-table ~ div.loading').hide();
+        $('#incoming-attacks-table').show();
+
+        table.appendTo($('#incoming-attacks-table'));
+    });
+}
+
 function plot_incoming_attacks_plot (period) {
     if (typeof(period) === 'undefined') {
         period = 'week';
     }
     
-    var url = "json/get_incoming_attacks_data.php";
+    var url = "json/get_incoming_attacks_plot_data.php";
     var now = parseInt((new Date().getTime()) / 1000);
     var max_start_time = now;
 

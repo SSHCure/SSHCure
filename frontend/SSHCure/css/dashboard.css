@@ -24,3 +24,8 @@
 #incoming-attacks-plot-legend tr {
     height: 20px;
 }
+
+/* Incoming attacks table */
+#incoming-attacks-table span.glyphicon-flash {
+    color: #be1517;
+}
