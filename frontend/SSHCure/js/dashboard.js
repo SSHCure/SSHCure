@@ -45,7 +45,7 @@ function plot_incoming_attacks_plot (period) {
         period = 'week';
     }
     
-    var url = "json/get_incoming_attacks_data.php";
+    var url = "json/get_incoming_attacks_plot_data.php";
     var now = parseInt((new Date().getTime()) / 1000);
     var max_start_time = now;
 
