@@ -57,9 +57,26 @@ function load_incoming_attacks_table (period) {
             $('<td>').text('Start time'),
             $('<td>').text('Targets')
         ).appendTo(head);
+
         $.each(data.data, function () {
+            var phases = $('<div>').addClass('phases').append(
+                $('<div>').addClass('phase scan'),
+                $('<div>').addClass('phase bruteforce'),
+                $('<div>').addClass('phase compromise')
+            );
+            
+            if (jQuery.inArray(this.certainty, [ 0.25, 0.5, 0.75 ])) {
+                phases.find('div.phase.scan').addClass('on');
+            }
+            if (jQuery.inArray(this.certainty, [ 0.4, 0.5 ])) {
+                phases.find('div.phase.bruteforce').addClass('on');
+            }
+            if (jQuery.inArray(this.certainty, [ 0.65, 0.75 ])) {
+                phases.find('div.phase.compromise').addClass('on');
+            }
+
             $('<tr>').append(
-                $('<td>').text(this.certainty),
+                $('<td>').append(phases),
                 $('<td>').html("<span class=\"glyphicon glyphicon-flash\"></span>"),
                 $('<td>').text(this.attacker),
                 $('<td>').text(this.start_time),
