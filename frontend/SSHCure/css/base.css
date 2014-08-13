@@ -1,5 +1,10 @@
 
 /* General */
+
+html {
+    background: #eee;
+}
+
 * {
     font-family: 'Roboto', sans-serif;
 }
