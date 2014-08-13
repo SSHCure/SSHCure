@@ -32,9 +32,9 @@ function add_time_window_control_listeners () {
         $(this).addClass('active');
 
         // Show loading message
-        $('#incoming-attacks-plot ~ div.loading').show();
-        $('#incoming-attacks-plot-header').hide();
-        $('#incoming-attacks-plot').hide();
+        $('#attacks-plot ~ div.loading').show();
+        $('#attacks-plot-header').hide();
+        $('#attacks-plot').hide();
 
         // Replot 'incoming attacks' plot based on newly selected time window
         plot_incoming_attacks_plot($(this).text().toLowerCase());
@@ -164,7 +164,7 @@ function plot_incoming_attacks_plot (period) {
                 stack: true
             },
             legend: {
-                container: $('#incoming-attacks-plot-legend'),
+                container: $('#attacks-plot-legend'),
                 noColumns: 3,
                 labelFormatter: function (label, series) {
                     return "<span>" + label + '</span>';
@@ -213,11 +213,11 @@ function plot_incoming_attacks_plot (period) {
         };
 
         // Hide loading message and show divs related to plot
-        $('#incoming-attacks-plot ~ div.loading').hide();
-        $('#incoming-attacks-plot-header').show();
-        $('#incoming-attacks-plot').show();
+        $('#attacks-plot ~ div.loading').hide();
+        $('#attacks-plot-header').show();
+        $('#attacks-plot').show();
         
-        $.plot($('#incoming-attacks-plot'),
+        $.plot($('#attacks-plot'),
                 [ plot_scan_data, plot_bruteforce_data, plot_compromise_data ], options);
     });
 }
