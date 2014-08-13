@@ -15,6 +15,10 @@
     margin-top: 8px;
 }
 
+#attacks-plot-legend .legendColorBox > div {
+    border: 0px solid !important;
+}
+
 #attacks-plot-legend .legendLabel span {
     font-size: 9pt;
     margin-left: 3px;
