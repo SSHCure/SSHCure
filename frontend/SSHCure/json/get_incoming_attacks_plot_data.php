@@ -22,7 +22,7 @@
     $stmnt->bindParam(":max_start_time", $max_start_time);
     $stmnt->execute();
 
-    $result = $stmnt->fetchAll(PDO::FETCH_ASSOC);
+    $db_result = $stmnt->fetchAll(PDO::FETCH_ASSOC);
     unset($stmnt);
 
     // Prepare query string for easy readability (for debugging purposes)
@@ -45,7 +45,7 @@
     $bruteforce_attacks = array();
     $compromise_attacks = array();
 
-    foreach ($result as $row) {
+    foreach ($db_result as $row) {
         $attack_start_time = intval($row['start_time']);
         $attack_end_time = ($row['end_time'] === null) ? $max_start_time : intval($row['end_time']);
         $certainty = floatval($row['certainty']);

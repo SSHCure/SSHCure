@@ -8,6 +8,11 @@ h1 {
     font-size: 12pt;
 }
 
+table {
+    text-align: center;
+    width: 100%;
+}
+
 .btn {
     font-size: 10pt;
 }
@@ -61,7 +66,6 @@ div.navbar {
 }
 
 /* Sidebar */
-
 div.sidebar {
     display: none;
 }
