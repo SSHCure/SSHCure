@@ -157,8 +157,31 @@ div.main-block > h1, div.main-block > div, div.main-block > p {
 }
 
 /* Tables */
-table tr {
-    border-bottom: 1pt solid #EEEEEE;
+div.main-block.table table tbody td {
+    border: 1pt solid #EEEEEE;
+}
+
+div.main-block.table table thead {
+    background-color: #DDDDDD;
+    color: #898989;
+    font-size: 11pt;
+    line-height: 50px;
+}
+
+div.main-block.table table tbody tr {
+    line-height: 40px;
+}
+
+div.main-block.table table tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+div.main-block.table table tbody tr td:first-child {
+    border-left: 0;
+}
+
+div.main-block.table table tbody tr td:last-child {
+    border-right: 0;
 }
 
 /* Phases */
@@ -166,12 +189,13 @@ div.phases {
     margin: 0 auto;
     width: 60px;
 }
+
 div.phase {
     border: 1px solid #CFCFCF;
     float: left;
     margin: 0 2px 0 2px;
-    height: 13px;
-    width: 13px;
+    height: 14px;
+    width: 14px;
 }
 
 div.phase.scan.on {
