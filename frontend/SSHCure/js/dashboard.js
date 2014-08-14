@@ -65,6 +65,7 @@ function load_incoming_attacks_table (period) {
                 $('<div>').addClass('phase compromise')
             );
             
+            // Phases
             if (jQuery.inArray(this.certainty, [ 0.25, 0.5, 0.75 ])) {
                 phases.find('div.phase.scan').addClass('on');
             }
@@ -75,11 +76,14 @@ function load_incoming_attacks_table (period) {
                 phases.find('div.phase.compromise').addClass('on');
             }
 
+            // Date
+            var date = new Date(this.start_time * 1000);
+
             $('<tr>').append(
                 $('<td>').append(phases),
                 $('<td>').html("<span class=\"glyphicon glyphicon-flash\"></span>"),
                 $('<td>').text(this.attacker),
-                $('<td>').text(this.start_time),
+                $('<td>').text(date.toString("ddd. MMM d, yyyy HH:mm")),
                 $('<td>').text(this.target_count)
             ).appendTo(body);
         });
