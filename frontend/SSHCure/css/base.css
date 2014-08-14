@@ -135,6 +135,7 @@ div.main {
 
 div.main-block {
     background-color: white;
+    border-bottom: 2.5pt solid #cccccc;
 }
 
 div.main-block h1 {
