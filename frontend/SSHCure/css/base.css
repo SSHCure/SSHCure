@@ -21,6 +21,14 @@ table {
     font-size: 10pt;
 }
 
+span.text-bruteforce {
+    color: #FA642D;
+}
+
+span.text-compromise {
+    color: #DC0008;
+}
+
 /* Loading indicator */
 .loading {
     text-align: center;
