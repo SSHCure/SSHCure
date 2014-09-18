@@ -56,6 +56,14 @@ my %perl_dependencies = (
             'OpenBSD'   => '',
         }
     },
+    'LWP::Simple' => {
+        'packages'      => {
+            'CentOS'    => 'perl-libwww-perl',
+            'Debian'    => 'libwww-perl',
+            'FreeBSD'   => 'p5-libwww',
+            'OpenBSD'   => 'p5-libwww',
+        }
+    },
     'LWP::UserAgent' => {
         'packages'      => {
             'CentOS'    => 'perl-libwww-perl',
