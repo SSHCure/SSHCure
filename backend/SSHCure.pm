@@ -30,6 +30,7 @@ use IO::Async::Future;
 use File::Basename;
 use File::Find;
 use JSON;
+use LWP::Simple;
 use LWP::UserAgent;
 use Storable;
 use Try::Tiny;
@@ -129,7 +130,7 @@ sub Init {
         $operating_system = "(Unknown)";
     }
 
-    # Determine ulimit and processing threads
+    # Determine ulimit and IO::Async workers
     my $ulimit = qx(echo `ulimit -n`);
     if ($ulimit =~ /^[+-]?\d+$/) {
         chomp($ulimit);
@@ -150,10 +151,10 @@ sub Init {
 
         $async_workers = $CFG::CONST{'MAX_ASYNC_WORKERS'} if ($async_workers > $CFG::CONST{'MAX_ASYNC_WORKERS'});
 
-        log_info("Using ".$async_workers." processing threads (ulimit: ".$ulimit.")");
+        log_info("Using ".$async_workers." IO::ASYNC workers (ulimit: ".$ulimit.")");
     } else {
         $async_workers = 10;
-        log_info("Could not determine system ulimit; using ".$async_workers." processing threads");
+        log_info("Could not determine system ulimit; using ".$async_workers." IO::ASYNC workers");
     }
 
     my $post_data = [
@@ -402,13 +403,13 @@ sub run {
         $retry_previous_maintenance = $retry_count < 10;
     }
     
-    unless (VALIDATION_MODE == 1) {
+    if (VALIDATION_MODE == 0) {
         if (-e $CFG::CONST{'FN_FORCE_DB_MAINTENANCE'}) {
             # Database maintenance should be started forceably
             log_info("Detected force database maintenance trigger file; removing file (".$CFG::CONST{'FN_FORCE_DB_MAINTENANCE'}.")");
             unlink($CFG::CONST{'FN_FORCE_DB_MAINTENANCE'});
             database_maintenance(nfcapd2unix($timeslot) + (5 * 60));
-        } elsif (grep($_ eq strftime("%u:%H:%M", localtime(nfcapd2unix($timeslot))), map ($_.":00", @{$CFG::MAINTENANCE{'TRIGGERS'}})) or $retry_previous_maintenance) {
+        } elsif (grep($_ eq strftime("%u:%H:%M", localtime(nfcapd2unix($timeslot))), map($_.":00", @{$CFG::MAINTENANCE{'TRIGGERS'}})) or $retry_previous_maintenance) {
             # Regular (scheduled) database maintenance should be performed
             if (300 - $run_time_spent > $CFG::MAINTENANCE{'TIME_NEEDED'} * 1.2) { # 20% leeway
                 database_maintenance(nfcapd2unix($timeslot) + (5 * 60));
@@ -424,13 +425,25 @@ sub run {
                     } else {
                         # Tried 10 times; database mainteance has definitely failed
                         rename("$CFG::CONST{'SSHCURE_DATA_DIR'}/$filename", "$CFG::CONST{'SSHCURE_DATA_DIR'}/failed_maintenance_$file_timestamp");
-                        log_error("Database maintenance for $file_timestamp failed $retry_count times");
+                        log_error("Database maintenance for $file_timestamp failed $retry_count time(s)");
                     }
                 } else {
                     # Retry file does not exist yet; create one with count '1'
                     open(TMPRETRYFILE, ">@{[$CFG::CONST{'SSHCURE_DATA_DIR'}]}/retry_maintenance_$timeslot.1");
                     close(TMPRETRYFILE);
                 }
+            }
+        }
+
+        # Check whether local OpenBL blacklist copy needs to be updated
+        my $nfcapd_time = strftime("%H:%M", localtime(nfcapd2unix($timeslot) + 5 * 60)); # nfcapd files are always 5 minutes behind in time
+        if (index($nfcapd_time, $CFG::CONST{'OPENBL'}{'UPDATE_TIME'}) != -1) {
+            log_info("Local OpenBL blacklist snapshot has expired; fetching new snapshot...");
+            my $resp_code = mirror($CFG::CONST{'OPENBL'}{'SSH_BLACKLIST_URL'}, $CFG::CONST{'OPENBL'}{'SSH_BLACKLIST_LOCAL_PATH'});
+            if ($resp_code == 200) {
+                log_info("Successfully fetched OpenBL blacklist snapshot ($nfcapd_time)");
+            } else {
+                log_error("OpenBL blacklist snapshot could not be fetched; trying again in 24 hours...");
             }
         }
     }

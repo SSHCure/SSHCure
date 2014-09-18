@@ -71,8 +71,8 @@ my $SSHCURE_DATA_DIR = "$NfConf::BACKEND_PLUGINDIR/SSHCure/data";
 
     # DB: database (clean-up) settings
     'DB' => {
-        'DSN'           => "dbi:SQLite:dbname=$NfConf::BACKEND_PLUGINDIR/SSHCure/data/SSHCure.sqlite3", #DB name/location
-        'DSN_PROFILING' => "dbi:SQLite:dbname=$NfConf::BACKEND_PLUGINDIR/SSHCure/data/SSHCure_profile.sqlite3", #Profiling DB name/location
+        'DSN'           => "dbi:SQLite:dbname=$NfConf::BACKEND_PLUGINDIR/SSHCure/data/SSHCure.sqlite3",         # DB name/location
+        'DSN_PROFILING' => "dbi:SQLite:dbname=$NfConf::BACKEND_PLUGINDIR/SSHCure/data/SSHCure_profile.sqlite3", # Profiling DB name/location
         
         # MAX_*_AGE: maximum values used in maintenance routine, in days
         'MAX_SCAN_ATTACK_AGE'       => 30,  # 1 month
@@ -106,11 +106,12 @@ my $SSHCURE_DATA_DIR = "$NfConf::BACKEND_PLUGINDIR/SSHCure/data";
             'ATTACK_END'        => 2,
         },
         'LIMITS' => {
-            'MAX_OVERALL'       => 20,
+            'MAX_OVERALL'       => 0,
             'MAX_PER_CONFIG'    => 10,
         },
     },
     
+    # Reasons for an attack to be blocked
     'BLOCKED' => {
         'NOT_BLOCKED'   => 0,
         'FAIL2BAN'      => 1,
@@ -125,6 +126,12 @@ my $SSHCURE_DATA_DIR = "$NfConf::BACKEND_PLUGINDIR/SSHCure/data";
         'MAINTAIN_CONNECTION_ABORT_DICTIONARY'      => 2,
         'MAINTAIN_CONNECTION_CONTINUE_DICTIONARY'   => 3,
         'MAINTAIN_CONNECTION'                       => 4,
+    },
+
+    'OPENBL' => {
+        'SSH_BLACKLIST_URL'         => "http://www.openbl.org/lists/base_all_ssh-only.txt",
+        'SSH_BLACKLIST_LOCAL_PATH'  => $SSHCURE_DATA_DIR."/openbl_ssh_snapshot.txt",
+        'UPDATE_TIME'               => "15:50", # Should be in the following format: %H:%M
     },
 );
 
