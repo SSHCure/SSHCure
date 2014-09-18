@@ -11,9 +11,12 @@
     $twig = new Twig_Environment($loader, array());
 
     // Determine action and block name
-    $action = (isset($_GET['action'])) ? $_GET['action'] : 'dashboard';
-    $block = (isset($_GET['block'])) ? $_GET['block'] : NULL;
+    $action = (isset($_GET['action'])) ? preg_replace("/[^a-zA-Z]/", "", $_GET['action']) : NULL;
+    if (is_null($action) || $action === "" || !file_exists("templates/".$action.".twig")) {
+        $action = 'dashboard';
+    }
 
+    $block = (isset($_GET['block'])) ? $_GET['block'] : NULL;
     $template = $twig->loadTemplate($action.'.twig');
 
     if (is_null($block)) {

@@ -5,17 +5,18 @@
 
     <link href="css/dashboard.css" rel="stylesheet">
     <script src="js/dashboard.js"></script>
+    <script src="lib/date.js/date.js"></script>
 {% endblock %}
 
 {% block main %}
     <div class="container-fluid">
         <div class="row">
             <div class="col-sm-12 col-md-12">
-                <div id="incoming-attacks" class="main-block">
-                    <h1>Incoming attacks</h1>
-                    <div id="incoming-attacks-plot-header" style="display: none;">
-                        <div id=incoming-attacks-plot-legend style="float: left;"></div>
-                        <div id=incoming-attacks-plot-selector style="float: right;">
+                <div id="attacks" class="main-block">
+                    <h1>Attacks</h1>
+                    <div id="attacks-plot-header" style="display: none;">
+                        <div id=attacks-plot-legend style="float: left;"></div>
+                        <div id=attacks-plot-selector style="float: right;">
                             <div class="btn-group">
                                 <button type="button" class="btn btn-default">Day</button>
                                 <button type="button" class="btn btn-default">Week</button>
@@ -23,35 +24,36 @@
                             </div>
                         </div>
                     </div>
-                    <div id="incoming-attacks-plot" style="display: none;"></div>
+                    <div id="attacks-plot" style="display: none;"></div>
                     <div class="loading"><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span>Loading...</div>
                 </div>
             </div>
         </div>
         <div class="row">
             <div class="col-sm-8 col-md-8">
-                <div id="incoming-attacks" class="main-block">
+                <div id="incoming-attacks" class="main-block table">
                     <h1>Incoming attacks</h1>
+                    <div id="incoming-attacks-table" style="display: none;"></div>
                     <div class="loading"><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span>Loading...</div>
                 </div>
             </div>
             <div class="col-sm-4 col-md-4">
-                <div id="top-targets-compromise" class="main-block">
-                    <h1>Top targets - Compromise</h1>
+                <div id="top-targets-compromise" class="main-block table">
+                    <h1>Top targets - <span class="text-compromise">Compromise<span></h1>
                     <div class="loading"><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span>Loading...</div>
                 </div>
             </div>
         </div>
         <div class="row">
             <div class="col-sm-8 col-md-8">
-                <div id="outgoing-attacks" class="main-block">
+                <div id="outgoing-attacks" class="main-block table">
                     <h1>Outgoing attacks</h1>
                     <p>Text...</p>
                 </div>
             </div>
             <div class="col-sm-4 col-md-4">
-                <div id="top-targets-bruteforce" class="main-block">
-                    <h1>Top targets - bruteforce</h1>
+                <div id="top-targets-bruteforce" class="main-block table">
+                    <h1>Top targets - <span class="text-bruteforce">Brute-force<span></h1>
                     <p>Text...</p>
                 </div>
             </div>

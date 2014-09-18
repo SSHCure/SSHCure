@@ -62,26 +62,26 @@
     <body>
         {% block body %}
             <div class="navbar" role="navigation">
-                <span id="logo"><img src="img/sshcure_logo.png" /></span>
+                <span id="logo"><a href="/"><img src="img/sshcure_logo.png" /></a></span>
                 <span id="logo-text">Flow-based intrusion detection for SSH</span>
             </div>
             <div class="container-fluid">
                 <div class="row">
-                    <div class="col-sm-3 col-md-2 sidebar" style="position: relative; height: 750px;">
+                    <div class="col-sm-2 col-md-2 col-lg-1 sidebar">
                         <ul class="nav nav-sidebar upper">
-                            <li><a href="#"><span class="glyphicon glyphicon-dashboard"></span>Dashboard</a></li>
-                            <li><a href="#"><span class="glyphicon glyphicon-exclamation-sign"></span>Incoming</a></li>
-                            <li><a href="#"><span class="glyphicon glyphicon-screenshot"></span>Outgoing</a></li>
-                            <li><a href="#"><span class="glyphicon glyphicon-user"></span>Hosts</a></li>
+                            <li><a href="/index.php?action=dashboard"><span class="glyphicon glyphicon-dashboard"></span>Dashboard</a></li>
+                            <li><a href="/index.php?action=incoming"><span class="glyphicon glyphicon-exclamation-sign"></span>Incoming</a></li>
+                            <li><a href="/index.php?action=outgoing"><span class="glyphicon glyphicon-screenshot"></span>Outgoing</a></li>
+                            <li><a href="/index.php?action=hosts"><span class="glyphicon glyphicon-user"></span>Hosts</a></li>
                         </ul>
-                        <ul class="nav nav-sidebar lower" style="position: absolute; bottom: 0;">
-                            <li><a href="#"><span class="glyphicon glyphicon-search"></span>Search</a></li>
-                            <li><a href="#"><span class="glyphicon glyphicon-stats"></span>Status</a></li>
-                            <li><a href="#"><span class="glyphicon glyphicon-question-sign"></span>Help</a></li>
-                            <li><a href="#"><span class="glyphicon glyphicon-wrench"></span>Settings</a></li>
+                        <ul class="nav nav-sidebar lower">
+                            <li><a href="/index.php?action=search"><span class="glyphicon glyphicon-search"></span>Search</a></li>
+                            <li><a href="/index.php?action=status"><span class="glyphicon glyphicon-stats"></span>Status</a></li>
+                            <li><a href="/index.php?action=help"><span class="glyphicon glyphicon-question-sign"></span>Help</a></li>
+                            <li><a href="/index.php?action=settings"><span class="glyphicon glyphicon-wrench"></span>Settings</a></li>
                         </ul>
                     </div>
-                    <div class="col-sm-9 col-sm-offset-0 col-md-10 col-md-offset-0 main">
+                    <div class="col-sm-10 col-sm-offset-2 col-md-10 col-md-offset-2 col-lg-11 col-lg-offset-1 main">
                         {% block main %}
                         {% endblock %}
                     </div>

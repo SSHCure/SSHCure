@@ -1,5 +1,9 @@
 
 /* General */
+html {
+    background: #eee;
+}
+
 * {
     font-family: 'Roboto', sans-serif;
 }
@@ -8,8 +12,21 @@ h1 {
     font-size: 12pt;
 }
 
+table {
+    text-align: center;
+    width: 100%;
+}
+
 .btn {
     font-size: 10pt;
+}
+
+span.text-bruteforce {
+    color: #FA642D;
+}
+
+span.text-compromise {
+    color: #DC0008;
 }
 
 /* Loading indicator */
@@ -20,27 +37,30 @@ h1 {
     margin-right: 5px;
 }
 .glyphicon-refresh-animate {
-    -animation: spin .7s infinite linear;
+    animation: spin .7s infinite linear;
     -webkit-animation: spin2 .7s infinite linear;
+}
+@keyframes spin {
+    from { transform: rotate(0deg);}
+    to { transform: rotate(359deg);}
 }
 @-webkit-keyframes spin2 {
     from { -webkit-transform: rotate(0deg);}
-    to { -webkit-transform: rotate(360deg);}
-}
-@keyframes spin {
-    from { transform: scale(1) rotate(0deg);}
-    to { transform: scale(1) rotate(360deg);}
+    to { -webkit-transform: rotate(359deg);}
 }
 
 /* Page header */
 div.navbar {
-    background: linear-gradient(360deg, #dadada, white, #dadada);
-    border-bottom-color: #BE1517;
-    border-bottom-width: 4pt;
+    background: linear-gradient(180deg, white, #d3d3d3);
+    border-width: 0 0 6px 0;
+    border-color: #be1517;
     border-radius: 0px;
-    line-height: 80px;
-    margin-bottom: 0pt;
-    vertical-align: middle;
+    margin-bottom: 0px;
+    height: 100px;
+    display: flex;
+    display: -webkit-flex;
+    align-items: center;
+    -webkit-align-items: center;
 }
 
 #logo {
@@ -48,61 +68,82 @@ div.navbar {
     padding-left: 40px;
 }
 
-#logo img {
-    height: 40px;
-    width: auto;
-}
-
 #logo-text {
     float: left;
-    color: #646464;
+    color: #787878;
+    font-size: 12px;
     padding-left: 40px;
+    display: none; /* Only enabled in medium and large view */
 }
 
 /* Sidebar */
-ul.nav-sidebar a span {
-    margin-right: 10px;
-    font-size: 1.75em;
-    vertical-align: middle;
+div.sidebar {
+    display: none;
+}
+@media (min-width: 768px) {
+    div.sidebar {
+        background-color: #34363F;
+        padding: 0;
+        position: fixed;
+        overflow-y: auto;
+        overflow-x: hidden;
+        top: 100px;
+        display: block;
+        bottom: 0;
+        z-index: 1000;
+        left: 0;
+        min-height: 500px;
+    }
+    #logo-text {
+        display: block;
+    }
 }
 
-div.sidebar {
-    background-color: #34363F;
+ul.nav-sidebar a span {
+    margin-right: 10px;
+    font-size: 1.35em;
+    vertical-align: middle;
 }
 
 div.sidebar a {
     color: #939393;
-}
-
-div.sidebar li a:hover, div.sidebar li a:focus {
-    background-color: #20242F;
-    color: red;
+    min-width: 150px;
 }
 
 div.sidebar li a:focus {
     outline: 0;
 }
 
-div.sidebar li.active {
-    background-color: #20242F;
+div.sidebar li {
+    border-top: 1px solid #4e505c;
+    border-bottom: 1px solid #242730;
 }
 
-div.sidebar li.active a {
-    color: red;
+div.sidebar li.active a, div.sidebar li.active a:focus, div.sidebar li a:hover {
+    background: linear-gradient(180deg, #33363f, #1d212d);
+    color: #be1517;
 }
 
 div.sidebar ul.lower {
-    /*position: relative;*/
-    /*margin-top: -6em;*/
+    bottom: 0;
+    display: block;
+    position: absolute;
+    width: 100%;
+    margin-bottom: 80px;
+}
+
+div.sidebar ul {
+    border-bottom: 1px solid #4e505c;
 }
 
 /* Main */
 div.main {
-    background: linear-gradient(360deg, #dadada, white, #dadada);
+    background: #eee;
 }
 
 div.main-block {
     background-color: white;
+    border-bottom: 2.5pt solid #cccccc;
 }
 
 div.main-block h1 {
@@ -112,6 +153,62 @@ div.main-block h1 {
 }
 
 div.main-block > h1, div.main-block > div, div.main-block > p {
-    padding: 8px;
+    padding: 11px;
 }
 
+/* Tables */
+div.main-block.table table tbody td {
+    border: 1pt solid #EEEEEE;
+}
+
+div.main-block.table table thead {
+    background-color: #DDDDDD;
+    color: #898989;
+    font-size: 11pt;
+    line-height: 50px;
+}
+
+div.main-block.table table tbody tr {
+    line-height: 40px;
+}
+
+div.main-block.table table tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+div.main-block.table table tbody tr td:first-child {
+    border-left: 0;
+}
+
+div.main-block.table table tbody tr td:last-child {
+    border-right: 0;
+}
+
+/* Phases */
+div.phases {
+    margin: 0 auto;
+    width: 60px;
+}
+
+div.phase {
+    border: 1px solid #CFCFCF;
+    float: left;
+    margin: 0 2px 0 2px;
+    height: 14px;
+    width: 14px;
+}
+
+div.phase.scan.on {
+    background-color: #1A96D4;
+    border: 0px solid;
+}
+
+div.phase.bruteforce.on {
+    background-color: #FA642D;
+    border: 0px solid;
+}
+
+div.phase.compromise.on {
+    background-color: #DC0008;
+    border: 0px solid;
+}

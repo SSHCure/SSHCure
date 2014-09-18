@@ -5,6 +5,7 @@ var Dashboard = function () {
     me.initialize = function () {
         add_time_window_control_listeners();
         plot_incoming_attacks_plot();
+        load_incoming_attacks_table();
     };
 
     return me;
@@ -31,12 +32,69 @@ function add_time_window_control_listeners () {
         $(this).addClass('active');
 
         // Show loading message
-        $('#incoming-attacks-plot ~ div.loading').show();
-        $('#incoming-attacks-plot-header').hide();
-        $('#incoming-attacks-plot').hide();
+        $('#attacks-plot ~ div.loading').show();
+        $('#attacks-plot-header').hide();
+        $('#attacks-plot').hide();
 
         // Replot 'incoming attacks' plot based on newly selected time window
         plot_incoming_attacks_plot($(this).text().toLowerCase());
+    });
+}
+
+function load_incoming_attacks_table (period) {
+    var url = "json/get_incoming_attacks_data.php";
+    var params = {
+    };
+
+    $.getJSON(url, params, function (data, textStatus, jqXHR) {
+        var table = $('<table>');
+        var head = $('<thead>');
+        var body = $('<tbody>');
+        head.append(
+            $('<td>').text('Phases'),
+            $('<td>').text('Active'),
+            $('<td>').text('Attacker'),
+            $('<td>').text('Start time'),
+            $('<td>').text('Targets')
+        ).appendTo(head);
+
+        $.each(data.data, function () {
+            var phases = $('<div>').addClass('phases').append(
+                $('<div>').addClass('phase scan'),
+                $('<div>').addClass('phase bruteforce'),
+                $('<div>').addClass('phase compromise')
+            );
+            
+            // Phases
+            if (jQuery.inArray(this.certainty, [ 0.25, 0.5, 0.75 ])) {
+                phases.find('div.phase.scan').addClass('on');
+            }
+            if (jQuery.inArray(this.certainty, [ 0.4, 0.5 ])) {
+                phases.find('div.phase.bruteforce').addClass('on');
+            }
+            if (jQuery.inArray(this.certainty, [ 0.65, 0.75 ])) {
+                phases.find('div.phase.compromise').addClass('on');
+            }
+
+            // Date
+            var date = new Date(this.start_time * 1000);
+
+            $('<tr>').append(
+                $('<td>').append(phases),
+                $('<td>').html("<span class=\"glyphicon glyphicon-flash\"></span>"),
+                $('<td>').text(this.attacker),
+                $('<td>').text(date.toString("ddd. MMM d, yyyy HH:mm")),
+                $('<td>').text(this.target_count)
+            ).appendTo(body);
+        });
+        head.appendTo(table);
+        body.appendTo(table);
+
+        // Hide loading message and show divs related to plot
+        $('#incoming-attacks-table ~ div.loading').hide();
+        $('#incoming-attacks-table').show();
+
+        table.appendTo($('#incoming-attacks-table'));
     });
 }
 
@@ -45,7 +103,7 @@ function plot_incoming_attacks_plot (period) {
         period = 'week';
     }
     
-    var url = "json/get_incoming_attacks_data.php";
+    var url = "json/get_incoming_attacks_plot_data.php";
     var now = parseInt((new Date().getTime()) / 1000);
     var max_start_time = now;
 
@@ -110,7 +168,7 @@ function plot_incoming_attacks_plot (period) {
                 stack: true
             },
             legend: {
-                container: $('#incoming-attacks-plot-legend'),
+                container: $('#attacks-plot-legend'),
                 noColumns: 3,
                 labelFormatter: function (label, series) {
                     return "<span>" + label + '</span>';
@@ -159,11 +217,11 @@ function plot_incoming_attacks_plot (period) {
         };
 
         // Hide loading message and show divs related to plot
-        $('#incoming-attacks-plot ~ div.loading').hide();
-        $('#incoming-attacks-plot-header').show();
-        $('#incoming-attacks-plot').show();
+        $('#attacks-plot ~ div.loading').hide();
+        $('#attacks-plot-header').show();
+        $('#attacks-plot').show();
         
-        $.plot($('#incoming-attacks-plot'),
+        $.plot($('#attacks-plot'),
                 [ plot_scan_data, plot_bruteforce_data, plot_compromise_data ], options);
     });
 }

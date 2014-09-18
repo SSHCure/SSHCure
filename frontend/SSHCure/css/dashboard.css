@@ -1,26 +1,36 @@
 
-/* Incoming attacks plot */
-#incoming-attacks-plot {
+/* Attacks plot */
+#attacks-plot {
     height: 250px;
-    margin: 10px 0px 10px 10px;
+    margin: 10px;
 }
 
-#incoming-attacks-plot-header {
+#attacks-plot-header {
     height: 40px;
     padding-right: 13px;
 }
 
-#incoming-attacks-plot-legend {
+#attacks-plot-legend {
     margin-left: 20px;
     margin-top: 8px;
 }
 
-#incoming-attacks-plot-legend .legendLabel span {
+#attacks-plot-legend .legendColorBox > div {
+    border: 0px solid !important;
+}
+
+#attacks-plot-legend .legendLabel span {
     font-size: 9pt;
     margin-left: 3px;
     margin-right: 10px;
 }
 
-#incoming-attacks-plot-legend tr {
+#attacks-plot-legend tr {
     height: 20px;
+}
+
+/* Incoming attacks table */
+#incoming-attacks-table span.glyphicon-flash {
+    color: #be1517;
+    font-size: 13pt;
 }
