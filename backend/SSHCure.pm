@@ -437,8 +437,16 @@ sub run {
 
         # Check whether local OpenBL blacklist copy needs to be updated
         my $nfcapd_time = strftime("%H:%M", localtime(nfcapd2unix($timeslot) + 5 * 60)); # nfcapd files are always 5 minutes behind in time
-        if (index($nfcapd_time, $CFG::CONST{'OPENBL'}{'UPDATE_TIME'}) != -1) {
+        my $fetch_openbl_snapshot = 0;
+        unless (-e $CFG::CONST{'OPENBL'}{'SSH_BLACKLIST_LOCAL_PATH'}) {
+            log_info("Could not find OpenBL snapshot; fetching snapshot...");
+            $fetch_openbl_snapshot = 1;
+        } elsif (index($nfcapd_time, $CFG::CONST{'OPENBL'}{'UPDATE_TIME'}) != -1) {
             log_info("Local OpenBL blacklist snapshot has expired; fetching new snapshot...");
+            $fetch_openbl_snapshot = 1;
+        }
+
+        if ($fetch_openbl_snapshot) {
             my $resp_code = mirror($CFG::CONST{'OPENBL'}{'SSH_BLACKLIST_URL'}, $CFG::CONST{'OPENBL'}{'SSH_BLACKLIST_LOCAL_PATH'});
             if ($resp_code == 200) {
                 log_info("Successfully fetched OpenBL blacklist snapshot ($nfcapd_time)");

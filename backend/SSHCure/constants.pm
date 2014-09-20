@@ -131,7 +131,7 @@ my $SSHCURE_DATA_DIR = "$NfConf::BACKEND_PLUGINDIR/SSHCure/data";
     'OPENBL' => {
         'SSH_BLACKLIST_URL'         => "http://www.openbl.org/lists/base_all_ssh-only.txt",
         'SSH_BLACKLIST_LOCAL_PATH'  => $SSHCURE_DATA_DIR."/openbl_ssh_snapshot.txt",
-        'UPDATE_TIME'               => "15:50", # Should be in the following format: %H:%M
+        'UPDATE_TIME'               => "5:00", # Should be in the following format: %H:%M
     },
 );
 
