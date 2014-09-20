@@ -96,6 +96,14 @@ my %perl_dependencies = (
             'OpenBSD'   => 'p5-Net-IP',
         }
     },
+    'RPC::XML' => {
+        'packages'      => {
+            'CentOS'    => 'perl-RPC-XML',
+            'Debian'    => 'librpc-xml-perl',
+            'FreeBSD'   => 'p5-RPC-XML',
+            'OpenBSD'   => 'p5-RPC-XML',
+        }
+    },
     'Try::Tiny' => {
         'packages'      => {
             'CentOS'    => 'perl-Try-Tiny',
