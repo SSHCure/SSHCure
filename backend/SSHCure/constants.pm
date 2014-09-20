@@ -99,6 +99,7 @@ my $SSHCURE_DATA_DIR = "$NfConf::BACKEND_PLUGINDIR/SSHCure/data";
         'TYPE' => {
             'EMAIL'             => "Email",
             'LOG'               => "Log",
+            'QMANAGE'           => "Qmanage",
         },
         'WHEN' => {
             'ATTACK_START'      => 0,

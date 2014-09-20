@@ -42,6 +42,7 @@
     #     # Supported values:
     #     #   - $CONST{'NOTIFICATIONS'}{'TYPE'}{'EMAIL'}
     #     #   - $CONST{'NOTIFICATIONS'}{'TYPE'}{'LOG'}
+    #     #   - $CONST{'NOTIFICATIONS'}{'TYPE'}{'QMANAGE'}
     #     'notification_type'         => $CONST{'NOTIFICATIONS'}{'TYPE'}{'EMAIL'},
     #     
     #     # Indicates the sender of the notification. It can be just a single e-mail address and only needs to be 
