@@ -105,32 +105,6 @@ sub Init {
     log_info("Performing configuration file sanity check...");
     return unless perform_config_sanity_check();
 
-    # Check latest version number
-    log_info("Checking for latest version of SSHCure...");
-    my $operating_system = qx(uname);
-    chomp $operating_system;
-    if ($operating_system eq "Linux") {
-        if (qx(which lsb_release)) { # Debian-based OS
-            ($operating_system) = qx(lsb_release -d 2> /dev/null) =~ /Description:\s+(.*)/;
-        } elsif (glob("/etc/*-release")) {
-            if (qx(cat /etc/*-release | grep -i 'pretty')) { # Example: PRETTY_NAME="Debian GNU/Linux 7 (wheezy)"
-                $operating_system = qx(cat /etc/*-release | grep -i \'pretty\') =~ "(.+)";
-                $operating_system =~ s/\"//g;
-            } else { # RedHat-based OS
-                $operating_system = qx(cat /etc/*-release | head -n 1);
-            }
-        } else {
-            # Do nothing, i.e., use 'Linux'
-        }
-    } elsif ($operating_system eq "Darwin") {
-        $operating_system = 'Mac OS X '.qx(sw_vers -productVersion);
-    } elsif ($operating_system eq "FreeBSD" || $operating_system eq "OpenBSD") {
-        my $version = qx(uname -r);
-        $operating_system .= " ".$version;
-    } else {
-        $operating_system = "(Unknown)";
-    }
-
     # Determine ulimit and IO::Async workers
     my $ulimit = qx(echo `ulimit -n`);
     if ($ulimit =~ /^[+-]?\d+$/) {
@@ -156,6 +130,32 @@ sub Init {
     } else {
         $async_workers = 10;
         log_info("Could not determine system ulimit; using ".$async_workers." IO::ASYNC workers");
+    }
+
+    # Check latest version number
+    log_info("Checking for latest version of SSHCure...");
+    my $operating_system = qx(uname);
+    chomp $operating_system;
+    if ($operating_system eq "Linux") {
+        if (qx(which lsb_release)) { # Debian-based OS
+            ($operating_system) = qx(lsb_release -d 2> /dev/null) =~ /Description:\s+(.*)/;
+        } elsif (glob("/etc/*-release")) {
+            if (qx(cat /etc/*-release | grep -i 'pretty')) { # Example: PRETTY_NAME="Debian GNU/Linux 7 (wheezy)"
+                $operating_system = qx(cat /etc/*-release | grep -i \'pretty\') =~ "(.+)";
+                $operating_system =~ s/\"//g;
+            } else { # RedHat-based OS
+                $operating_system = qx(cat /etc/*-release | head -n 1);
+            }
+        } else {
+            # Do nothing, i.e., use 'Linux'
+        }
+    } elsif ($operating_system eq "Darwin") {
+        $operating_system = 'Mac OS X '.qx(sw_vers -productVersion);
+    } elsif ($operating_system eq "FreeBSD" || $operating_system eq "OpenBSD") {
+        my $version = qx(uname -r);
+        $operating_system .= " ".$version;
+    } else {
+        $operating_system = "(Unknown)";
     }
 
     my $post_data = [
