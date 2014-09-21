@@ -481,6 +481,11 @@ sub run_cleanup {
 }
 
 sub Cleanup {
+    if (-e $CFG::CONST{'OPENBL'}{'SSH_BLACKLIST_LOCAL_PATH'}) {
+        log_info("Removing OpenBL blacklist snapshot...");
+        unlink($CFG::CONST{'OPENBL'}{'SSH_BLACKLIST_LOCAL_PATH'});
+    }
+
     log_info("Cleanup completed");
 }
 
