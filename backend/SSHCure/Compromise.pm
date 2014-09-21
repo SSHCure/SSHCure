@@ -11,11 +11,11 @@
 # vim: expandtab:tw=4:sw=4
 
 package SSHCure::Compromise;
-
 use strict;
 use warnings;
 
 use SSHCure::Utils;
+use SSHCure::Utils::Nfdump;
 use SSHCure::Model;
 
 use Exporter;

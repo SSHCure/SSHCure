@@ -15,6 +15,7 @@ use strict;
 use warnings;
 
 use SSHCure::Utils;
+use SSHCure::Utils::Nfdump;
 use SSHCure::Model;
 
 use IO::Async::Function;

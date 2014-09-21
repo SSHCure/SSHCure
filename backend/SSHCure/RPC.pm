@@ -15,6 +15,7 @@ use warnings;
 use strict;
 
 use SSHCure::Utils;
+use SSHCure::Utils::Nfdump;
 
 use Exporter;
 our @ISA = 'Exporter';

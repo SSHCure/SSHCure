@@ -14,8 +14,9 @@ package SSHCure::Bruteforce::Checks;
 use strict;
 use warnings;
 
-use SSHCure::Utils;
 use SSHCure::Bruteforce::Utils;
+use SSHCure::Utils;
+use SSHCure::Utils::Nfdump;
 
 use IO::Async::Future;
 use Future::Utils;

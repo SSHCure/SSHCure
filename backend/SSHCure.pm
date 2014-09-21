@@ -18,6 +18,7 @@ our $SSHCURE_VERSION = "3.0";
 
 use SSHCure::Model;
 use SSHCure::Utils;
+use SSHCure::Utils::Nfdump;
 use SSHCure::RPC;
 
 use SSHCure::Scan;
@@ -167,7 +168,7 @@ sub Init {
     if ($response->is_success) {
         my $result = decode_json($response->decoded_content);
         my $latest_version = $result->{'version'}; 
-        my $version_comparison_result = compare_string_version_number($SSHCURE_VERSION, $latest_version);
+        my $version_comparison_result = compare_nfdump_version_number($SSHCURE_VERSION, $latest_version);
         if ($version_comparison_result == 1) {
             log_info("A newer version of SSHCure is available: v$result->{'version'} (installed: v${SSHCURE_VERSION})");
         } elsif ($version_comparison_result == 0) {

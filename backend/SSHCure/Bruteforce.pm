@@ -17,6 +17,7 @@ use warnings;
 use SSHCure::Bruteforce::Checks;
 use SSHCure::Bruteforce::Utils;
 use SSHCure::Utils;
+use SSHCure::Utils::Nfdump;
 use SSHCure::Model;
 
 use IO::Async::Function;
