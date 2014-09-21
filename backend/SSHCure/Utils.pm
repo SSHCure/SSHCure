@@ -61,6 +61,8 @@ our @EXPORT = qw (
     database_maintenance
     backend_checks
     perform_config_sanity_check
+
+    host_on_openbl_blacklist
 );
 
 ####################
@@ -539,6 +541,27 @@ sub perform_config_sanity_check {
     }
     
     return 1;
+}
+
+sub host_on_openbl_blacklist {
+    my ($host) = @_;
+
+    # If $host does not contain valid IPv4 or IPv6 address, it may be a decimal IPv4 address
+    unless (($host =~ tr/.//) == 3 || ($host =~ tr/://) > 1) {
+        $host = dec2ip($host);
+    }
+    
+    open(my $fh, '<:encoding(UTF-8)', $CFG::CONST{'OPENBL'}{'SSH_BLACKLIST_LOCAL_PATH'}) or log_error("Could not open OpenBL blacklist snapshot");
+    while (my $row = <$fh>) {
+        chomp($row);
+
+        # Skip line if it starts with a comment
+        next if (index($row, "#") == 0);
+
+        return 1 if ($host eq $row);
+    }
+
+    return 0;
 }
 
 sub IO::Async::Loop::run_child_future {

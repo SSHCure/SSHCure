@@ -28,6 +28,7 @@ our @EXPORT = qw (
     get_backend_sources
     get_backend_version
     get_db_max_size
+    get_host_on_openbl_blacklist
     get_nfdump_version
     get_nfsen_profiledatadir
     get_override_source
@@ -124,6 +125,21 @@ sub get_db_max_size {
     my $opts = shift;
     my %args = (
         'db_max_size' => $CFG::CONST{'DB'}{'MAX_SIZE'}
+    );
+    Nfcomm::socket_send_ok($socket, \%args);
+}
+
+sub get_host_on_openbl_blacklist {
+    my ($socket, $opts) = @_;
+
+    unless (exists $$opts{'host'} ) {
+        Nfcomm::socket_send_error($socket, "Missing parameter");
+        return;
+    }
+
+    my %args = (
+        'host'              => $CFG::CONST{'DB'}{'MAX_SIZE'},
+        'host_on_blacklist' => host_on_openbl_blacklist($$opts{'host'})
     );
     Nfcomm::socket_send_ok($socket, \%args);
 }

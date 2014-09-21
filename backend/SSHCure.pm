@@ -55,17 +55,18 @@ our @EXPORT = qw(
 );
 
 our %cmd_lookup = (
-    'get_active_notification_configs'   =>  \&get_active_notification_configs,
-    'get_backend_errors'                =>  \&get_backend_errors,
-    'get_backend_init_time'             =>  \&get_backend_init_time,
-    'get_backend_profile'               =>  \&get_backend_profile,
-    'get_backend_sources'               =>  \&get_backend_sources,
-    'get_backend_version'               =>  \&get_backend_version,
-    'get_db_max_size'                   =>  \&get_db_max_size,
-    'get_nfdump_version'                =>  \&get_nfdump_version,
-    'get_nfsen_profiledatadir'          =>  \&get_nfsen_profiledatadir,
-    'get_override_source'               =>  \&get_override_source,
-    'get_run_lock_mtime'                =>  \&get_run_lock_mtime
+    'get_active_notification_configs'   => \&get_active_notification_configs,
+    'get_backend_errors'                => \&get_backend_errors,
+    'get_backend_init_time'             => \&get_backend_init_time,
+    'get_backend_profile'               => \&get_backend_profile,
+    'get_backend_sources'               => \&get_backend_sources,
+    'get_backend_version'               => \&get_backend_version,
+    'get_db_max_size'                   => \&get_db_max_size,
+    'get_host_on_openbl_blacklist'      => \&get_host_on_openbl_blacklist,
+    'get_nfdump_version'                => \&get_nfdump_version,
+    'get_nfsen_profiledatadir'          => \&get_nfsen_profiledatadir,
+    'get_override_source'               => \&get_override_source,
+    'get_run_lock_mtime'                => \&get_run_lock_mtime
 );
 
 our ($ignored_records_far_outlier_count, $ignored_records_close_outlier_count);
