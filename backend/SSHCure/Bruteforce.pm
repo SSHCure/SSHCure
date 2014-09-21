@@ -387,7 +387,7 @@ sub bruteforce_detection_function {
     foreach my $flow_record (@$parsed_flows) {
         my $duration = int(@$flow_record[1]) - int(@$flow_record[0]);
         $duration_histogram{$duration} += 1 or $duration_histogram{$duration} = 1;
-
+        
         my $ppf = @$flow_record[8];
         $ppf_histogram{$ppf} += 1 or $ppf_histogram{$ppf} = 1;
 

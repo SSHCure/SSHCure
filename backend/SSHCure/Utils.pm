@@ -41,6 +41,9 @@ our @EXPORT = qw (
     ip_addr_in_range
     ip2hostname
     
+    bin2dec
+    dec2bin
+
     SYN_only
     ACK_only
     RST_only
@@ -107,27 +110,32 @@ sub log_warning {
 ##############################
 
 sub parse_nfdump_pipe {
-    # FIXME make this ipv6 compatible
     my $nfdump_output = shift;
     my @nfdump_parsed_output = ();
 
     foreach my $line (@$nfdump_output) {
         chomp($line);
-        my ($af, $first, $first_msec, $last, $last_msec, $prot,
+        next if $line eq "" || $line eq "No matched flows" || index($line, 'ERROR') != -1;
+        my ($af, $first, $first_msec, $last, $last_msec, $protocol,
             $sa_0, $sa_1, $sa_2, $sa_3, $src_port,
             $da_0, $da_1, $da_2, $da_3, $dst_port,
             $src_as, $dst_as, $r_input, $r_output,
-            $flags, $tos, $no_pkts, $no_octets) = split(/\|/, $line);
-        
+            $flags, $tos, $packets, $octets) = split(/\|/, $line);
+
         push(@nfdump_parsed_output, [
                 (scalar $first) + (scalar $first_msec) / 1000,
                 (scalar $last) + (scalar $last_msec) / 1000,
-                $prot,
+                $protocol,
+
+                # $sa_0, $sa_1, $sa_2, $sa_3, $src_port,
+                # $da_0, $da_1, $da_2, $da_3, $dst_port,
+
                 $sa_3, $src_port,
                 $da_3, $dst_port,
+
                 $flags,
-                $no_pkts,
-                $no_octets
+                $packets,
+                $octets
             ]
         );
     }
@@ -139,8 +147,9 @@ sub parse_nfdump_list {
     my ($nfdump_output, $parsed_output) = @_;
 
     foreach my $line (@$nfdump_output) {
-        $line =~ s/^\s+|\s+$//g;                                                            # trim whitespace
-        next if $line eq "" || $line eq "No matched flows" || index($line, 'ERROR') != -1;  # skip
+        chomp($line);
+        next if $line eq "" || $line eq "No matched flows" || index($line, 'ERROR') != -1;
+
         my @values = split(/\|\s*/, $line);                                                 # split line into seperate values
         push(@$parsed_output, \@values);                                                    # add array of values to result-array    
     }
@@ -193,9 +202,7 @@ sub save_profiling_value {
     my $sth = $profile_DBH->prepare($sql);
     $sth->execute($value, $timestamp);
     
-    if ($sth->err) {
-        log_error("Could not insert data into profiling DB: ".$sth->errstr);
-    }
+    log_error("Could not insert data into profiling DB: ".$sth->errstr) if ($sth->err);
 }
 
 ##############################
@@ -204,21 +211,38 @@ sub save_profiling_value {
 #
 ##############################
 
-sub ip2dec ($) {
-    my $ip = shift;
-    return $ip if $ip =~/:/;
-    return unpack N => pack CCCC => split /\./ => $ip;
+sub ip2dec {
+    my $address = shift;
+
+    # Determine IP address version
+    if (($address =~ tr/.//) == 3) {
+        return unpack N => pack CCCC => split /\./ => $address;
+    } else {
+        # Return input value if not a valid IPv4 address, or IPv6 address
+        return $address;
+    }
 }
 
-# http://netfactory.dk/2007/10/02/ip-address-conversion-with-perl/
-sub dec2ip ($) {
-    my $dec = shift;
-    return $dec if $dec =~ /:/;
-    return join '.' => map { ($dec >> 8*(3-$_)) % 256 } 0 .. 3;
+sub dec2ip {
+    my ($addr0, $addr1, $addr2, $addr3) = @_;
+    my $ip_address;
+
+    if (scalar (@_) == 1) { # IPv4
+        # This condition exists for compatibility with code that calls dec2ip using a single parameter
+        $ip_address = join '.' => map { ($addr0 >> 8*(3-$_)) % 256 } 0 .. 3;
+    } elsif ($addr0 == 0 && $addr1 == 0 && $addr2 == 0) { # IPv4
+        $ip_address = join '.' => map { ($addr3 >> 8*(3-$_)) % 256 } 0 .. 3;
+    } else { # IPv6
+        # Concatenate into a single binary string, as that is what ipv6_ntoa expects
+        my $addr_bin = dec2bin($addr0).dec2bin($addr1).dec2bin($addr2).dec2bin($addr3);
+        $ip_address = ipv6_ntoa($addr_bin);
+    }
+
+    return $ip_address;
 }
 
 # Determines whether an IP address (first parameter) falls within the
-# provided IP prefix (second parameter).
+# provided IP address prefix (second parameter).
 my %prefix_cache = ();
 
 sub ip_addr_in_range {
@@ -263,6 +287,18 @@ sub ip2hostname {
     }
     
     return $hostname;
+}
+
+# Convert number from binary to decimal (http://www.jb.man.ac.uk/~slowe/perl/binary.html)
+sub bin2dec {
+    unpack("N", pack("B32", substr("0" x 32 . shift, -32)));
+}
+
+# Convert number from decimal to binary (http://www.jb.man.ac.uk/~slowe/perl/binary.html)
+sub dec2bin {
+    my $str = unpack("B32", pack("N", shift));
+    $str =~ s/^0+(?=\d)//; # otherwise you'll get leading zeros
+    return $str;
 }
 
 # Flags: UAPRSF
