@@ -1,8 +1,8 @@
 ######################################################################
 #
-#  nfdump.pm
-#  Authors: Luuk Hendriks
-#           Rick Hofstede <r.j.hofstede@utwente.nl>
+#  Utils::Nfdump.pm
+#  Authors: Rick Hofstede <r.j.hofstede@utwente.nl>
+#           Luuk Hendriks <luuk.hendriks@utwente.nl>
 #  University of Twente, The Netherlands
 #
 #  LICENSE TERMS: 3-clause BSD license (outlined in license.html)
