@@ -29,6 +29,8 @@ our @EXPORT = qw(scan_detection);
 
 my @cmd_base;
 
+# FIXME IPv6 compatibility (check for _3 in addresses)
+
 # check_parsed_for_scan_phase_attackers
 # parameters:
 #   $parsed: parsed nfdump output (output from SSHCure::Utils::parse_nfdump_list/pipe)
@@ -47,37 +49,6 @@ sub check_parsed_for_scan_phase_attackers {
         }
     }
     return %result;
-}
-
-# piped_check_parsed_for_scan_phase_targets
-# parameters:
-#   $parsed: parsed nfdump output (output from SSHCure::Utils::parse_nfdump_pipe)
-sub piped_check_parsed_for_scan_phase_targets {
-    my ($parsed, $attacker_ip) = @_;
-    my %targets = ();
-    my $no_of_distinct_targets = scalar(@$parsed);
-    
-    if ($no_of_distinct_targets >= $CFG::ALGO{'SCAN_MIN_FLOWS'}) {
-        foreach my $entry (@$parsed) {
-            my ($flow_start, $flow_end, $prot, $sa_3, $src_port, $da_3, $dst_port, $flags, $packets, $octets) = @$entry;
-            
-            # Check whether the traffic to this possible target matches scan characteristics
-            next if $packets > $CFG::ALGO{'SCAN_MAX_PPF'};
-
-            # Check for behaviour that might occur in a network wide (L3) block (e.g. QNet) and results in invalid scan-targets
-            if (exists $SSHCure::attacks{$attacker_ip} && exists $SSHCure::attacks{$attacker_ip}{'targets'}{$da_3}) {
-                if ($SSHCure::attacks{$attacker_ip}{'targets'}{$da_3}{'certainty'} >= $CFG::ALGO{'CERT_BRUTEFORCE_NO_SCAN'}) {
-                    debug sprintf "[NETBLOCK] not-a-scan detected for %s -> %s, this tuple is already in BF phase",
-                            dec2ip($attacker_ip), dec2ip($da_3);
-                    next;
-                }
-            }
-            $targets{$da_3}->{'last_act'} = $flow_start;
-            $targets{$da_3}->{'prev_ppf'} = 2;
-        }
-    }
-
-    return %targets;
 }
 
 sub scan_detection_function {
@@ -104,22 +75,36 @@ sub scan_detection_function {
     }
     
     $control_f->then( sub {
-        my $parsed_nfdump_output = parse_nfdump_pipe(\@piped_nfdump_output);
-        my %piped_targets = piped_check_parsed_for_scan_phase_targets($parsed_nfdump_output, $attacker_ip_dec);
-        
+        my $parsed_flows = parse_nfdump_pipe(\@piped_nfdump_output);
+        my %targets = ();
+        if (scalar(@$parsed_flows) >= $CFG::ALGO{'SCAN_MIN_FLOWS'}) {
+            foreach my $flow_record (@$parsed_flows) {
+                my ($flow_start, $flow_end, $protocol, 
+                    $sa_0, $sa_1, $sa_2, $sa_3, $src_port,
+                    $da_0, $da_1, $da_2, $da_3, $dst_port,
+                    $flags, $packets, $octets) = @$flow_record;
+
+                # Check whether the traffic to this possible target matches scan characteristics
+                next if $packets > $CFG::ALGO{'SCAN_MAX_PPF'};
+
+                # Check for behaviour that might occur in a network wide (L3) block (e.g. QNet) and results in invalid scan-targets
+                if (exists $SSHCure::attacks{$attacker_ip_dec} && exists $SSHCure::attacks{$attacker_ip_dec}{'targets'}{$da_3}) {
+                    next if ($SSHCure::attacks{$attacker_ip_dec}{'targets'}{$da_3}{'certainty'} >= $CFG::ALGO{'CERT_BRUTEFORCE_NO_SCAN'});
+                }
+                $targets{$da_3}->{'last_act'} = $flow_start;
+                $targets{$da_3}->{'prev_ppf'} = 2;
+            }
+        }
+
         my @new_scan_tuples;
-        if (scalar (keys %piped_targets) > 0) {
-            push(@new_scan_tuples, [ $attacker_ip_dec, \%piped_targets ]);
+        if (scalar (keys %targets) > 0) {
+            push(@new_scan_tuples, [ $attacker_ip_dec, \%targets ]);
         }
         
         return Future->wrap(@new_scan_tuples);
     });
 }
 
-# scan_detection
-# parameters:
-#   $
-# This is the only routine that will be called from SSHCure.pm, and will take care of all the scan phase related detection matters.
 sub scan_detection {
     my ($sources, $sources_path, $timeslot, $timeslot_interval) = @_;
     @cmd_base = ("$NfConf::PREFIX/nfdump", split(" ", "-6 -Nq"));
@@ -138,7 +123,7 @@ sub scan_detection {
     
         # Get all sources of SSH traffic that show characteristics the characteristics of a scan -> attackers
         my %attackers = check_parsed_for_scan_phase_attackers(\@nfdump_parsed_result, $timeslot_interval);
-        @queue = keys %attackers;
+        @queue = keys(%attackers);
 
         Future->wrap(fmap_concat {
             my $attacker_ip = shift;

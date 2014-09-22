@@ -125,13 +125,8 @@ sub parse_nfdump_pipe {
                 (scalar $first) + (scalar $first_msec) / 1000,
                 (scalar $last) + (scalar $last_msec) / 1000,
                 $protocol,
-
-                # $sa_0, $sa_1, $sa_2, $sa_3, $src_port,
-                # $da_0, $da_1, $da_2, $da_3, $dst_port,
-
-                $sa_3, $src_port,
-                $da_3, $dst_port,
-
+                $sa_0, $sa_1, $sa_2, $sa_3, $src_port,
+                $da_0, $da_1, $da_2, $da_3, $dst_port,
                 $flags,
                 $packets,
                 $octets

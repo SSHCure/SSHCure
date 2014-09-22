@@ -35,6 +35,8 @@ our @EXPORT = qw (
     check_login_grace_time
 );
 
+# FIXME IPv6 compatibility (check for _3 in addresses)
+
 # check_network_block detects possible network-wide L3 blocking (e.g. QuarantaineNet)
 sub check_network_block {
     my ($attacker_ip) = @_;
@@ -88,8 +90,11 @@ sub check_instant_logout_abort_dictionary {
     # | ---------
     
     # 'Aggregated flow record' has been produced using 'nfdump -a'
-    my ($cmd_base, $sources_path, $source, $aggr_flow_record, $last_flow, $cusum_mean, $ppf_histogram) = @_;
-    my ($fl_stime, $fl_etime, $proto, $attacker_ip, $attacker_port, $target_ip, $target_port, $flags, $ppf) = @{$aggr_flow_record};
+    my ($cmd_base, $sources_path, $source, $aggr_flow_record, $last_flow, $cusum_mean, $packets_histogram) = @_;
+    my ($fl_stime, $fl_etime, $protocol,
+            $attacker_ip_0, $attacker_ip_1, $attacker_ip_2, $attacker_ip_3, $attacker_port,
+            $target_ip_0, $target_ip_1, $target_ip_2, $target_ip_3, $target_port,
+            $flags, $packets, $bytes) = @{$aggr_flow_record};
     
     # The check only has to be performed if it's the last flow of the current tuple.
     return Future->wrap(0) unless ($last_flow);
@@ -97,31 +102,31 @@ sub check_instant_logout_abort_dictionary {
     # The potential compromise flow must have at least shown communication with the SSH daemon
     return Future->wrap(0) unless (APS($flags));
 
-    my @ppf_histogram_keys = keys %{$ppf_histogram};
-    my $highest_ppf = (sort {$a <=> $b} @ppf_histogram_keys)[-1];
+    my @packets_histogram_keys = keys %{$packets_histogram};
+    my $highest_packets = (sort {$a <=> $b} @packets_histogram_keys)[-1];
 
     # Make a guess on whether port number reuse affects the 'highest PPF', i.e., '$highest_ppf == 2 * $cusum_mean'.
     # Since we only want to make a guess here, we do it in a conservative way, i.e., without a buffer range.
-    if ($highest_ppf == 2 * $cusum_mean) {
+    if ($highest_packets == 2 * $cusum_mean) {
         # If port number reuse is suspected but there is only one PPF, we skip further processing
-        return Future->wrap(0) if (scalar @ppf_histogram_keys < 2);
+        return Future->wrap(0) if (scalar @packets_histogram_keys < 2);
 
-        $highest_ppf = (sort {$a <=> $b} @ppf_histogram_keys)[-2];
+        $highest_packets = (sort {$a <=> $b} @packets_histogram_keys)[-2];
     }
     
-    if ($ppf >= $cusum_mean + $CFG::ALGO{'BRUTEFORCE_COMPROMISE_MIN_PPF_DEVIATION'} && $ppf == $highest_ppf && $$ppf_histogram{$ppf} <= 2) {
+    if ($packets >= $cusum_mean + $CFG::ALGO{'BRUTEFORCE_COMPROMISE_MIN_PPF_DEVIATION'} && $packets == $highest_packets && $$packets_histogram{$packets} <= 2) {
         # Calculate the fraction of PPF that is > cusum_mean, to determine whether outlier is expectional or not.
-        my $above_cusum_ppf_count = 0;
-        my $total_ppf_count = 0;
-        for my $ppf_key (@ppf_histogram_keys) {
-            $above_cusum_ppf_count += $$ppf_histogram{$ppf_key} if ($ppf_key > $cusum_mean);
-            $total_ppf_count += $$ppf_histogram{$ppf_key};
+        my $above_cusum_packets_count = 0;
+        my $total_packets_count = 0;
+        for my $key (@packets_histogram_keys) {
+            $above_cusum_packets_count += $$packets_histogram{$key} if ($key > $cusum_mean);
+            $total_packets_count += $$packets_histogram{$key};
         }
 
         # Given the outer if-condition, we know that above_cusum_ppf_count is always > 0
-        my $above_cusum_ppf_frac = $above_cusum_ppf_count / $total_ppf_count;
-        my $ppf_count_threshold = ($total_ppf_count > 25) ? 2 : 1;
-        unless ($above_cusum_ppf_count <= $ppf_count_threshold || $above_cusum_ppf_frac < 0.05) {
+        my $above_cusum_packets_frac = $above_cusum_packets_count / $total_packets_count;
+        my $packets_count_threshold = ($total_packets_count > 25) ? 2 : 1;
+        unless ($above_cusum_packets_count <= $packets_count_threshold || $above_cusum_packets_frac < 0.05) {
             return Future->wrap(0);
         }
     } else {
@@ -130,8 +135,8 @@ sub check_instant_logout_abort_dictionary {
 
     # Find all other bruteforce targets for this attack
     my @bruteforce_targets = ();
-    if (exists $SSHCure::attacks{$attacker_ip}) {
-        while ((my $target, my $target_info) = each (%{$SSHCure::attacks{$attacker_ip}{'targets'}})) {
+    if (exists $SSHCure::attacks{$attacker_ip_3}) {
+        while ((my $target, my $target_info) = each (%{$SSHCure::attacks{$attacker_ip_3}{'targets'}})) {
             if (exists $$target_info{'last_act_bf'}) {
                 push(@bruteforce_targets, $target);
             }
@@ -143,7 +148,7 @@ sub check_instant_logout_abort_dictionary {
     my @other_targets_to_consider = ();
     if (scalar @bruteforce_targets > $CFG::ALGO{'BRUTEFORCE_MIN_TARGET_COMPARISON_COUNT'}) {
         # Try to take up to 3 targets that are just below the considered target in the IP address space.
-        my @lower_target_ips = (grep $_ < $target_ip, sort @bruteforce_targets);
+        my @lower_target_ips = (grep $_ < $target_ip_3, sort @bruteforce_targets);
         if (scalar @lower_target_ips >= 3) {
             push(@other_targets_to_consider, @lower_target_ips[-3..-1]);
         } elsif (scalar @lower_target_ips > 0) {
@@ -151,7 +156,7 @@ sub check_instant_logout_abort_dictionary {
         }
         
         # Try to take up to 3 targets that are just above the considered target in the IP address space.
-        my @higher_target_ips = (grep $_ > $target_ip, sort @bruteforce_targets);
+        my @higher_target_ips = (grep $_ > $target_ip_3, sort @bruteforce_targets);
         if (scalar @higher_target_ips >= 3) {
             push(@other_targets_to_consider, @higher_target_ips[-3..-1]);
         } elsif (scalar @lower_target_ips > 0) {
@@ -165,9 +170,9 @@ sub check_instant_logout_abort_dictionary {
     }
     
     if (scalar @other_targets_to_consider > 0) {
-        $cmd_filter = sprintf "proto tcp and src ip %s and dst ip in [%s] and dst port in [%s]", dec2ip($attacker_ip), join(",", @other_targets_to_consider), "22";
+        $cmd_filter = sprintf "proto tcp and src ip %s and dst ip in [%s] and dst port in [%s]", dec2ip($attacker_ip_3), join(",", @other_targets_to_consider), "22";
     } else {
-        $cmd_filter = sprintf "proto tcp and src ip %s and not dst ip %s and dst port in [%s]", dec2ip($attacker_ip), dec2ip($target_ip), "22";
+        $cmd_filter = sprintf "proto tcp and src ip %s and not dst ip %s and dst port in [%s]", dec2ip($attacker_ip_3), dec2ip($target_ip_3), "22";
     }
     
     my $cmd = sprintf "-M %s%s -o pipe -Nq -A srcip", $sources_path, $source;
@@ -185,7 +190,10 @@ sub check_instant_logout_abort_dictionary {
 
         # We expect just a single flow, due to '-A srcip' and filter on source IP address
         my $flow = (@{$parsed_flows})[0];
-        my ($aggr_fl_stime, $aggr_fl_etime, $aggr_proto, $aggr_attacker_ip, $aggr_attacker_port, $aggr_target_ip, $aggr_target_port, $aggr_flags, $aggr_ppf) = @$flow;
+        my ($aggr_fl_stime, $aggr_fl_etime, $aggr_protocol,
+                $aggr_attacker_ip_0, $aggr_attacker_ip_1, $aggr_attacker_ip_2, $aggr_attacker_ip_3, $aggr_attacker_port, 
+                $aggr_target_ip_0, $aggr_target_ip_1, $aggr_target_ip_2, $aggr_target_ip_3, $aggr_target_port,
+                $aggr_flags, $aggr_packets, $aggr_octets) = @$flow;
 
         # Only a potential compromise in case the time between the last flow of the tuple and the last traffic of the attacker is more than 7 seconds
         return Future->wrap(abs($aggr_fl_etime - $fl_etime) > 7);
@@ -194,42 +202,48 @@ sub check_instant_logout_abort_dictionary {
 
 sub check_instant_logout_continue_dictionary {
     # 'Aggregated flow record' has been produced using 'nfdump -a'
-    my ($aggr_flow_record, $last_flow, $one_but_last_flow, $non_aggr_flow_records, $cusum_mean, $ppf_histogram, $port_number_reuse) = @_;
-    my ($fl_stime, $fl_etime, $proto, $attacker_ip, $attacker_port, $target_ip, $target_port, $flags, $ppf) = @{$aggr_flow_record};
+    my ($aggr_flow_record, $last_flow, $one_but_last_flow, $non_aggr_flow_records, $cusum_mean, $packets_histogram, $port_number_reuse) = @_;
+    my ($fl_stime, $fl_etime, $protocol,
+            $attacker_ip_0, $attacker_ip_1, $attacker_ip_2, $attacker_ip_3, $attacker_port,
+            $target_ip_0, $target_ip_1, $target_ip_2, $target_ip_3, $target_port,
+            $flags, $packets, $bytes) = @{$aggr_flow_record};
 
     # An attacker can never have continued the dictionary if this is the last flow.
-    # Also, we see that very often a spike in the one-but-last flow, which could result in a FP.
+    # Also, we see a spike in the one-but-last flow very often, which could result in a FP.
     return Future->wrap(0) if ($last_flow || $one_but_last_flow);
 
-    my @ppf_values = ();
+    my @packets_values = ();
     if ($port_number_reuse) {
         foreach my $flow_record (@$non_aggr_flow_records) {
-            my ($fl_stime, $fl_etime, $proto, $attacker_ip, $attacker_port, $target_ip, $target_port, $flags, $ppf) = @$flow_record;
-            push(@ppf_values, $ppf);
+            ($fl_stime, $fl_etime, $protocol,
+                $attacker_ip_0, $attacker_ip_1, $attacker_ip_2, $attacker_ip_3, $attacker_port,
+                $target_ip_0, $target_ip_1, $target_ip_2, $target_ip_3, $target_port,
+                $flags, $packets, $bytes) = @$flow_record;
+            push(@packets_values, $packets);
         }
     } else {
-        push(@ppf_values, $ppf);
+        push(@packets_values, $packets);
     }
 
     my $result = 0;
-    foreach $ppf (@ppf_values) {
-        my @ppf_histogram_keys = keys %{$ppf_histogram};
-        my $highest_ppf = (sort {$a <=> $b} @ppf_histogram_keys)[-1];
+    foreach $packets (@packets_values) {
+        my @packets_histogram_keys = keys %{$packets_histogram};
+        my $highest_packets = (sort {$a <=> $b} @packets_histogram_keys)[-1];
         
-        if ($ppf >= $cusum_mean + $CFG::ALGO{'BRUTEFORCE_COMPROMISE_MIN_PPF_DEVIATION'} && $ppf == $highest_ppf && $$ppf_histogram{$ppf} <= 2) {
+        if ($packets >= $cusum_mean + $CFG::ALGO{'BRUTEFORCE_COMPROMISE_MIN_PPF_DEVIATION'} && $packets == $highest_packets && $$packets_histogram{$packets} <= 2) {
             # Calculate the fraction of PPF that is > cusum_mean, to determine whether outlier is expectional or not.
-            my $above_cusum_ppf_count = 0;
-            my $total_ppf_count = 0;
-            for my $ppf_key (@ppf_histogram_keys) {
+            my $above_cusum_packets_count = 0;
+            my $total_packets_count = 0;
+            for my $ppf_key (@packets_histogram_keys) {
                 if ($ppf_key > $cusum_mean) {
-                    $above_cusum_ppf_count += $$ppf_histogram{$ppf_key};
+                    $above_cusum_packets_count += $$packets_histogram{$ppf_key};
                 }
-                $total_ppf_count += $$ppf_histogram{$ppf_key};
+                $total_packets_count += $$packets_histogram{$ppf_key};
             }
             
-            # Given the outer if-condition, we know that above_cusum_ppf_count is always > 0
-            my $above_cusum_ppf_frac = $above_cusum_ppf_count / $total_ppf_count;
-            $result = $above_cusum_ppf_count == 1 || $above_cusum_ppf_frac < 0.05;
+            # Given the outer if-condition, we know that above_cusum_packets_count is always > 0
+            my $above_cusum_packets_frac = $above_cusum_packets_count / $total_packets_count;
+            $result = $above_cusum_packets_count == 1 || $above_cusum_packets_frac < 0.05;
         }
         
         last if $result == 1;
@@ -243,7 +257,10 @@ sub check_instant_logout_continue_dictionary {
 sub check_maintain_connection_abort_dictionary {
     # 'Aggregated flow record' has been produced using 'nfdump -a'
     my ($cmd_base, $sources_path, $source, $aggr_flow_record, $last_flow, $highest_duration, $cusum_mean) = @_;
-    my ($fl_stime, $fl_etime, $proto, $attacker_ip, $attacker_port, $target_ip, $target_port, $flags, $ppf) = @{$aggr_flow_record};
+    my ($fl_stime, $fl_etime, $protocol,
+            $attacker_ip_0, $attacker_ip_1, $attacker_ip_2, $attacker_ip_3, $attacker_port,
+            $target_ip_0, $target_ip_1, $target_ip_2, $target_ip_3, $target_port,
+            $flags, $packets, $bytes) = @{$aggr_flow_record};
     
     # This check only has to be performed if it's the last flow of the current tuple.
     return Future->wrap(0) unless ($last_flow);
@@ -259,7 +276,7 @@ sub check_maintain_connection_abort_dictionary {
     return Future->wrap(0) unless ($fl_etime - $fl_stime >= $highest_duration - 1 && $fl_etime - $fl_stime <= $highest_duration + 1);
 
     # This check can only be performed if other targets exist in this attack and when they are known.
-    return Future->wrap(0) unless (exists $SSHCure::attacks{$attacker_ip});
+    return Future->wrap(0) unless (exists $SSHCure::attacks{$attacker_ip_3});
 
     # We have seen many attacks that look as follows:
     # 2014-02-01  14:39:12.664  21.700  6  A:2371  ->  T:22  .AP.SF  0  21  3351  1
@@ -269,13 +286,13 @@ sub check_maintain_connection_abort_dictionary {
     # 2014-02-01  14:39:57.564  23.900  6  A:2430  ->  T:22  .APRS.  0  12  2277  1
     # 2014-02-01  14:40:01.164  16.700  6  A:2120  ->  T:22  .AP.SF  0  17  3167  1
     # 2014-02-01  14:40:18.014  23.150  6  A:2263  ->  T:22  .APRS.  0  18  3167  1 <-- Not a compromise
-    return Future->wrap(0) if ($ppf < $cusum_mean && APS($flags) && RST($flags));
+    return Future->wrap(0) if ($packets < $cusum_mean && APS($flags) && RST($flags));
     
     my $last_activity_to_target = $fl_etime;
     
     # Determine all of the other bruteforce targets for this attack
     my @bruteforce_targets = ();
-    while ((my $target, my $target_info) = each (%{$SSHCure::attacks{$attacker_ip}{'targets'}})) {
+    while ((my $target, my $target_info) = each (%{$SSHCure::attacks{$attacker_ip_3}{'targets'}})) {
         push(@bruteforce_targets, dec2ip($target)) if (exists $$target_info{'last_act_bf'});
     }
 
@@ -283,7 +300,7 @@ sub check_maintain_connection_abort_dictionary {
     return Future->wrap(0) unless (scalar @bruteforce_targets > $CFG::ALGO{'BRUTEFORCE_MIN_TARGET_COMPARISON_COUNT'});
 
     my $cmd = sprintf "-M %s%s -o pipe -Nq -A srcip", $sources_path, $source;
-    my $cmd_filter = sprintf "proto tcp and flags APS and src ip %s and not dst ip %s and dst port in [%s]", dec2ip($attacker_ip), dec2ip($target_ip), "22";
+    my $cmd_filter = sprintf "proto tcp and flags APS and src ip %s and not dst ip %s and dst port in [%s]", dec2ip($attacker_ip_3), dec2ip($target_ip_3), "22";
     my @cmd = (@$cmd_base, split(" ", $cmd), $cmd_filter);
     
     $SSHCure::loop->run_child_future(
@@ -300,7 +317,10 @@ sub check_maintain_connection_abort_dictionary {
         # We expect just a single flow, due to '-A srcip' and filter on source IP address
         my $flow = (@{$parsed_flows})[0];
 
-        ($fl_stime, $fl_etime, $proto, $attacker_ip, $attacker_port, $target_ip, $target_port, $flags, $ppf) = @$flow;
+        ($fl_stime, $fl_etime, $protocol,
+                $attacker_ip_0, $attacker_ip_1, $attacker_ip_2, $attacker_ip_3, $attacker_port,
+                $target_ip_0, $target_ip_1, $target_ip_2, $target_ip_3, $target_port,
+                $flags, $packets, $bytes) = @$flow;
         return Future->wrap(abs($last_activity_to_target - $fl_etime) < 1);
     });
 }
@@ -308,9 +328,15 @@ sub check_maintain_connection_abort_dictionary {
 sub check_maintain_connection_continue_dictionary {
     # 'Aggregated flow record' has been produced using 'nfdump -a'
     # 'Last flow record' has been produced using 'nfdump -a'
-    my ($cmd_base, $sources_path, $source, $aggr_flow_record, $first_flow, $last_flow, $one_but_last_flow, $last_flow_record, $highest_duration, $port_number_reuse, $highest_ppf) = @_;
-    my ($fl_stime, $fl_etime, $proto, $attacker_ip, $attacker_port, $target_ip, $target_port, $flags, $ppf) = @{$aggr_flow_record};
-    my ($last_fl_stime, $last_fl_etime, $last_proto, $last_attacker_ip, $last_attacker_port, $last_target_ip, $last_target_port, $last_flags, $last_ppf) = @{$last_flow_record};
+    my ($cmd_base, $sources_path, $source, $aggr_flow_record, $first_flow, $last_flow, $one_but_last_flow, $last_flow_record, $highest_duration, $port_number_reuse, $highest_packets) = @_;
+    my ($fl_stime, $fl_etime, $protocol,
+            $attacker_ip_0, $attacker_ip_1, $attacker_ip_2, $attacker_ip_3, $attacker_port,
+            $target_ip_0, $target_ip_1, $target_ip_2, $target_ip_3, $target_port,
+            $flags, $packets, $bytes) = @{$aggr_flow_record};
+    my ($last_fl_stime, $last_fl_etime, $last_protocol,
+            $last_attacker_ip_0, $last_attacker_ip_1, $last_attacker_ip_2, $last_attacker_ip_3, $last_attacker_port,
+            $last_target_ip_0, $last_target_ip_1, $last_target_ip_2, $last_target_ip_3, $last_target_port,
+            $last_flags, $last_packets, $last_bytes) = @{$last_flow_record};
 
     # Many attacks have a flow with an increased PPF as the first flow after the scan phase. Example:
     # 2014-01-13 06:55:55.122   0.350 6  A:6000  ->  T:22  ...RS.  0   2    92  1
@@ -321,13 +347,13 @@ sub check_maintain_connection_continue_dictionary {
     #
     # However, if we have a first flow in a new data chunk which is not the first flow for the tuple, we should continue processing.
     # We therefore check whether the tuple is already present in the attacks hash.
-    return Future->wrap(0) if ($first_flow && !(exists $SSHCure::attacks{$attacker_ip} && exists $SSHCure::attacks{$attacker_ip}{'targets'}{$target_ip}));
+    return Future->wrap(0) if ($first_flow && !(exists $SSHCure::attacks{$attacker_ip_3} && exists $SSHCure::attacks{$attacker_ip_3}{'targets'}{$target_ip_3}));
 
     # Connection until dictionary end can never be the case for the last flow; in that case it's an 'instant logout'
     # Also, we see that very often a spike in the one-but-last flow, which could result in a FP.
     return Future->wrap(0) if ($last_flow || $one_but_last_flow);
 
-    return Future->wrap(0) if ($ppf != $highest_ppf);
+    return Future->wrap(0) if ($packets != $highest_packets);
 
     return Future->wrap(0) if ($port_number_reuse);
 
@@ -352,7 +378,7 @@ sub check_maintain_connection_continue_dictionary {
     # Compare the flow end time of the possible compromise flow with the aggregated flow record.
     # In this way, we evaluate whether the possible compromise flow 'stops when all activity between attacker/target stops'.
     my $cmd = sprintf "-M %s%s -o pipe -Nq -A srcip,dstip", $sources_path, $source;
-    my $cmd_filter = sprintf "proto tcp and (flags APSF or flags APSR) and src ip %s and dst ip %s and dst port in [%s] and not src port %i", dec2ip($attacker_ip), dec2ip($target_ip), "22", $attacker_port;
+    my $cmd_filter = sprintf "proto tcp and (flags APSF or flags APSR) and src ip %s and dst ip %s and dst port in [%s] and not src port %i", dec2ip($attacker_ip_3), dec2ip($target_ip_3), "22", $attacker_port;
     my @cmd = (@$cmd_base, split(" ", $cmd), $cmd_filter);
 
     $SSHCure::loop->run_child_future(
@@ -369,7 +395,10 @@ sub check_maintain_connection_continue_dictionary {
         # We expect just a single flow, due to '-A srcip' and filter on source IP address
         my $flow = (@{$parsed_flows})[0];
 
-        ($fl_stime, $fl_etime, $proto, $attacker_ip, $attacker_port, $target_ip, $target_port, $flags, $ppf) = @$flow;
+        ($fl_stime, $fl_etime, $protocol,
+                $attacker_ip_0, $attacker_ip_1, $attacker_ip_2, $attacker_ip_3, $attacker_port,
+                $target_ip_0, $target_ip_1, $target_ip_2, $target_ip_3, $target_port,
+                $flags, $packets, $bytes) = @$flow;
 
         # Check whether the last two flow records start with a 1s-deviation (abs($last_fl_stime - $comp_start_time) > 1).
         # 2014-01-10 01:46:47.156  5.500 TCP  A:34654 -> T:22  .AP.SF  0  16 1660  1 <-- Not a compromise
@@ -390,11 +419,14 @@ sub check_maintain_connection_continue_dictionary {
 sub check_APS_only_flow {
     # 'Aggregated flow record' has been produced using 'nfdump -a'
     my ($aggr_flow_record) = @_;
-    my ($fl_stime, $fl_etime, $proto, $attacker_ip, $attacker_port, $target_ip, $target_port, $flags, $ppf) = @{$aggr_flow_record};
+    my ($fl_stime, $fl_etime, $protocol,
+            $attacker_ip_0, $attacker_ip_1, $attacker_ip_2, $attacker_ip_3, $attacker_port,
+            $target_ip_0, $target_ip_1, $target_ip_2, $target_ip_3, $target_port,
+            $flags, $packets, $bytes) = @{$aggr_flow_record};
 
     # We have to use the aggregated flow record here, since we have to look for connections that remain open (i.e., APS-only) beyond
     # the current data chunk. In case it is closed within the current chunk, it is potentially a type of 'maintain connection'.
-    return Future->wrap(APS_only($flags) && $ppf >= $CFG::ALGO{'MINIMAL_SSH_AUTH_PPF'});
+    return Future->wrap(APS_only($flags) && $packets >= $CFG::ALGO{'MINIMAL_SSH_AUTH_PPF'});
 }
 
 # check_login_grace_time is only to be called when an open connection has been observed
@@ -405,7 +437,10 @@ sub check_login_grace_time {
     # If the non-aggregated attacker->target traffic does not have a single APS-flow, the result can never be true
     my $open_conn_found = 0;
     foreach my $flow_record (@$non_aggr_flow_records) {
-        my ($fl_stime, $fl_etime, $proto, $attacker_ip, $attacker_port, $target_ip, $target_port, $flags, $ppf) = @$flow_record;
+        my ($fl_stime, $fl_etime, $protocol,
+                $attacker_ip_0, $attacker_ip_1, $attacker_ip_2, $attacker_ip_3, $attacker_port,
+                $target_ip_0, $target_ip_1, $target_ip_2, $target_ip_3, $target_port,
+                $flags, $packets, $bytes) = @$flow_record;
         if (SYN_ACK($flags) && no_FIN_RST($flags)) {
             $open_conn_found = 1;
             last;
@@ -414,11 +449,14 @@ sub check_login_grace_time {
 
     return Future->wrap(0) unless ($open_conn_found);
 
-    my ($fl_stime, $fl_etime, $proto, $attacker_ip, $attacker_port, $target_ip, $target_port, $flags, $ppf) = @{$aggr_flow_record};
+    my ($fl_stime, $fl_etime, $protocol,
+            $attacker_ip_0, $attacker_ip_1, $attacker_ip_2, $attacker_ip_3, $attacker_port,
+            $target_ip_0, $target_ip_1, $target_ip_2, $target_ip_3, $target_port,
+            $flags, $packets, $bytes) = @{$aggr_flow_record};
 
     # Check RETURN traffic (target->attacker)
     my $cmd = sprintf "-M %s%s %s -o pipe -Nq", $sources_path, $source, get_sorting_flag();
-    my $cmd_filter = sprintf "proto tcp and src ip %s and src port in [%s] and dst ip %s and dst port %i", dec2ip($target_ip), "22", dec2ip($attacker_ip), $target_port;
+    my $cmd_filter = sprintf "proto tcp and src ip %s and src port in [%s] and dst ip %s and dst port %i", dec2ip($target_ip_3), "22", dec2ip($attacker_ip_3), $target_port;
     my @cmd = (@$cmd_base, split(" ", $cmd), $cmd_filter);
     
     $SSHCure::loop->run_child_future(
@@ -430,7 +468,10 @@ sub check_login_grace_time {
         
         my $login_grace_time_detected = 0;
         foreach my $flow (@$parsed_flows) {
-            my ($fl_stime, $fl_etime, $proto, $t_ip, $t_port, $a_ip, $a_port, $flags, $ppf) = @$flow;
+            my ($fl_stime, $fl_etime, $protocol,
+                    $attacker_ip_0, $attacker_ip_1, $attacker_ip_2, $attacker_ip_3, $attacker_port,
+                    $target_ip_0, $target_ip_1, $target_ip_2, $target_ip_3, $target_port,
+                    $flags, $packets, $bytes) = @$flow;
             my $duration = $fl_etime - $fl_stime;
             if (FIN($flags) && $duration >= $CFG::ALGO{'OPENSSH_LOGIN_GRACE_TIME'}) {
                 # Flow has terminated and its duration is >= SSH login grace time: idle SSH connection in authentication phase

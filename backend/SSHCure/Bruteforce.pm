@@ -31,6 +31,8 @@ use Exporter;
 our @ISA    = qw(Exporter);
 our @EXPORT = qw(bruteforce_detection);
 
+# FIXME IPv6 compatibility (check for _3 in addresses)
+
 my @potential_compromises_next_interval = ();   # Potential compromises that have to be checked only during the next interval
 my @potential_compromises_next_intervals = ();  # Potential compromises that have to be checked for at least one next interval
 my @cmd_base;
@@ -185,7 +187,6 @@ sub bruteforce_detection {
             command => \@cmd
         )->then( sub {
             my @preselection_raw = split("\n", shift);
-            my $parsed_output = parse_nfdump_pipe(\@preselection_raw);
             Future->wrap(parse_nfdump_pipe(\@preselection_raw));
         });
     } concurrent => $SSHCure::async_workers, foreach => [ split(":", $sources) ])->get();
@@ -203,14 +204,14 @@ sub bruteforce_detection {
     return if scalar $preselection_tuples == 0;
 
     my @new_attackers = ();
-
     foreach my $source (@splitted_sources) {
         my @new_attackers_source = (fmap_concat {
             my $preselection_flow = shift;
-            my $attacker_ip = @$preselection_flow[3];
-            my $target_ip = @$preselection_flow[5];
+            my $attacker_ip = dec2ip(@$preselection_flow[3], @$preselection_flow[4], @$preselection_flow[5], @$preselection_flow[6]);
+            my $target_ip = dec2ip(@$preselection_flow[8], @$preselection_flow[9], @$preselection_flow[10], @$preselection_flow[11]);
+            
             my $cmd = sprintf "%s -o pipe -Nq -a", get_sorting_flag();
-            my $filter_cmd = sprintf "proto tcp and dst port in [%s] and src ip %s and dst ip %s", "22", dec2ip($attacker_ip), dec2ip($target_ip);
+            my $filter_cmd = sprintf "proto tcp and dst port in [%s] and src ip %s and dst ip %s", "22", $attacker_ip, $target_ip;
             my @cmd = (@cmd_base, "-M", "${sources_path}${sources}", split(" ", $cmd), $filter_cmd);
             $SSHCure::loop->run_child_future(
                 command => \@cmd,
@@ -367,16 +368,15 @@ sub bruteforce_detection_function {
     # Get all the SSH flows from src to dst, ordered by start time
     my @flow_records = split("\n", $raw_nfdump_output);
     my $parsed_flows = parse_nfdump_pipe(\@flow_records);
-    
-    my $no_of_flows = scalar @$parsed_flows;
+    my $flow_count = scalar @$parsed_flows;
 
     # The 2nd part of the if-condition below is for situations in which a (last) fraction of the attack lies in a new data chunk
-    if ($no_of_flows < $CFG::ALGO{'BRUTEFORCE_CUSUM_STREAK_THRESHOLD'} && !(
+    if ($flow_count < $CFG::ALGO{'BRUTEFORCE_CUSUM_STREAK_THRESHOLD'} && !(
                 exists $SSHCure::attacks{$preselection_attacker_ip} &&
                 exists $SSHCure::attacks{$preselection_attacker_ip}{'targets'}{$preselection_target_ip} &&
                 exists $SSHCure::attacks{$preselection_attacker_ip}{'targets'}{$preselection_target_ip}{'certainty'} >= $CFG::ALGO{'CERT_BRUTEFORCE_NO_SCAN'}
             )) {
-         # Skip further processing as soon as possible
+        # Skip further processing as soon as possible
         return Future->wrap();
     }
 
@@ -388,7 +388,7 @@ sub bruteforce_detection_function {
         my $duration = int(@$flow_record[1]) - int(@$flow_record[0]);
         $duration_histogram{$duration} += 1 or $duration_histogram{$duration} = 1;
         
-        my $ppf = @$flow_record[8];
+        my $ppf = @$flow_record[14];
         $ppf_histogram{$ppf} += 1 or $ppf_histogram{$ppf} = 1;
 
         # Concurrent connection starts
@@ -446,8 +446,8 @@ sub bruteforce_detection_function {
             
             # $last_flow is a boolean stating whether the current flow record is the last one for this tuple (analogous for one_but_last_flow)
             my $first_flow = ($current_flow_index == 1);
-            my $last_flow = ($current_flow_index == $total_flows);
-            my $one_but_last_flow = ($total_flows > 1 && $current_flow_index == $total_flows - 1);
+            my $last_flow = ($current_flow_index == $flow_count);
+            my $one_but_last_flow = ($flow_count > 1 && $current_flow_index == $flow_count - 1);
              
             if ($ppf == $cusum_mean) {
                 # Traffic fits brute-force characteristics
@@ -467,7 +467,6 @@ sub bruteforce_detection_function {
             # Reset cusum_streak if PPF deviates from cusum_mean
             } elsif ($cusum_streak < $CFG::ALGO{'BRUTEFORCE_CUSUM_STREAK_THRESHOLD'}) {
                 $cusum_streak = 0;
-                # return Future->wrap();
             }
             
             # Check whether other targets in the same attack have been marked_as_bf
