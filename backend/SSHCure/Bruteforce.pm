@@ -433,9 +433,7 @@ sub bruteforce_detection_function {
         my $cusum_streak = 0;
         my $attack_start_time = time;
         my $marked_as_bf = 0;
-        
         my $current_flow_index = 0;
-        my $total_flows = scalar @$parsed_flows;
         
         (fmap_void {
             my $flow_record = shift;
