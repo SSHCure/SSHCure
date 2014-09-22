@@ -41,6 +41,7 @@ our @EXPORT = qw (
     dec2ip
     ip_addr_in_range
     ip2hostname
+    get_ip_version
 
     SYN_only
     ACK_only
@@ -280,6 +281,21 @@ sub ip2hostname {
     }
     
     return $hostname;
+}
+
+# Return the version of the supplied IP address. In case of an invalid IP address, -1 is returned
+sub get_ip_version {
+    my $address = shift;
+    my $version = -1;
+    if (($address =~ tr/.//) == 3) {
+        $version = 4;
+    } elsif (($address =~ tr/://) > 1) {
+        $version = 6;
+    } else {
+        # Do nothing (return -1)
+    }
+
+    return $version;
 }
 
 # Flags: UAPRSF
@@ -575,7 +591,7 @@ sub host_on_openbl_blacklist {
     my ($host) = @_;
 
     # If $host does not contain valid IPv4 or IPv6 address, it may be a decimal IPv4 address
-    unless (($host =~ tr/.//) == 3 || ($host =~ tr/://) > 1) {
+    if (get_ip_version($host) == -1) {
         $host = dec2ip($host);
     }
     
