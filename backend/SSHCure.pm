@@ -31,7 +31,6 @@ use IO::Async::Future;
 use File::Basename;
 use File::Find;
 use JSON;
-use LWP::Simple;
 use LWP::UserAgent;
 use Storable;
 use Try::Tiny;
@@ -214,6 +213,8 @@ sub Init {
     $nfdump_version = retrieve_nfdump_version(0);
     $nfdump_version_full = retrieve_nfdump_version(1);
     log_info("Detected nfdump v$nfdump_version_full");
+
+    fetch_openbl_blacklist_snapshot();
 
     $init_time = time;
     log_info("Initialized");
@@ -448,14 +449,7 @@ sub run {
             $fetch_openbl_snapshot = 1;
         }
 
-        if ($fetch_openbl_snapshot) {
-            my $resp_code = mirror($CFG::CONST{'OPENBL'}{'SSH_BLACKLIST_URL'}, $CFG::CONST{'OPENBL'}{'SSH_BLACKLIST_LOCAL_PATH'});
-            if ($resp_code == 200) {
-                log_info("Successfully fetched OpenBL blacklist snapshot ($nfcapd_time)");
-            } else {
-                log_error("OpenBL blacklist snapshot could not be fetched; trying again in 24 hours...");
-            }
-        }
+        fetch_openbl_blacklist_snapshot() if $fetch_openbl_snapshot;
     }
 
     if (VALIDATION_MODE == 1 && @VALIDATION_TIMESTAMPS) {

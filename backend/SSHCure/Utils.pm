@@ -17,6 +17,7 @@ use warnings;
 use SSHCure::Utils::Nfdump;
 
 use DBD::SQLite;
+use LWP::Simple;
 use Net::IP;
 use POSIX qw(strftime);
 use Sys::Syslog;
@@ -40,9 +41,6 @@ our @EXPORT = qw (
     dec2ip
     ip_addr_in_range
     ip2hostname
-    
-    bin2dec
-    dec2bin
 
     SYN_only
     ACK_only
@@ -65,6 +63,7 @@ our @EXPORT = qw (
     backend_checks
     perform_config_sanity_check
 
+    fetch_openbl_blacklist_snapshot
     host_on_openbl_blacklist
 );
 
@@ -287,18 +286,6 @@ sub ip2hostname {
     }
     
     return $hostname;
-}
-
-# Convert number from binary to decimal (http://www.jb.man.ac.uk/~slowe/perl/binary.html)
-sub bin2dec {
-    unpack("N", pack("B32", substr("0" x 32 . shift, -32)));
-}
-
-# Convert number from decimal to binary (http://www.jb.man.ac.uk/~slowe/perl/binary.html)
-sub dec2bin {
-    my $str = unpack("B32", pack("N", shift));
-    $str =~ s/^0+(?=\d)//; # otherwise you'll get leading zeros
-    return $str;
 }
 
 # Flags: UAPRSF
@@ -577,6 +564,17 @@ sub perform_config_sanity_check {
     }
     
     return 1;
+}
+
+sub fetch_openbl_blacklist_snapshot {
+    my $resp_code = mirror($CFG::CONST{'OPENBL'}{'SSH_BLACKLIST_URL'}, $CFG::CONST{'OPENBL'}{'SSH_BLACKLIST_LOCAL_PATH'});
+    if ($resp_code == 200) {
+        log_info("Successfully fetched OpenBL blacklist snapshot (".strftime("%H:%M", localtime(time)).")");
+    } else {
+        log_error("OpenBL blacklist snapshot could not be fetched; trying again in 24 hours...");
+    }
+
+    return $resp_code;
 }
 
 sub host_on_openbl_blacklist {
