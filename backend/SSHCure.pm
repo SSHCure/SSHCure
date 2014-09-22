@@ -127,10 +127,10 @@ sub Init {
 
         $async_workers = $CFG::CONST{'MAX_ASYNC_WORKERS'} if ($async_workers > $CFG::CONST{'MAX_ASYNC_WORKERS'});
 
-        log_info("Using ".$async_workers." IO::ASYNC workers (ulimit: ".$ulimit.")");
+        log_info("Using ".$async_workers." IO::Async workers (ulimit: ".$ulimit.")");
     } else {
         $async_workers = 10;
-        log_info("Could not determine system ulimit; using ".$async_workers." IO::ASYNC workers");
+        log_info("Could not determine system ulimit; using ".$async_workers." IO::Async workers");
     }
 
     # Check latest version number
