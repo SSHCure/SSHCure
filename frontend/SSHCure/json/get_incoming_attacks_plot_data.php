@@ -99,7 +99,7 @@
     $result['data']['bruteforce'] = $bruteforce_attacks;
     $result['data']['compromise'] = $compromise_attacks;
 
-    echo json_encode(($result));
+    echo json_encode($result);
     die();
 
 ?>

@@ -1,11 +1,18 @@
 
 var Dashboard = function () {
     var me = this;
+    var internal_networks = "";
 
     me.initialize = function () {
-        add_time_window_control_listeners();
-        plot_incoming_attacks_plot();
-        load_incoming_attacks_table();
+        // Retrieve internal domains
+        var url = "json/rpc/get_internal_networks.php";
+        var params = {};
+        $.getJSON(url, params, function (data, textStatus, jqXHR) {
+            internal_networks = data;
+            add_time_window_control_listeners();
+            plot_incoming_attacks_plot(internal_networks);
+            load_incoming_attacks_table(internal_networks);
+        });
     };
 
     return me;
@@ -41,9 +48,10 @@ function add_time_window_control_listeners () {
     });
 }
 
-function load_incoming_attacks_table (period) {
+function load_incoming_attacks_table (internal_networks, period) {
     var url = "json/get_incoming_attacks_data.php";
     var params = {
+        'internal_networks': internal_networks
     };
 
     $.getJSON(url, params, function (data, textStatus, jqXHR) {
@@ -105,7 +113,7 @@ function load_incoming_attacks_table (period) {
     });
 }
 
-function plot_incoming_attacks_plot (period) {
+function plot_incoming_attacks_plot (internal_networks, period) {
     if (typeof(period) === 'undefined') {
         period = 'week';
     }
