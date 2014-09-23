@@ -57,6 +57,7 @@ div.navbar {
     border-radius: 0px;
     margin-bottom: 0px;
     height: 100px;
+    width: 100%;
     display: flex;
     display: -webkit-flex;
     align-items: center;
@@ -74,6 +75,10 @@ div.navbar {
     font-size: 12px;
     padding-left: 40px;
     display: none; /* Only enabled in medium and large view */
+}
+
+#inst-logo {
+    float: right;
 }
 
 /* Sidebar */
