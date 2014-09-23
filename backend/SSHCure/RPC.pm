@@ -29,7 +29,7 @@ our @EXPORT = qw (
     get_backend_version
     get_db_max_size
     get_host_on_openbl_blacklist
-    get_internal_domains
+    get_internal_networks
     get_nfdump_version
     get_nfsen_profiledatadir
     get_override_source
@@ -138,10 +138,10 @@ sub get_host_on_openbl_blacklist {
     Nfcomm::socket_send_ok($socket, \%args);
 }
 
-sub get_internal_domains {
+sub get_internal_networks {
     my ($socket, $opts) = @_;
     my %args = (
-        'internal_domains' => $CFG::INTERNAL_DOMAINS
+        'internal_networks' => $CFG::INTERNAL_NETWORKS
     );
     Nfcomm::socket_send_ok($socket, \%args);
 }
