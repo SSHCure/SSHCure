@@ -150,6 +150,7 @@ div.main-block h1 {
     border-bottom-color: #CCCCCC;
     border-bottom-style: solid;
     border-bottom-width: 2.5pt;
+    margin-bottom: 0;
 }
 
 div.main-block > h1, div.main-block > div, div.main-block > p {
@@ -167,7 +168,9 @@ div.main-block.table table thead {
     font-size: 11pt;
     line-height: 50px;
 }
-
+div.main-block div[id$='-table'] {
+    padding: 0;
+}
 div.main-block.table table tbody tr {
     line-height: 40px;
 }

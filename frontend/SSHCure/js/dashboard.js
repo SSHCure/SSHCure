@@ -188,8 +188,8 @@ function plot_incoming_attacks_plot (period) {
                     // 'date > Dashboard.getStartTime()' is there to make sure that selected date is actually visible
                     if (date.getDate() != last_day && date > min_start_time * 1000) {
                         last_day = date.getDate();
-                        var months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
-                                "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+                        var months = [ "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                                "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" ];
                         label += date.getDate() + " " + months[date.getMonth()];
                         
                         if (!week) {
