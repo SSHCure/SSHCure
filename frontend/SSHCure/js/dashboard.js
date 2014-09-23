@@ -11,7 +11,10 @@ var Dashboard = function () {
             internal_networks = data;
             add_time_window_control_listeners();
             plot_incoming_attacks_plot(internal_networks);
-            load_incoming_attacks_table(internal_networks);
+            load_attacks_table(INCOMING, internal_networks);
+            load_attacks_table(OUTGOING, internal_networks);
+            load_top_targets_table(COMPROMISE);
+            load_top_targets_table(BRUTEFORCE);
         });
     };
 
@@ -48,8 +51,15 @@ function add_time_window_control_listeners () {
     });
 }
 
-function load_incoming_attacks_table (internal_networks, period) {
-    var url = "json/get_incoming_attacks_data.php";
+function load_attacks_table (type, internal_networks, period) {
+    var url;
+
+    if (type == INCOMING) {
+        url = "json/get_incoming_attacks_data.php";
+    } else {
+        url = "json/get_outgoing_attacks_data.php";
+    }
+
     var params = {
         'internal_networks': internal_networks
     };
@@ -105,11 +115,69 @@ function load_incoming_attacks_table (internal_networks, period) {
         head.appendTo(table);
         body.appendTo(table);
 
-        // Hide loading message and show divs related to plot
-        $('#incoming-attacks-table ~ div.loading').hide();
-        $('#incoming-attacks-table').show();
+        if (type == INCOMING) {
+            // Hide loading message and show divs related to plot
+            $('#incoming-attacks-table ~ div.loading').hide();
+            $('#incoming-attacks-table').show();
+            table.appendTo($('#incoming-attacks-table'));
+        } else {
+            // Hide loading message and show divs related to plot
+            $('#outgoing-attacks-table ~ div.loading').hide();
+            $('#outgoing-attacks-table').show();
+            table.appendTo($('#outgoing-attacks-table'));
+        }
+    });
+}
 
-        table.appendTo($('#incoming-attacks-table'));
+function load_top_targets_table (type) {
+    var url;
+
+    if (type == BRUTEFORCE) {
+        url = "json/get_top_targets_bruteforce_data.php";
+    } else {
+        url = "json/get_top_targets_compromise_data.php";
+    }
+
+    var params = {};
+
+    $.getJSON(url, params, function (data, textStatus, jqXHR) {
+        var table = $('<table>');
+        var head = $('<thead>');
+        var body = $('<tbody>');
+        head.append(
+            $('<td>').text('Target'),
+            $('<td>').text('Attacks'),
+            $('<td>').text('Compromises')
+        ).appendTo(head);
+
+        if (data.data.length == 0) {
+            $('<tr>').append(
+                $('<td colspan="5" style="font-style: italic;">').text("No data available...")
+            ).appendTo(body);
+        } else {
+            $.each(data.data, function () {
+                $('<tr>').append(
+                    $('<td>').text(this.target),
+                    $('<td>').text(this.attack_count),
+                    $('<td>').text(this.compromise_count)
+                ).appendTo(body);
+            });
+        }
+        
+        head.appendTo(table);
+        body.appendTo(table);
+
+        if (type == BRUTEFORCE) {
+            // Hide loading message and show divs related to plot
+            $('#top-targets-bruteforce-table ~ div.loading').hide();
+            $('#top-targets-bruteforce-table').show();
+            table.appendTo($('#top-targets-bruteforce-table'));
+        } else {
+            // Hide loading message and show divs related to plot
+            $('#top-targets-compromise-table ~ div.loading').hide();
+            $('#top-targets-compromise-table').show();
+            table.appendTo($('#top-targets-compromise-table'));
+        }
     });
 }
 
@@ -240,3 +308,9 @@ function plot_incoming_attacks_plot (internal_networks, period) {
                 [ plot_scan_data, plot_bruteforce_data, plot_compromise_data ], options);
     });
 }
+
+// Constants
+var BRUTEFORCE = 1;
+var COMPROMISE = 2;
+var INCOMING = 1;
+var OUTGOING = 2;
