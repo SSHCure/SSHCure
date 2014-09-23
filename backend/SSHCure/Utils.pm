@@ -575,13 +575,13 @@ sub config_sanity_check {
     }
 
     # Override source
-    unless ($CFG::OVERRIDE_SOURCE eq "" || scalar split(':', $CFG::OVERRIDE_SOURCE) == ($CFG::OVERRIDE_SOURCE =~ tr/://) - 1) {
+    unless (($CFG::OVERRIDE_SOURCE =~ tr/;//) == 0 && ($CFG::OVERRIDE_SOURCE =~ tr/,//) == 0) {
         log_error("Syntax error in OVERRIDE_SOURCE specification");
         return 0;
     }
 
     # Internal networks
-    unless ($CFG::INTERNAL_NETWORKS eq "" || scalar split(',', $CFG::INTERNAL_NETWORKS) == ($CFG::INTERNAL_NETWORKS =~ tr/,//) - 1) {
+    unless ($CFG::INTERNAL_NETWORKS eq "" || ($CFG::INTERNAL_NETWORKS =~ tr/\///) == ($CFG::INTERNAL_NETWORKS =~ tr/,//) + 1) {
         log_error("Syntax error in INTERNAL_NETWORKS specification");
         return 0;
     }
