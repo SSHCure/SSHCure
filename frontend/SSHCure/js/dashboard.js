@@ -58,35 +58,42 @@ function load_incoming_attacks_table (period) {
             $('<td>').text('Targets')
         ).appendTo(head);
 
-        $.each(data.data, function () {
-            var phases = $('<div>').addClass('phases').append(
-                $('<div>').addClass('phase scan'),
-                $('<div>').addClass('phase bruteforce'),
-                $('<div>').addClass('phase compromise')
-            );
-            
-            // Phases
-            if (jQuery.inArray(this.certainty, [ 0.25, 0.5, 0.75 ])) {
-                phases.find('div.phase.scan').addClass('on');
-            }
-            if (jQuery.inArray(this.certainty, [ 0.4, 0.5 ])) {
-                phases.find('div.phase.bruteforce').addClass('on');
-            }
-            if (jQuery.inArray(this.certainty, [ 0.65, 0.75 ])) {
-                phases.find('div.phase.compromise').addClass('on');
-            }
-
-            // Date
-            var date = new Date(this.start_time * 1000);
-
+        if (data.data.length == 0) {
             $('<tr>').append(
-                $('<td>').append(phases),
-                $('<td>').html("<span class=\"glyphicon glyphicon-flash\"></span>"),
-                $('<td>').text(this.attacker),
-                $('<td>').text(date.toString("ddd. MMM d, yyyy HH:mm")),
-                $('<td>').text(this.target_count)
+                $('<td colspan="5" style="font-style: italic;">').text("No data available...")
             ).appendTo(body);
-        });
+        } else {
+            $.each(data.data, function () {
+                var phases = $('<div>').addClass('phases').append(
+                    $('<div>').addClass('phase scan'),
+                    $('<div>').addClass('phase bruteforce'),
+                    $('<div>').addClass('phase compromise')
+                );
+                
+                // Phases
+                if (jQuery.inArray(this.certainty, [ 0.25, 0.5, 0.75 ])) {
+                    phases.find('div.phase.scan').addClass('on');
+                }
+                if (jQuery.inArray(this.certainty, [ 0.4, 0.5 ])) {
+                    phases.find('div.phase.bruteforce').addClass('on');
+                }
+                if (jQuery.inArray(this.certainty, [ 0.65, 0.75 ])) {
+                    phases.find('div.phase.compromise').addClass('on');
+                }
+
+                // Date
+                var date = new Date(this.start_time * 1000);
+
+                $('<tr>').append(
+                    $('<td>').append(phases),
+                    $('<td>').html("<span class=\"glyphicon glyphicon-flash\"></span>"),
+                    $('<td>').text(this.attacker),
+                    $('<td>').text(date.toString("ddd. MMM d, yyyy HH:mm")),
+                    $('<td>').text(this.target_count)
+                ).appendTo(body);
+            });
+        }
+        
         head.appendTo(table);
         body.appendTo(table);
 
