@@ -62,7 +62,7 @@ our @EXPORT = qw (
     
     database_maintenance
     backend_checks
-    perform_config_sanity_check
+    config_sanity_check
 
     fetch_openbl_blacklist_snapshot
     host_on_openbl_blacklist
@@ -502,7 +502,8 @@ sub backend_checks {
 }
 
 # Checks the notification configuration in config.pm
-sub perform_config_sanity_check {
+sub config_sanity_check {
+    # Notifications
     while (my ($notification_id, $config) = each(%CFG::NOTIFICATIONS)) {
         # Name
         unless ($notification_id ne '') {
@@ -571,6 +572,18 @@ sub perform_config_sanity_check {
                 return 0;
             }
         }
+    }
+
+    # Override source
+    unless ($CFG::OVERRIDE_SOURCE eq "" || scalar split(':', $CFG::OVERRIDE_SOURCE) == ($CFG::OVERRIDE_SOURCE =~ tr/://) - 1) {
+        log_error("Syntax error in OVERRIDE_SOURCE specification");
+        return 0;
+    }
+
+    # Internal networks
+    unless ($CFG::INTERNAL_NETWORKS eq "" || scalar split(',', $CFG::INTERNAL_NETWORKS) == ($CFG::INTERNAL_NETWORKS =~ tr/,//) - 1) {
+        log_error("Syntax error in INTERNAL_NETWORKS specification");
+        return 0;
     }
     
     return 1;

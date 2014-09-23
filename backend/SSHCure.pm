@@ -62,6 +62,7 @@ our %cmd_lookup = (
     'get_backend_version'               => \&get_backend_version,
     'get_db_max_size'                   => \&get_db_max_size,
     'get_host_on_openbl_blacklist'      => \&get_host_on_openbl_blacklist,
+    'get_internal_domains'              => \&get_internal_domains,
     'get_nfdump_version'                => \&get_nfdump_version,
     'get_nfsen_profiledatadir'          => \&get_nfsen_profiledatadir,
     'get_override_source'               => \&get_override_source,
@@ -103,7 +104,7 @@ sub Init {
 
     # Perform config file sanity check
     log_info("Performing configuration file sanity check...");
-    return unless perform_config_sanity_check();
+    return unless config_sanity_check();
 
     # Determine ulimit and IO::Async workers
     my $ulimit = qx(echo `ulimit -n`);

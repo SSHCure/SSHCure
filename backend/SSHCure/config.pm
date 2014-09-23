@@ -67,8 +67,12 @@
 );
 
 # Override the NfSen sources to be used. Multiple values separated by ":".
-# If OVERRIDE_SOURCE is empty, all sources are used. Default: "".
+# If OVERRIDE_SOURCE is empty, all profile sources are used. Default: "".
 $OVERRIDE_SOURCE = "";
+
+# The specification of the internal network(s) is used for SSHCure to determine what is ingress and egress traffic.
+# The networks must be specified as a comma-separated list of subnets. Examples: "192.168.0.0/16" or "192.168.0.0/16,172.16.0.0/20"
+$INTERNAL_NETWORKS = "";
 
 # The maintenance mechanism purges old entries from the database. For further fine-tuning see constants.pm.
 %MAINTENANCE = (

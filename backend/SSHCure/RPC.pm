@@ -29,6 +29,7 @@ our @EXPORT = qw (
     get_backend_version
     get_db_max_size
     get_host_on_openbl_blacklist
+    get_internal_domains
     get_nfdump_version
     get_nfsen_profiledatadir
     get_override_source
@@ -36,8 +37,7 @@ our @EXPORT = qw (
 );
 
 sub get_active_notification_configs {
-    my $socket = shift;
-    my $opts = shift;
+    my ($socket, $opts) = @_;
     my @configs;
     
     while (my ($notification_id, $config) = each(%CFG::NOTIFICATIONS)) {
@@ -59,8 +59,7 @@ sub get_active_notification_configs {
 }
 
 sub get_backend_errors {
-    my $socket = shift;
-    my $opts = shift;
+    my ($socket, $opts) = @_;
     my %args = (
         'error_codes' => backend_checks()
     );
@@ -68,16 +67,14 @@ sub get_backend_errors {
 }
 
 sub get_backend_init_time {
-    my $socket = shift;
-    my $opts = shift;
+    my ($socket, $opts) = @_;
     my %args;
     $args{'backend_init_time'} = $SSHCure::init_time;
     Nfcomm::socket_send_ok($socket, \%args);
 }
 
 sub get_backend_profile {
-    my $socket = shift;
-    my $opts = shift;
+    my ($socket, $opts) = @_;
     my %args = (
         'backend_profile' => get_profile()
     );
@@ -85,8 +82,7 @@ sub get_backend_profile {
 }
 
 sub get_backend_sources {
-    my $socket = shift;
-    my $opts = shift;
+    my ($socket, $opts) = @_;
     my %args;
 
     if ($CFG::OVERRIDE_SOURCE eq '') {
@@ -112,8 +108,7 @@ sub get_backend_sources {
 }
 
 sub get_backend_version {
-    my $socket = shift;
-    my $opts = shift;
+    my ($socket, $opts) = @_;
     my %args = (
         'backend_version' => $SSHCure::SSHCURE_VERSION
     );
@@ -121,8 +116,7 @@ sub get_backend_version {
 }
 
 sub get_db_max_size {
-    my $socket = shift;
-    my $opts = shift;
+    my ($socket, $opts) = @_;
     my %args = (
         'db_max_size' => $CFG::CONST{'DB'}{'MAX_SIZE'}
     );
@@ -144,9 +138,16 @@ sub get_host_on_openbl_blacklist {
     Nfcomm::socket_send_ok($socket, \%args);
 }
 
+sub get_internal_domains {
+    my ($socket, $opts) = @_;
+    my %args = (
+        'internal_domains' => $CFG::INTERNAL_DOMAINS
+    );
+    Nfcomm::socket_send_ok($socket, \%args);
+}
+
 sub get_nfdump_version {
-    my $socket = shift;
-    my $opts = shift;
+    my ($socket, $opts) = @_;
     my %args = (
         'nfdump_version' => $SSHCure::nfdump_version
     );
@@ -154,8 +155,7 @@ sub get_nfdump_version {
 }
 
 sub get_nfsen_profiledatadir {
-    my $socket = shift;
-    my $opts = shift;
+    my ($socket, $opts) = @_;
     my %args = (
         'nfsen_profiledatadir' => $NfConf::PROFILEDATADIR
     );
@@ -163,8 +163,7 @@ sub get_nfsen_profiledatadir {
 }
 
 sub get_override_source {
-    my $socket  = shift;    # scalar
-    my $opts    = shift;    # reference to a hash
+    my ($socket, $opts) = @_;
     my %args = (
         'sources' => $CFG::OVERRIDE_SOURCE
     );
@@ -173,8 +172,7 @@ sub get_override_source {
 }
 
 sub get_run_lock_mtime {
-    my $socket = shift;
-    my $opts = shift;
+    my ($socket, $opts) = @_;
     my %args;
 
     my $mtime = (stat($CFG::CONST{'FN_RUN_LOCK'}))[9];
