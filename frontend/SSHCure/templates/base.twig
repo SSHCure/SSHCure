@@ -61,11 +61,13 @@
     </head>
     <body>
         {% block body %}
-            <div class="navbar" role="navigation">
-                <span id="logo"><a href="/"><img src="img/sshcure_logo.png" /></a></span>
-                <span id="logo-text">Flow-based intrusion detection for SSH</span>
-                <span id="inst-logo"><a href="http://www.utwente.nl"><img src="img/utwente_logo.png" /></a></span>
-            </div>
+            <nav class="navbar navbar-default" role="navigation">
+                <div class="container-fluid">
+                    <span id="logo" class="navbar-left navbar-brand"><a href="/"><img src="img/sshcure_logo.png" /></a></span>
+                    <p id="logo-text" class="navbar-text">Flow-based intrusion detection for SSH</p>
+                    <span id="inst-logo" class="navbar-right navbar-brand"><a href="http://www.utwente.nl"><img src="img/utwente_logo.png" /></a></span>
+                </div>
+            </nav>
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-sm-2 col-md-2 col-lg-1 sidebar">
