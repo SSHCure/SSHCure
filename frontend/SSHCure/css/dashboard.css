@@ -30,7 +30,7 @@
 }
 
 /* Incoming attacks table */
-#incoming-attacks-table span.glyphicon-flash {
+#incoming-attacks-table span.glyphicon-flash, #outgoing-attacks-table span.glyphicon-flash {
     color: #be1517;
     font-size: 13pt;
 }
