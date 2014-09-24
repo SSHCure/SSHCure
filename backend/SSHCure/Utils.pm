@@ -228,7 +228,7 @@ sub dec2ip {
     } elsif ($addr0 == 0 && $addr1 == 0 && $addr2 == 0) { # IPv4
         $ip_address = join '.' => map { ($addr3 >> 8*(3-$_)) % 256 } 0 .. 3;
     } else { # IPv6
-        my $ip_address = sprintf("%08x", $addr0).sprintf("%08x", $addr1).sprintf("%08x", $addr2).sprintf("%08x", $addr3);
+        $ip_address = sprintf("%08x", $addr0).sprintf("%08x", $addr1).sprintf("%08x", $addr2).sprintf("%08x", $addr3);
         $ip_address =~ s/....\K(?=.)/:/sg; # Add colons after every 2 bytes
     }
 
