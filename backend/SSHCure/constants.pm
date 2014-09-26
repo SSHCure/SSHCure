@@ -54,8 +54,9 @@ my $SSHCURE_DATA_DIR = "$NfConf::BACKEND_PLUGINDIR/SSHCure/data";
     'FN_FORCE_DB_MAINTENANCE'   => $SSHCURE_DATA_DIR."/force_db_maintenance",
     'FN_VALIDATION_LOCK'        => "/tmp/sshcure_validation.lock",
     'FN_DEBUG_LOG'              => "$NfConf::BACKEND_PLUGINDIR/SSHCure/data/debug.log",
-    'RUN_LOCK_TIMEOUT'          => 2 * 60 * 60, # 2 hours, in seconds
     'MAX_ASYNC_WORKERS'         => 100,
+    'RUN_LOCK_TIMEOUT'          => 2 * 60 * 60, # 2 hours, in seconds
+    'CACHES_CLEANUP_TIME'       => "6:00", # Use the following format: %H:%M. Minutes must be multiples of 5, in [0, 55]
 
     # ERRORs: constants used to communicate errors towards the front-end's dashboard
     'ERROR' => {
@@ -132,7 +133,7 @@ my $SSHCURE_DATA_DIR = "$NfConf::BACKEND_PLUGINDIR/SSHCure/data";
     'OPENBL' => {
         'SSH_BLACKLIST_URL'         => "http://www.openbl.org/lists/base_all_ssh-only.txt",
         'SSH_BLACKLIST_LOCAL_PATH'  => $SSHCURE_DATA_DIR."/openbl_ssh_snapshot.txt",
-        'UPDATE_TIME'               => "5:00", # Should be in the following format: %H:%M
+        'UPDATE_TIME'               => "5:00", # Use the following format: %H:%M. Minutes must be multiples of 5, in [0, 55]
     },
 );
 

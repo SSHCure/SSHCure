@@ -268,7 +268,6 @@ sub dec2ip {
 # Determines whether an IP address (first parameter) falls within the
 # provided IP address prefix (second parameter).
 sub ip_addr_in_range {
-    log_debug("[ip_addr_in_range] Called");
     my ($address, $prefix) = @_;
     my $cache_elem = $SSHCure::prefix_cache->get($prefix);
     my ($first_address, $last_address);

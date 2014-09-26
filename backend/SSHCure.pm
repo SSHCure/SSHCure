@@ -374,7 +374,7 @@ sub run {
     ################################
 
     # Check whether maintenance file with counter < 10 exists. Should be within 10 * maintenance_retry_interval from current timestamp.
-    # If it exists, try to perform maintenance
+    # Try to perform maintenance in case it exists.
     my $retry_previous_maintenance = 0;
     my $filename = '';
     my $file_timestamp;
@@ -420,7 +420,7 @@ sub run {
             }
         }
 
-        # Check whether local OpenBL blacklist copy needs to be updated
+        # Check whether local OpenBL blacklist snapshot needs to be updated, and update snapshot if needed
         my $nfcapd_time = strftime("%H:%M", localtime(nfcapd2unix($timeslot) + 5 * 60)); # nfcapd files are always 5 minutes behind in time
         my $fetch_openbl_snapshot = 0;
         unless (-e $CFG::CONST{'OPENBL'}{'SSH_BLACKLIST_LOCAL_PATH'}) {
@@ -432,6 +432,13 @@ sub run {
         }
 
         fetch_openbl_blacklist_snapshot() if $fetch_openbl_snapshot;
+
+        # Check whether the local caches need to be cleaned up, and update them if needed
+        if (index($nfcapd_time, $CFG::CONST{'CACHES_CLEANUP_TIME'}) != -1) {
+            $dec2ip_cache->clean();
+            $ip2dec_cache->clean();
+            $prefix_cache->clean();
+        }
     }
 
     if (VALIDATION_MODE == 1 && @VALIDATION_TIMESTAMPS) {
