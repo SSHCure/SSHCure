@@ -16,6 +16,7 @@ use warnings;
 our $VERSION = 136;
 our $SSHCURE_VERSION = "3.0";
 
+use SSHCure::Cache;
 use SSHCure::Model;
 use SSHCure::Utils;
 use SSHCure::Utils::Nfdump;
@@ -39,16 +40,6 @@ use POSIX qw(strftime);
 # Enable validation mode. NB the $VALIDATION_NFCAPD_DIR needs to be defined either way!
 use constant VALIDATION_MODE => 0;
 our $VALIDATION_NFCAPD_DIR = "";
-
-require Exporter;
-our @ISA    = qw(Exporter);
-our @EXPORT = qw(
-    async_workers
-    attacks
-    DBH
-    debug_log_fh
-    loop
-);
 
 our %cmd_lookup = (
     'get_active_notification_configs'   => \&get_active_notification_configs,
