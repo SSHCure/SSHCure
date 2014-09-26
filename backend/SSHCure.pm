@@ -43,14 +43,11 @@ our $VALIDATION_NFCAPD_DIR = "";
 require Exporter;
 our @ISA    = qw(Exporter);
 our @EXPORT = qw(
+    async_workers
     attacks
     DBH
     debug_log_fh
-    ignored_records_close_outlier_count
-    ignored_records_far_outlier_count
     loop
-    PHASE
-    async_workers
 );
 
 our %cmd_lookup = (
@@ -78,7 +75,6 @@ our $init_time;
 our $loop = IO::Async::Loop->new;
 our $nfdump_version;        # Without potential patch number
 our $nfdump_version_full;   # Includes potential patch number
-our $PHASE = "PRE-INIT";
 our $async_workers;
 
 # The Init function is called when the plugin is loaded. It's purpose is to give the plugin
@@ -86,8 +82,6 @@ our $async_workers;
 # failure. If the plugin fails to initialize, it's disabled and not used. Therefore, if
 # you want to temporarily disable your plugin return 0 when Init is called.
 sub Init {
-    $PHASE = "INIT";
-
     # Parse config files
     use Safe;
     my $cpt = new Safe 'CFG';
@@ -233,8 +227,6 @@ sub run {
     my $profilegroup = $$argref{'profilegroup'};
     my $timeslot     = $$argref{'timeslot'};
 
-    $PHASE = "RUN";
-
     if (-e $CFG::CONST{'FN_RUN_LOCK'}) {
         log_warning("Previous run has not finished yet (or a stale lock file exists); skipping data processing...");
         my $skip = 1;
@@ -352,19 +344,14 @@ sub run {
     }
     debug "Corrected time-interval: $corrected_interval";
 
-    $SSHCure::PHASE = "SCAN";
     scan_detection($sources, $sources_path, $timeslot, $corrected_interval)->then( sub {
-        $SSHCure::PHASE = "BF";
         bruteforce_detection($sources, $sources_path, $timeslot, $corrected_interval);
     })->then( sub {
-        $SSHCure::PHASE = "COMP";
-
         # Turn off the 'compromise' detection for now; the BF detector does this currently (most sanely)
         # compromise_detection($sources, $timeslot, $corrected_interval, \@timeslot_intervals);
         Future->wrap();
     })->get();
 
-    $PHASE = "";
     if (VALIDATION_MODE) {
         my $time_now_hack = nfcapd2unix($timeslot) + (5 * 60);
         remove_timeouts(\%attacks, $time_now_hack);
