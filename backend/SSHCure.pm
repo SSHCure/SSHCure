@@ -57,16 +57,19 @@ our %cmd_lookup = (
     'get_run_lock_mtime'                => \&get_run_lock_mtime
 );
 
-our ($ignored_records_far_outlier_count, $ignored_records_close_outlier_count);
-
+our $async_workers;
 our %attacks;
 our $DBH;
 our $debug_log_fh;
 our $init_time;
 our $loop = IO::Async::Loop->new;
-our $nfdump_version;        # Without potential patch number
+our $nfdump_version;        # Without patch number
 our $nfdump_version_full;   # Includes potential patch number
-our $async_workers;
+our ($ignored_records_far_outlier_count, $ignored_records_close_outlier_count);
+
+our $dec2ip_cache = SSHCure::Cache->new("dec2ip", 1000);
+our $ip2dec_cache = SSHCure::Cache->new("ip2dec", 1000);
+our $prefix_cache = SSHCure::Cache->new("ip_addr_in_range", 1000);
 
 # The Init function is called when the plugin is loaded. It's purpose is to give the plugin
 # the possibility to initialize itself. The plugin should return 1 for success or 0 for

@@ -209,9 +209,15 @@ sub save_profiling_value {
 sub ip2dec {
     my $address = shift;
 
-    # Determine IP address version
+    # Determine whether $address is a valid IPv4 address
     if (($address =~ tr/.//) == 3) {
-        return unpack N => pack CCCC => split /\./ => $address;
+        my $address_dec = $SSHCure::ip2dec_cache->get($address);
+        unless ($address_dec) {
+            $address_dec = unpack N => pack CCCC => split /\./ => $address;
+            $SSHCure::ip2dec_cache->set($address, $address_dec);
+        }
+
+        return $address_dec;
     } else {
         # Return input value if not a valid IPv4 address, or IPv6 address
         return $address;
@@ -224,9 +230,18 @@ sub dec2ip {
 
     if (scalar (@_) == 1) { # IPv4
         # This condition exists for compatibility with code that calls dec2ip using a single parameter
-        $ip_address = join '.' => map { ($addr0 >> 8*(3-$_)) % 256 } 0 .. 3;
-    } elsif ($addr0 == 0 && $addr1 == 0 && $addr2 == 0) { # IPv4
-        $ip_address = join '.' => map { ($addr3 >> 8*(3-$_)) % 256 } 0 .. 3;
+        $addr3 = $addr0;
+        $addr0 = 0;
+        $addr1 = 0;
+        $addr2 = 0;
+    }
+
+    if ($addr0 == 0 && $addr1 == 0 && $addr2 == 0) { # IPv4
+        $ip_address = $SSHCure::dec2ip_cache->get($addr3);
+        unless ($ip_address) {
+            $ip_address = join '.' => map { ($addr3 >> 8*(3-$_)) % 256 } 0..3;
+            $SSHCure::dec2ip_cache->set($addr3, $ip_address);
+        }
     } else { # IPv6
         $ip_address = sprintf("%08x", $addr0).sprintf("%08x", $addr1).sprintf("%08x", $addr2).sprintf("%08x", $addr3);
         $ip_address =~ s/....\K(?=.)/:/sg; # Add colons after every 2 bytes
@@ -237,26 +252,29 @@ sub dec2ip {
 
 # Determines whether an IP address (first parameter) falls within the
 # provided IP address prefix (second parameter).
-my %prefix_cache = ();
-
 sub ip_addr_in_range {
-    my $address = shift;
-    my $prefix = shift;
-    
-    unless (exists $prefix_cache{$prefix}) {
+    log_debug("[ip_addr_in_range] Called");
+    my ($address, $prefix) = @_;
+    my $cache_elem = $SSHCure::prefix_cache->get($prefix);
+    my ($first_address, $last_address);
+
+    if ($cache_elem) {
+        $first_address = @{$cache_elem}[0];
+        $last_address = @{$cache_elem}[1];
+    } else {
         my $prefix_obj = new Net::IP($prefix);
-        my $first_address = scalar $prefix_obj->intip();
+        $first_address = scalar $prefix_obj->intip();
         
         # intip() does not return properly in case a '/0' prefix is used
         unless (defined $first_address) {
             $first_address = 0;
         }
         
-        my $last_address = scalar $prefix_obj->last_int();
-        $prefix_cache{$prefix} = [scalar $first_address, scalar $last_address];
+        $last_address = scalar $prefix_obj->last_int();
+        $SSHCure::prefix_cache->set($prefix, [ scalar $first_address, scalar $last_address ]);
     }
 
-    return ($address >= $prefix_cache{$prefix}[0] && $address <= $prefix_cache{$prefix}[1]);
+    return ($address >= $first_address && $address <= $last_address);
 }
 
 # Returns the hostname for a provided IP address. If the hostname could
