@@ -29,8 +29,6 @@ our @EXPORT = qw(scan_detection);
 
 my @cmd_base;
 
-# FIXME IPv6 compatibility (check for _3 in addresses)
-
 # check_parsed_for_scan_phase_attackers
 # parameters:
 #   $parsed: parsed nfdump output (output from SSHCure::Utils::parse_nfdump_list/pipe)
@@ -63,7 +61,6 @@ sub scan_detection_function {
         log_error("Nfdump query in scan phase failed (not fatal): $std_err");
 
         my @piped_cmd = (@cmd_base, "-M", "${sources_path}${sources}", split(" ", "-r nfcapd.$timeslot -t $timeslot_interval -A dstip -o pipe"), ("proto tcp and dst port 22 and src ip $attacker_ip"));
-
         $SSHCure::loop->run_child_future(
             command => \@piped_cmd,
         )->on_done( sub {
@@ -79,20 +76,19 @@ sub scan_detection_function {
         my %targets = ();
         if (scalar(@$parsed_flows) >= $CFG::ALGO{'SCAN_MIN_FLOWS'}) {
             foreach my $flow_record (@$parsed_flows) {
-                my ($flow_start, $flow_end, $protocol, 
-                    $sa_0, $sa_1, $sa_2, $sa_3, $src_port,
-                    $da_0, $da_1, $da_2, $da_3, $dst_port,
+                my ($ip_version, $flow_start, $flow_end, $protocol, 
+                    $sa, $src_port, $da, $dst_port,
                     $flags, $packets, $octets) = @$flow_record;
 
                 # Check whether the traffic to this possible target matches scan characteristics
                 next if $packets > $CFG::ALGO{'SCAN_MAX_PPF'};
 
                 # Check for behaviour that might occur in a network wide (L3) block (e.g. QNet) and results in invalid scan-targets
-                if (exists $SSHCure::attacks{$attacker_ip_dec} && exists $SSHCure::attacks{$attacker_ip_dec}{'targets'}{$da_3}) {
-                    next if ($SSHCure::attacks{$attacker_ip_dec}{'targets'}{$da_3}{'certainty'} >= $CFG::ALGO{'CERT_BRUTEFORCE_NO_SCAN'});
+                if (exists $SSHCure::attacks{$attacker_ip_dec} && exists $SSHCure::attacks{$attacker_ip_dec}{'targets'}{$da}) {
+                    next if ($SSHCure::attacks{$attacker_ip_dec}{'targets'}{$da}{'certainty'} >= $CFG::ALGO{'CERT_BRUTEFORCE_NO_SCAN'});
                 }
-                $targets{$da_3}->{'last_act'} = $flow_start;
-                $targets{$da_3}->{'prev_ppf'} = 2;
+                $targets{$da}->{'last_act'} = $flow_start;
+                $targets{$da}->{'prev_ppf'} = 2;
             }
         }
 
