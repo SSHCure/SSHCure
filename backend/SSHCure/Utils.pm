@@ -122,12 +122,27 @@ sub parse_nfdump_pipe {
             $src_as, $dst_as, $r_input, $r_output,
             $flags, $tos, $packets, $octets) = split(/\|/, $line);
 
-        push(@nfdump_parsed_output, [
+        my $ip_version;
+        if ($af == 2) {
+            $ip_version = 4;
+        } else {
+            $ip_version = 6;
+        }
+
+        my ($sa, $da);
+        if ($ip_version == 4) {
+            $sa = $sa_3;
+            $da = $da_3;
+        } else {
+            $sa = dec2ip($sa_0, $sa_1, $sa_2, $sa_3);
+            $da = dec2ip($da_0, $da_1, $da_2, $da_3);
+        }
+
+        push(@nfdump_parsed_output, [ $ip_version,
                 (scalar $first) + (scalar $first_msec) / 1000,
                 (scalar $last) + (scalar $last_msec) / 1000,
                 $protocol,
-                $sa_0, $sa_1, $sa_2, $sa_3, $src_port,
-                $da_0, $da_1, $da_2, $da_3, $dst_port,
+                $sa, $src_port, $da, $dst_port,
                 $flags,
                 $packets,
                 $octets
