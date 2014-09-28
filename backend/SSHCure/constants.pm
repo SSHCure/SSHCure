@@ -41,7 +41,7 @@
     
     # Default values used by OpenSSH SSH daemon
     'OPENSSH_LOGIN_GRACE_TIME'                      => 120, # in seconds
-    'PAM_TIMEOUT'                                   => 3, # in seconds
+    'PAM_TIMEOUT'                                   => 3,   # in seconds
 );
 
 # SSHCURE_DATA_DIR: directory containing file-based runtime information such as serialized attack hashes and lock files
@@ -56,7 +56,6 @@ my $SSHCURE_DATA_DIR = "$NfConf::BACKEND_PLUGINDIR/SSHCure/data";
     'FN_DEBUG_LOG'              => "$NfConf::BACKEND_PLUGINDIR/SSHCure/data/debug.log",
     'MAX_ASYNC_WORKERS'         => 100,
     'RUN_LOCK_TIMEOUT'          => 2 * 60 * 60, # 2 hours, in seconds
-    'CACHES_CLEANUP_TIME'       => "6:00", # Use the following format: %H:%M. Minutes must be multiples of 5, in [0, 55]
 
     # ERRORs: constants used to communicate errors towards the front-end's dashboard
     'ERROR' => {
@@ -119,6 +118,12 @@ my $SSHCURE_DATA_DIR = "$NfConf::BACKEND_PLUGINDIR/SSHCure/data";
         'FAIL2BAN'      => 1,
         'QNET'          => 2,
         'TCPWRAPPER'    => 3,
+    },
+
+    'CACHES' => {
+        'CLEANUP_TIME'      => "6:00",          # Use the following format: %H:%M. Minutes must be multiples of 5, in [0, 55]
+        'FN_CACHES_HASH'    => $SSHCURE_DATA_DIR."/caches_hash",
+        'EXPIRATION_TIME'   => 24 * 60 * 60,    # 1 day, in seconds
     },
     
     'COMPROMISE_REASON' => {

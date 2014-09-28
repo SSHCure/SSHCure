@@ -226,10 +226,10 @@ sub ip2dec {
 
     # Determine whether $address is a valid IPv4 address
     if (($address =~ tr/.//) == 3) {
-        my $address_dec = $SSHCure::ip2dec_cache->get($address);
+        my $address_dec = $SSHCure::caches{'ip2dec'}->get($address);
         unless ($address_dec) {
             $address_dec = unpack N => pack CCCC => split /\./ => $address;
-            $SSHCure::ip2dec_cache->set($address, $address_dec);
+            $SSHCure::caches{'ip2dec'}->set($address, $address_dec);
         }
 
         return $address_dec;
@@ -252,10 +252,10 @@ sub dec2ip {
     }
 
     if ($addr0 == 0 && $addr1 == 0 && $addr2 == 0) { # IPv4
-        $ip_address = $SSHCure::dec2ip_cache->get($addr3);
+        $ip_address = $SSHCure::caches{'dec2ip'}->get($addr3);
         unless ($ip_address) {
             $ip_address = join '.' => map { ($addr3 >> 8*(3-$_)) % 256 } 0..3;
-            $SSHCure::dec2ip_cache->set($addr3, $ip_address);
+            $SSHCure::caches{'dec2ip'}->set($addr3, $ip_address);
         }
     } else { # IPv6
         $ip_address = sprintf("%08x", $addr0).sprintf("%08x", $addr1).sprintf("%08x", $addr2).sprintf("%08x", $addr3);
@@ -269,7 +269,7 @@ sub dec2ip {
 # provided IP address prefix (second parameter).
 sub ip_addr_in_range {
     my ($address, $prefix) = @_;
-    my $cache_elem = $SSHCure::prefix_cache->get($prefix);
+    my $cache_elem = $SSHCure::caches{'ip_addr_in_range'}->get($prefix);
     my ($first_address, $last_address);
 
     if ($cache_elem) {
@@ -285,7 +285,7 @@ sub ip_addr_in_range {
         }
         
         $last_address = scalar $prefix_obj->last_int();
-        $SSHCure::prefix_cache->set($prefix, [ scalar $first_address, scalar $last_address ]);
+        $SSHCure::caches{'ip_addr_in_range'}->set($prefix, [ scalar $first_address, scalar $last_address ]);
     }
 
     return ($address >= $first_address && $address <= $last_address);

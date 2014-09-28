@@ -59,6 +59,7 @@ our %cmd_lookup = (
 
 our $async_workers;
 our %attacks;
+our %caches;
 our $DBH;
 our $debug_log_fh;
 our $init_time;
@@ -66,10 +67,6 @@ our $loop = IO::Async::Loop->new;
 our $nfdump_version;        # Without patch number
 our $nfdump_version_full;   # Includes potential patch number
 our ($ignored_records_far_outlier_count, $ignored_records_close_outlier_count);
-
-our $dec2ip_cache = SSHCure::Cache->new("dec2ip", 1000);
-our $ip2dec_cache = SSHCure::Cache->new("ip2dec", 1000);
-our $prefix_cache = SSHCure::Cache->new("ip_addr_in_range", 1000);
 
 # The Init function is called when the plugin is loaded. It's purpose is to give the plugin
 # the possibility to initialize itself. The plugin should return 1 for success or 0 for
@@ -224,8 +221,8 @@ sub run {
     if (-e $CFG::CONST{'FN_RUN_LOCK'}) {
         log_warning("Previous run has not finished yet (or a stale lock file exists); skipping data processing...");
         my $skip = 1;
-        my $mtime = scalar ((stat($CFG::CONST{'FN_RUN_LOCK'}))[9]);
-        if ((time() - $mtime) >= $CFG::CONST{'RUN_LOCK_TIMEOUT'}) {
+        my $run_lock_mtime = scalar ((stat($CFG::CONST{'FN_RUN_LOCK'}))[9]);
+        if ((time() - $run_lock_mtime) >= $CFG::CONST{'RUN_LOCK_TIMEOUT'}) {
             log_warning("Lock file exists for more than $CFG::CONST{'RUN_LOCK_TIMEOUT'} second(s); assuming stale lock file");
             unlink($CFG::CONST{'FN_RUN_LOCK'});
             log_warning("Stale lock file removed");
@@ -293,6 +290,7 @@ sub run {
         }
     }
 
+    # Load attacks hash
     if (-e $CFG::CONST{'FN_ATTACKS_HASH'}) {
         try {
             my $fh = retrieve($CFG::CONST{'FN_ATTACKS_HASH'});
@@ -302,6 +300,35 @@ sub run {
             %attacks = ();
             log_error("Failed to load attacks hash; renamed corrupted attacks hash to $CFG::CONST{'FN_ATTACKS_HASH'}_old and created new hash");
         };
+    }
+
+    # Load caches
+    if (-e $CFG::CONST{'CACHES'}{'FN_CACHES_HASH'}) {
+        my $caches_mtime = scalar ((stat($CFG::CONST{'CACHES'}{'FN_CACHES_HASH'}))[9]);
+        if ((time() - $caches_mtime) < $CFG::CONST{'CACHES'}{'EXPIRATION_TIME'}) {
+            try {
+                my $fh = retrieve($CFG::CONST{'CACHES'}{'FN_CACHES_HASH'});
+                %caches = %{$fh};
+            } catch {
+                log_error("Failed to load caches hash; renamed corrupted caches hash to $CFG::CONST{'CACHES'}{'FN_CACHES_HASH'}_old and created new hash");
+                rename($CFG::CONST{'CACHES'}{'FN_CACHES_HASH'}, $CFG::CONST{'CACHES'}{'FN_CACHES_HASH'}."_old");
+                $caches{'dec2ip'} = SSHCure::Cache->new("dec2ip", 1000);
+                $caches{'ip2dec'} = SSHCure::Cache->new("ip2dec", 1000);
+                $caches{'ip_addr_in_range'} = SSHCure::Cache->new("ip_addr_in_range", 1000);
+            };
+        } else {
+            log_info("Caches have been expired; renamed expired caches hash to $CFG::CONST{'CACHES'}{'FN_CACHES_HASH'}_old");
+            rename($CFG::CONST{'CACHES'}{'FN_CACHES_HASH'}, $CFG::CONST{'CACHES'}{'FN_CACHES_HASH'}."_old");
+            log_info("Initializing new caches...");
+            $caches{'dec2ip'} = SSHCure::Cache->new("dec2ip", 1000);
+            $caches{'ip2dec'} = SSHCure::Cache->new("ip2dec", 1000);
+            $caches{'ip_addr_in_range'} = SSHCure::Cache->new("ip_addr_in_range", 1000);
+        }
+    } else {
+        log_info("Initializing caches...");
+        $caches{'dec2ip'} = SSHCure::Cache->new("dec2ip", 1000);
+        $caches{'ip2dec'} = SSHCure::Cache->new("ip2dec", 1000);
+        $caches{'ip_addr_in_range'} = SSHCure::Cache->new("ip_addr_in_range", 1000);
     }
 
     # This label is for validation purposes. it processes all of the nfcapd from the specified dir are ran through the algorithm.
@@ -434,10 +461,11 @@ sub run {
         fetch_openbl_blacklist_snapshot() if $fetch_openbl_snapshot;
 
         # Check whether the local caches need to be cleaned up, and update them if needed
-        if (index($nfcapd_time, $CFG::CONST{'CACHES_CLEANUP_TIME'}) != -1) {
-            $dec2ip_cache->clean();
-            $ip2dec_cache->clean();
-            $prefix_cache->clean();
+        if (index($nfcapd_time, $CFG::CONST{'CACHES'}{'CLEANUP_TIME'}) != -1) {
+            log_info("Performing cleanup of caches...");
+            for my $cache (values(%caches)) {
+                $cache->clean();
+            }
         }
     }
 
@@ -445,7 +473,9 @@ sub run {
         goto VALIDATION_MODE_START;
     }
     
+    # Store attacks hash and caches
     store(\%attacks, $CFG::CONST{'FN_ATTACKS_HASH'});
+    store(\%caches, $CFG::CONST{'CACHES'}{'FN_CACHES_HASH'});
 
     if (VALIDATION_MODE) {
         log_info("Validation runs completed; alter the constants in SSHCure.pm, empty the db/hashes, remove /tmp/sshcure_validation.lock");
