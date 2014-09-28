@@ -22,6 +22,7 @@ sub new {
 
     $self->{name} = $name;
     $self->{max_entries} = $max_entries;
+    $self->{misses} = 0;
 
     my %data = ();
     $self->{data} = \%data;
@@ -34,7 +35,7 @@ sub clean {
     my $cache_entry_count = scalar keys($self->{data});
 
     if ($cache_entry_count > $self->{max_entries}) {
-        SSHCure::Utils::log_info("Cleaning up cache '".$self->{name}."'...");
+        SSHCure::Utils::log_info(sprintf("Cleaning up cache '%s' (hit ratio: %.2f)...", $self->{name}, $self->get_hit_ratio()));
         my @keys_to_be_cleared = ();
 
         # Determine which elements must be removed from the cache
@@ -46,6 +47,12 @@ sub clean {
         foreach my $key (@keys_to_be_cleared) {
             delete($self->{data}{$key});
         }
+
+        # Reset hit and miss counters
+        foreach my $key (keys($self->{data})) {
+            $self->{data}{$key}{'hits'} = 0;
+        }
+        $self->{misses} = 0;
 
         SSHCure::Utils::log_info(sprintf("Removed %i elements from cache '%s'; new number of elements in cache: %i", scalar @keys_to_be_cleared, $self->{name}, scalar keys($self->{data})));
     } else {
@@ -63,6 +70,7 @@ sub get {
         $self->{data}{$key}{'hits'}++;
         return $self->{data}{$key}{'value'};
     } else {
+        $self->{misses}++;
         return;
     }
 }
@@ -78,8 +86,16 @@ sub set {
         $self->{data}{$key}{'value'} = $value;
         $self->{data}{$key}{'hits'} = 1;
     }
+}
 
-    SSHCure::Utils::log_debug("Added element '$key' to cache '".$self->{name}."'; elements in cache: ".scalar keys($self->{data}));
+sub get_hit_ratio {
+    my $self = shift;
+    my $hits = 0;
+    foreach my $key (keys(%{$self->{data}})) {
+        $hits += $self->{data}{$key}{'hits'};
+    }
+
+    return $hits / ($hits + $self->{misses});
 }
 
 1;
