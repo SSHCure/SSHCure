@@ -267,6 +267,8 @@ sub dec2ip {
 
 # Determines whether an IP address (first parameter) falls within the
 # provided IP address prefix (second parameter).
+# The first argument, $address, must be provided in decimal notation, while
+# the second argument, $prefix, must be provided as 'a.b.c.d/x'.
 sub ip_addr_in_range {
     my ($address, $prefix) = @_;
     my $cache_elem = $SSHCure::caches{'ip_addr_in_range'}->get($prefix);
