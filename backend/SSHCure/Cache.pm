@@ -56,7 +56,7 @@ sub clean {
 
         SSHCure::Utils::log_info(sprintf("Removed %i elements from cache '%s'; new number of elements in cache: %i", scalar @keys_to_be_cleared, $self->{name}, scalar keys($self->{data})));
     } else {
-        SSHCure::Utils::log_info("No cleanup of cache '".$self->{name}."' needed...");
+        SSHCure::Utils::log_info("No cleanup of cache '".$self->{name}."' needed (utilization: ${cache_entry_count}/${$self}->{max_entries})...");
     }
 
     return;
