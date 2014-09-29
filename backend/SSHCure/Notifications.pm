@@ -16,6 +16,7 @@ use strict;
 
 use SSHCure::Notifications::Email;
 use SSHCure::Notifications::Log;
+use SSHCure::Notifications::Qmanage;
 use SSHCure::Utils;
 
 use Exporter;
