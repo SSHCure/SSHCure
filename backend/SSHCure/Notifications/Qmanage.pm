@@ -19,7 +19,7 @@ use SSHCure::Utils;
 use Exporter;
 our @ISA = 'Exporter';
 
-my $server_url = "http://<host>/admin/rpc";
+my $server_url = "https://<host>/admin/rpc";
 my $realm = "";
 my $username = "";
 my $password = "";
