@@ -619,6 +619,18 @@ sub config_sanity_check {
         log_error("Syntax error in INTERNAL_NETWORKS specification");
         return 0;
     }
+
+    # OpenBL snapshot synchronization
+    unless (index($CFG::CONST{'OPENBL'}{'UPDATE_TIME'}, ":") == 2 && length($CFG::CONST{'OPENBL'}{'UPDATE_TIME'}) == 5) {
+        log_error("Syntax error in configured OpenBL snapshot synchronization time (constants.pm)");
+        return 0;
+    }
+
+    # Cache cleanup
+    unless (index($CFG::CONST{'CACHES'}{'CLEANUP_TIME'}, ":") == 2 && length($CFG::CONST{'CACHES'}{'CLEANUP_TIME'}) == 5) {
+        log_error("Syntax error in configured cache cleanup time (constants.pm)");
+        return 0;
+    }
     
     return 1;
 }

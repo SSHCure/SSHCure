@@ -453,7 +453,7 @@ sub run {
         unless (-e $CFG::CONST{'OPENBL'}{'SSH_BLACKLIST_LOCAL_PATH'}) {
             log_info("Could not find OpenBL snapshot; fetching snapshot...");
             $fetch_openbl_snapshot = 1;
-        } elsif (index($nfcapd_time, $CFG::CONST{'OPENBL'}{'UPDATE_TIME'}) != -1) {
+        } elsif ($nfcapd_time eq $CFG::CONST{'OPENBL'}{'UPDATE_TIME'}) {
             log_info("Local OpenBL blacklist snapshot has expired; fetching new snapshot...");
             $fetch_openbl_snapshot = 1;
         }
@@ -461,7 +461,7 @@ sub run {
         fetch_openbl_blacklist_snapshot() if $fetch_openbl_snapshot;
 
         # Check whether the local caches need to be cleaned up, and update them if needed
-        if (index($nfcapd_time, $CFG::CONST{'CACHES'}{'CLEANUP_TIME'}) != -1) {
+        if ($nfcapd_time eq $CFG::CONST{'CACHES'}{'CLEANUP_TIME'}) {
             log_info("Performing cleanup of caches...");
             for my $cache (values(%caches)) {
                 $cache->clean();

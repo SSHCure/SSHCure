@@ -121,7 +121,7 @@ my $SSHCURE_DATA_DIR = "$NfConf::BACKEND_PLUGINDIR/SSHCure/data";
     },
 
     'CACHES' => {
-        'CLEANUP_TIME'      => "6:00",          # Use the following format: %H:%M. Minutes must be multiples of 5, in [0, 55]
+        'CLEANUP_TIME'      => "06:00",         # Use the following format: %H:%M. Hours must have a leading zero (in [00, 23]); minutes must be multiples of 5, in [00, 55]
         'FN_CACHES_HASH'    => $SSHCURE_DATA_DIR."/caches_hash",
         'EXPIRATION_TIME'   => 24 * 60 * 60,    # 1 day, in seconds
     },
@@ -138,7 +138,7 @@ my $SSHCURE_DATA_DIR = "$NfConf::BACKEND_PLUGINDIR/SSHCure/data";
     'OPENBL' => {
         'SSH_BLACKLIST_URL'         => "http://www.openbl.org/lists/base_all_ssh-only.txt",
         'SSH_BLACKLIST_LOCAL_PATH'  => $SSHCURE_DATA_DIR."/openbl_ssh_snapshot.txt",
-        'UPDATE_TIME'               => "5:00", # Use the following format: %H:%M. Minutes must be multiples of 5, in [0, 55]
+        'UPDATE_TIME'               => "05:00", # Use the following format: %H:%M. Hours must have a leading zero (in [00, 23]); minutes must be multiples of 5, in [00, 55]
     },
 );
 
