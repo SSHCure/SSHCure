@@ -14,15 +14,17 @@ use strict;
 use warnings;
 
 use RPC::XML::Client;
+use POSIX qw(strftime);
 use SSHCure::Utils;
 
 use Exporter;
 our @ISA = 'Exporter';
 
-my $server_url = "https://<host>/admin/rpc";
-my $realm = "";
+# Provide your Qmanage configuration here
 my $username = "";
 my $password = "";
+my $server_url = "https://<host>/admin/rpc";
+# -----
 
 sub handle_notification {
     my (undef, $attacker_ip, $attack, $new_targets, $notification_id) = @_;
@@ -34,37 +36,76 @@ sub handle_notification {
     my $sshcure_host = qx(hostname -f);
     $sshcure_host =~ s/^\s+|\s+\n?$//g;
 
-    my $qmanage_subcategory = "";
-    if ($$attack{'certainty'} >= $CFG::CONST{'NOTIFICATIONS'}{'ATTACK_PHASE'}{'COMPROMISE'}){
-        $qmanage_subcategory = "Compromise";
-    } elsif ($$attack{'certainty'} >= $CFG::CONST{'NOTIFICATIONS'}{'ATTACK_PHASE'}{'BRUTEFORCE'}){
-        $qmanage_subcategory = "Brute-force";
-    } elsif ($$attack{'certainty'} >= $CFG::CONST{'NOTIFICATIONS'}{'ATTACK_PHASE'}{'SCAN'}){
-        $qmanage_subcategory = "Scan";
+    # Check whether attacker is part of internal network
+    my $internal_attacker = 0;
+    for my $internal_network (split(/,/, $CFG::INTERNAL_NETWORKS)) {
+        if (ip_addr_in_range($attacker_ip, $internal_network)) {
+            $internal_attacker = 1;
+            last;
+        }
     }
-    
-    my $client = RPC::XML::Client->new($server_url,
+
+    # Compromised machines should be placed in category 'Network Risk'
+    my $qmanage_category = "";
+    if ($$attack{'certainty'} >= $CFG::CONST{'NOTIFICATIONS'}{'ATTACK_PHASE'}{'COMPROMISE'}) {
+        $qmanage_category = "Network Risk";
+    } elsif ($internal_attacker || $$attack{'certainty'} >= $CFG::CONST{'NOTIFICATIONS'}{'ATTACK_PHASE'}{'BRUTEFORCE'}) {
+        $qmanage_category = "Brute-Force Attack";
+    } elsif ($$attack{'certainty'} >= $CFG::CONST{'NOTIFICATIONS'}{'ATTACK_PHASE'}{'SCAN'}) {
+        $qmanage_category = "Portscan";
+    } else {
+        # Do nothing
+        log_error("Qmanage notification: Could not identify Qmanage category");
+
+        # Stop further processing since 'category' is a required field
+        return;
+    }
+
+    # Username and password are added to the URL, since ->credentials seems to not be supported by Qmanage
+    my $server_url_auth = $server_url;
+    if (index(lc($server_url), "https:") == -1) { # HTTP
+        $server_url_auth =~ s/^http:\/\//http:\/\/${username}:${password}\@/;
+    } else { # HTTPS
+        $server_url_auth =~ s/^https:\/\//https:\/\/${username}:${password}\@/;
+    }
+
+    my $client = RPC::XML::Client->new($server_url_auth,
         error_handler => sub {
-            log_error("Could not communicate with Qmanage ($server_url): $_[0]");
+            if (index($_[0], "Authorization Required") != -1) {
+                log_error("Could not communicate with Qmanage ($server_url): credentials missing or incorrect");
+            } else {
+                log_error("Could not communicate with Qmanage ($server_url): $_[0]");
+            }
         },
         fault_handler => sub {
             my $fault = $_;
             log_error("A server-side error occurred with communicating with Qmanage ($server_url); code: $$fault{'faultCode'}, message: $$fault{'faultString'}");
         }
     );
-    $client->credentials($realm, $username, $password);
 
-    # my $response = $client->send_request('reports_api_version');
-    my $response = $client->send_request('create_reports' => {
-            Reports => {
-                suspect => (('ipv4', dec2ip($attacker_ip))),
-                source => 'SSHCure@$sshcure_host',
-                timestamp => strftime("%Y-%m-%dT%H:%M:%S", localtime($$attack{'start_time'})),
-                category => 'Brute-Force Attack',
-                subcategory => $qmanage_subcategory,
-                confidence => $$attack{'certainty'},
-            }
+    my $time_zone = strftime("%z", localtime($$attack{'start_time'}));
+    $time_zone =~ s/(\d{2})(\d{2})/$1:$2/;
+    my $timestamp_iso8601 = strftime("%Y-%m-%dT%H:%M:%S".$time_zone, localtime($$attack{'start_time'}));
+
+    log_error("No start time set for attack (attack ID: ".$$attack{'db_id'}.")") unless ($$attack{'start_time'});
+
+    my $response = $client->simple_request('create_reports' => {
+            reports => RPC::XML::array->new({
+                suspect => RPC::XML::array->new(RPC::XML::array->new('ipv4', dec2ip($attacker_ip))), # Should be a list of lists
+                source => RPC::XML::string->new('SSHCure@'.$sshcure_host),
+                timestamp => RPC::XML::datetime_iso8601->new($timestamp_iso8601),
+                category => RPC::XML::string->new($qmanage_category),
+                subcategory => RPC::XML::string->new('SSHCure'),
+                confidence => RPC::XML::double->new($$attack{'certainty'}),
+            })
     });
+
+    if ($response) {
+        my $report_id = $$response{'report_id'}[0];
+        log_info("Notification was successfully sent to Qmanage (attack ID: ".$$attack{'db_id'}.", report ID: $report_id)");
+    } else {
+        log_error("No XML-RPC response received from Qmanage ($server_url)");
+    }
 }
 
 1;
