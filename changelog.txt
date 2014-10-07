@@ -5,7 +5,10 @@ Please check the manual or readme for installation instructions.
 
 Release notes [v3.0]:
 
-- [FEATURE] New front-end
+- [FEATURE] Overhauled front-end, with particular focus on incoming vs. outgoing attacks
+- [FEATURE] Integration with QuarantaineNet Qmanage by sending reports to Qmanage's XML-RPC interface
+- [FEATURE] Integration with OpenBL SSH blacklist
+- [FEATURE] Full IPv6 support
 
 Release notes [v2.4.1]:
 
