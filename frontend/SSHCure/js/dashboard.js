@@ -105,7 +105,12 @@ function load_attacks_table (type, internal_networks, period) {
                 $('<tr>').append(
                     $('<td>').append(phases),
                     $('<td>').html("<span class=\"glyphicon glyphicon-flash\"></span>"),
-                    $('<td>').text(this.attacker),
+                    $('<td>').append($('<a>')
+                            .addClass('ip-addr')
+                            .attr('href', '#')
+                            .attr('data-toggle', 'modal')
+                            .attr('data-target', '#host-details')
+                            .text(this.attacker)),
                     $('<td>').text(date.toString("ddd. MMM d, yyyy HH:mm")),
                     $('<td>').text(this.target_count)
                 ).appendTo(body);

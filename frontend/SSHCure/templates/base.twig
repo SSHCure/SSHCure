@@ -13,13 +13,14 @@
 
             <script src="lib/jquery/jquery.min.js"></script>
             <script src="lib/jquery/jquery-queryParser.min.js"></script>
+            <script src="lib/bootstrap/js/bootstrap.min.js"></script>
             <script src="lib/flot/jquery.flot.min.js"></script>
             <script src="lib/flot/jquery.flot.stack.min.js"></script>
             <script src="lib/flot/jquery.flot.time.min.js"></script>
             <script src="js/dashboard.js"></script>
         {% endblock %}
-            <script src="js/base.js"></script>
 
+        <script src="js/base.js"></script>
         <script type="text/javascript">
             $(document).ready(function (){
                 console.log("document.ready from base.twig");
@@ -31,7 +32,6 @@
                 console.log("href post match: " + href);
                 loadPage(href, true);
             });
-
         </script>
     </head>
     <body>
@@ -43,6 +43,19 @@
                     <span id="inst-logo" class="navbar-right navbar-brand"><a href="http://www.utwente.nl"><img src="img/utwente_logo.png" /></a></span>
                 </div>
             </nav>
+            <div id="host-details" class="modal fade">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                            <h4 class="modal-title">Host details</h4>
+                        </div>
+                        <div class="modal-body">
+                            <p>One fine body&hellip;</p>
+                        </div>
+                    </div><!-- /.modal-content -->
+                </div><!-- /.modal-dialog -->
+            </div><!-- /.modal -->
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-sm-2 col-md-2 col-lg-1 sidebar">
@@ -63,7 +76,8 @@
                         {% block main %}
                         {% endblock %}
                     </div>
-                </div> </div>
+                </div>
+            </div>
         {% endblock %}
     </body>
 </html>
