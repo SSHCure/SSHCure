@@ -25,7 +25,7 @@
                 console.log("document.ready from base.twig");
                 href = window.location.href;
                 console.log("window.location.href: " + href);
-                if (href.match(/\/$/)) {
+                if (href.match(/\/$/) || href.match(/index\.php$/)) {
                     href = 'index.php?action=dashboard';
                 }
                 console.log("href post match: " + href);
