@@ -12,51 +12,26 @@
             <link href="css/base.css" rel="stylesheet">
 
             <script src="lib/jquery/jquery.min.js"></script>
+            <script src="lib/jquery/jquery-queryParser.min.js"></script>
             <script src="lib/flot/jquery.flot.min.js"></script>
             <script src="lib/flot/jquery.flot.stack.min.js"></script>
             <script src="lib/flot/jquery.flot.time.min.js"></script>
+            <script src="js/dashboard.js"></script>
         {% endblock %}
+            <script src="js/base.js"></script>
 
         <script type="text/javascript">
-            $(window).load(function () {
-                {% block js %}
-                    // Sidebar button handling
-                    $('ul.nav-sidebar a').click(function (e) {
-                        var sidebar_button_text = $(this).text();
-                        var formatted_action = sidebar_button_text.toLowerCase().replace(" ", "_");
-
-                        // Fetch head to include template includes
-                        $('head').load("index.php?action=" + formatted_action + "&block=head", function () {
-                            // Fetch main page body
-                            $('div.main').load("index.php?action=" + formatted_action + "&block=main", function () {
-                                if (formatted_action == "dashboard") {
-                                    Dashboard = new Dashboard();
-                                    Dashboard.initialize();
-                                }
-                            });
-                        });
-
-                        // Change URL in address bar without reload (i.e., ignore 'block')
-                        window.history.replaceState({}, "SSHCure | " + sidebar_button_text, "index.php?action=" + formatted_action);
-
-                        // Remove 'active' class from previously selected sidebar element
-                        $('ul.nav-sidebar li').removeClass('active');
-
-                        // Add 'active' class to currently selected sidebar element
-                        var parent = $(this).parent();
-                        if (!parent.hasClass('active')) {
-                            parent.addClass('active');
-                        }
-
-                        e.preventDefault();
-                    });
-
-                    // Select 'Dashboard' in sidebar if nothing has been selected (i.e., when opening SSHCure)
-                    if ($('ul.nav-sidebar li:active').length == 0) {
-                        $('ul.nav-sidebar li a:contains(\"Dashboard\")').trigger('click');
-                    }
-                {% endblock %}
+            $(document).ready(function (){
+                console.log("document.ready from base.twig");
+                href = window.location.href;
+                console.log("window.location.href: " + href);
+                if (href.match(/\/$/)) {
+                    href = 'index.php?action=dashboard';
+                }
+                console.log("href post match: " + href);
+                loadPage(href, true);
             });
+
         </script>
     </head>
     <body>
