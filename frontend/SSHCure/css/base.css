@@ -8,6 +8,10 @@ html {
     font-family: 'Roboto', sans-serif;
 }
 
+a:visited, a:hover, a:active {
+    text-decoration: none;
+}
+
 h1 {
     font-size: 12pt;
 }
@@ -58,10 +62,6 @@ nav.navbar {
     margin-bottom: 0px;
     height: 100px;
     padding-top: 15px;
-/*  display: flex;
-    display: -webkit-flex;
-    align-items: center;
-    -webkit-align-items: center;*/
 }
 
 #logo {
@@ -161,6 +161,14 @@ div.main-block h1 {
 
 div.main-block > h1, div.main-block > div, div.main-block > p {
     padding: 11px;
+}
+
+/* Modal */
+div.modal {
+    top: 40%;
+}
+div.modal-content {
+    border-radius: 0px;
 }
 
 /* Tables */
