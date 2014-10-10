@@ -22,6 +22,10 @@ var loadPage = function(href, replaceState) {
     }
 
     $('div#main').load("index.php?action=" + action + "&block=main", function() {
+        // Update the active button on the navigation bar
+        $('.nav-sidebar li').removeClass('active');
+        $('.nav-sidebar li a[href="index.php?action='+action+'"]').parent().addClass('active')
+
         // This switch functions as a $(document).ready for asynchronous page loads
         switch (action) {
             case "dashboard":

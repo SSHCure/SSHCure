@@ -111,13 +111,15 @@ ul.nav-sidebar a span {
     vertical-align: middle;
 }
 
-div.sidebar a {
-    color: #939393;
-    min-width: 150px;
-}
-
 div.sidebar li a:focus {
     outline: 0;
+    color: #939393;
+    background-color: #34363F;
+}
+
+div.sidebar li a {
+    color: #939393;
+    min-width: 150px;
 }
 
 div.sidebar li {
