@@ -20,7 +20,7 @@
     $template = $twig->loadTemplate($action.'.twig');
 
     if (is_null($block)) {
-        echo $template->render(array());
+        echo $template->render(array('action' => $action));
     } else {
         echo $template->renderBlock($block, array());
     }
