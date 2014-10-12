@@ -1,6 +1,6 @@
 <?php
     
-    require_once("../config.php");
+    require_once("../../config.php");
     header("content-type: application/json");
 
     // Parse and process parameters

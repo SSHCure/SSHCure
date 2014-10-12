@@ -55,9 +55,9 @@ function load_attacks_table (type, internal_networks, period) {
     var url;
 
     if (type == INCOMING) {
-        url = "json/get_incoming_attacks_data.php";
+        url = "json/data/get_incoming_attacks.php";
     } else {
-        url = "json/get_outgoing_attacks_data.php";
+        url = "json/data/get_outgoing_attacks.php";
     }
 
     var params = {
@@ -138,9 +138,9 @@ function load_top_targets_table (type) {
     var url;
 
     if (type == BRUTEFORCE) {
-        url = "json/get_top_targets_bruteforce_data.php";
+        url = "json/data/get_top_targets_bruteforce.php";
     } else {
-        url = "json/get_top_targets_compromise_data.php";
+        url = "json/data/get_top_targets_compromise.php";
     }
 
     var params = {};
@@ -191,7 +191,7 @@ function plot_incoming_attacks_plot (internal_networks, period) {
         period = 'week';
     }
     
-    var url = "json/get_incoming_attacks_plot_data.php";
+    var url = "json/data/get_incoming_attacks_plot.php";
     var now = parseInt((new Date().getTime()) / 1000);
     var max_start_time = now;
 
