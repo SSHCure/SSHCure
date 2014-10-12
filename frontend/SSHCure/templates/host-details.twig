@@ -1,6 +1,10 @@
 {% block main %}
     <div>
-        <h1>Host details of {{ host }}</h1>
-        <p>Country: {{ country }}</p>
+        <table id="overview-table">
+            <tbody>
+                <tr><td class="field-name left">IP address</td><td>{{ host }}</td><td class="field-name right">Domain name</td><td>{{ host-name }}</td></tr>
+                <tr><td class="field-name left">Country</td><td>{{ country }}</td><td class="field-name right">City</td><td>{{ city }}</td></tr>
+            </tbody>
+        </table>
     </div>
 {% endblock %}

@@ -108,9 +108,23 @@ function load_attacks_table (type, internal_networks, period) {
                     $('<td>').append($('<a>')
                             .addClass('ip-addr')
                             .attr('href', '#')
-                            .attr('data-toggle', 'modal')
-                            .attr('data-target', '#host-details')
-                            .text(this.attacker)),
+                            .text(this.attacker))
+                            .click(function () {
+                                var url = "json/html/get_host_details.php";
+                                var params = {
+                                    'host': $(this).text()
+                                }
+                                $.getJSON(url, params, function (data, textStatus, jqXHR) {
+                                    // Overwrite modal title using Javascript, since Bootstrap uses a completely different element for modal headers and bodies
+                                    $('#host-details h4.modal-title').text("Host details for " + params['host']);
+
+                                    // Insert pre-rendered HTML into body
+                                    $('#host-details div.modal-body').html(data.data);
+                                    $('#host-details').modal({
+                                        show: true
+                                    });
+                                });
+                            }),
                     $('<td>').text(date.toString("ddd. MMM d, yyyy HH:mm")),
                     $('<td>').text(this.target_count)
                 ).appendTo(body);

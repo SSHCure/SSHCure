@@ -1,0 +1,8 @@
+
+table#overview-table {
+    text-align: left;
+}
+
+table#overview-table td.field-name {
+    font-weight: bold;
+}

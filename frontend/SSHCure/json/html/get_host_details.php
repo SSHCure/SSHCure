@@ -16,6 +16,7 @@
     }
     
     $country = "The Netherlands";
+    $city = "Enschede";
 
     // $db = new PDO($config['database.dsn']);
 
@@ -38,7 +39,7 @@
     $twig = new Twig_Environment($loader, array());
 
     $result['status'] = 0;
-    $result['data'] = $twig->render('host-details.twig', array('host' => $host, 'country' => $country));
+    $result['data'] = $twig->render('host-details.twig', array('host' => $host, 'host-name' => 'utwente.nl', 'country' => $country, 'city' => $city));
 
     // foreach ($db_result as $row) {
     //     $record = [];
