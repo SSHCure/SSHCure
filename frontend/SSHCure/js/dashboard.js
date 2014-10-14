@@ -176,7 +176,26 @@ function load_top_targets_table (type) {
         } else {
             $.each(data.data, function () {
                 $('<tr>').append(
-                    $('<td>').text(this.target),
+                    $('<td>').append($('<a>')
+                        .addClass('ip-addr')
+                        .attr('href', '#')
+                        .text(this.target))
+                        .click(function () {
+                            var url = "json/html/get_host_details.php";
+                            var params = {
+                                'host': $(this).text()
+                            }
+                            $.getJSON(url, params, function (data, textStatus, jqXHR) {
+                                // Overwrite modal title using Javascript, since Bootstrap uses a completely different element for modal headers and bodies
+                                $('#host-details h4.modal-title').text("Host details for " + params['host']);
+
+                                // Insert pre-rendered HTML into body
+                                $('#host-details div.modal-body').html(data.data);
+                                $('#host-details').modal({
+                                    show: true
+                                });
+                            });
+                        }),
                     $('<td>').text(this.attack_count),
                     $('<td>').text(this.compromise_count)
                 ).appendTo(body);
