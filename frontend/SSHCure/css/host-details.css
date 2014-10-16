@@ -1,8 +1,28 @@
 
 table#overview-table {
+    font-size: 10pt;
     text-align: left;
 }
 
 table#overview-table td.field-name {
     font-weight: bold;
+}
+
+ul.nav-tabs {
+    margin-top: 15px;
+}
+
+.nav-tabs > li > a {
+    border-radius: 0px;
+}
+
+.nav-tabs > li, .nav-pills > li {
+    float: none;
+    display: inline-block;
+    *display: inline; /* ie7 fix */
+    zoom: 1; /* hasLayout ie7 trigger */
+}
+
+.nav-tabs, .nav-pills {
+    text-align: center;
 }
