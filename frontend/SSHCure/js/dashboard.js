@@ -55,9 +55,9 @@ function load_attacks_table (type, internal_networks, period) {
     var url;
 
     if (type == INCOMING) {
-        url = "json/get_incoming_attacks_data.php";
+        url = "json/data/get_incoming_attacks.php";
     } else {
-        url = "json/get_outgoing_attacks_data.php";
+        url = "json/data/get_outgoing_attacks.php";
     }
 
     var params = {
@@ -108,9 +108,23 @@ function load_attacks_table (type, internal_networks, period) {
                     $('<td>').append($('<a>')
                             .addClass('ip-addr')
                             .attr('href', '#')
-                            .attr('data-toggle', 'modal')
-                            .attr('data-target', '#host-details')
-                            .text(this.attacker)),
+                            .text(this.attacker))
+                            .click(function () {
+                                var url = "json/html/get_host_details.php";
+                                var params = {
+                                    'host': $(this).text()
+                                }
+                                $.getJSON(url, params, function (data, textStatus, jqXHR) {
+                                    // Overwrite modal title using Javascript, since Bootstrap uses a completely different element for modal headers and bodies
+                                    $('#host-details h4.modal-title').text("Host details for " + params['host']);
+
+                                    // Insert pre-rendered HTML into body
+                                    $('#host-details div.modal-body').html(data.data);
+                                    $('#host-details').modal({
+                                        show: true
+                                    });
+                                });
+                            }),
                     $('<td>').text(date.toString("ddd. MMM d, yyyy HH:mm")),
                     $('<td>').text(this.target_count)
                 ).appendTo(body);
@@ -138,9 +152,9 @@ function load_top_targets_table (type) {
     var url;
 
     if (type == BRUTEFORCE) {
-        url = "json/get_top_targets_bruteforce_data.php";
+        url = "json/data/get_top_targets_bruteforce.php";
     } else {
-        url = "json/get_top_targets_compromise_data.php";
+        url = "json/data/get_top_targets_compromise.php";
     }
 
     var params = {};
@@ -162,7 +176,26 @@ function load_top_targets_table (type) {
         } else {
             $.each(data.data, function () {
                 $('<tr>').append(
-                    $('<td>').text(this.target),
+                    $('<td>').append($('<a>')
+                        .addClass('ip-addr')
+                        .attr('href', '#')
+                        .text(this.target))
+                        .click(function () {
+                            var url = "json/html/get_host_details.php";
+                            var params = {
+                                'host': $(this).text()
+                            }
+                            $.getJSON(url, params, function (data, textStatus, jqXHR) {
+                                // Overwrite modal title using Javascript, since Bootstrap uses a completely different element for modal headers and bodies
+                                $('#host-details h4.modal-title').text("Host details for " + params['host']);
+
+                                // Insert pre-rendered HTML into body
+                                $('#host-details div.modal-body').html(data.data);
+                                $('#host-details').modal({
+                                    show: true
+                                });
+                            });
+                        }),
                     $('<td>').text(this.attack_count),
                     $('<td>').text(this.compromise_count)
                 ).appendTo(body);
@@ -191,7 +224,7 @@ function plot_incoming_attacks_plot (internal_networks, period) {
         period = 'week';
     }
     
-    var url = "json/get_incoming_attacks_plot_data.php";
+    var url = "json/data/get_incoming_attacks_plot.php";
     var now = parseInt((new Date().getTime()) / 1000);
     var max_start_time = now;
 
