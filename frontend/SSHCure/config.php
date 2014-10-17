@@ -7,4 +7,5 @@
     $config['maxmind_IPv4.path']        = 'lib/MaxMind/GeoLiteCity.dat';
     $config['maxmind_IPv6.path']        = 'lib/MaxMind/GeoLiteCityv6.dat';
     
+    $config['web.root']                 = '/nfsen/plugins/SSHCure';
 ?>

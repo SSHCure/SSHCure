@@ -4,6 +4,7 @@
     define("TEMPLATE_PATH", "templates");
 
     require_once(TWIG_PATH.'/Autoloader.php');
+    require_once('config.php');
 
     Twig_Autoloader::register();
 
@@ -19,10 +20,14 @@
     $block = (isset($_GET['block'])) ? $_GET['block'] : NULL;
     $template = $twig->loadTemplate($action.'.twig');
 
+    $template_args = array();
+    $template_args['WEBROOT'] = $config['web.root'];
+
     if (is_null($block)) {
-        echo $template->render(array('action' => $action));
+        $template_args['action'] = $action;
+        echo $template->render($template_args);
     } else {
-        echo $template->renderBlock($block, array());
+        echo $template->renderBlock($block, $template_args);
     }
 
 ?>
