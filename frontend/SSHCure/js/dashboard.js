@@ -65,7 +65,7 @@ function load_attacks_table (type, internal_networks, period) {
     };
 
     $.getJSON(url, params, function (data, textStatus, jqXHR) {
-        var table = $('<table>');
+        var table = $('<table>').addClass('list');
         var head = $('<thead>');
         var body = $('<tbody>');
         head.append(
@@ -160,7 +160,7 @@ function load_top_targets_table (type) {
     var params = {};
 
     $.getJSON(url, params, function (data, textStatus, jqXHR) {
-        var table = $('<table>');
+        var table = $('<table>').addClass('list');
         var head = $('<thead>');
         var body = $('<tbody>');
         head.append(
