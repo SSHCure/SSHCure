@@ -77,9 +77,9 @@ nav.navbar {
 }
 
 #inst-logo {
-    /* display: none; */ /* Only enabled in medium and large view */
+    display: none; /* Only enabled in medium and large view */
     height: 100%;
-    padding-right: 40px;
+    padding-right: 35px;
 }
 
 /* Sidebar */
@@ -100,7 +100,7 @@ div.sidebar {
         left: 0;
         min-height: 500px;
     }
-    #logo-text {
+    #logo-text, #inst-logo {
         display: block;
     }
 }

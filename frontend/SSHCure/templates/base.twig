@@ -22,24 +22,12 @@
         {% endblock %}
 
         <script src="js/base.js"></script>
-        <script type="text/javascript">
-            $(document).ready(function (){
-                console.log("document.ready from base.twig");
-                href = window.location.href;
-                console.log("window.location.href: " + href);
-                if (href.match(/\/$/) || href.match(/index\.php$/)) {
-                    href = 'index.php?action=dashboard';
-                }
-                console.log("href post match: " + href);
-                loadPage(href, true);
-            });
-        </script>
     </head>
     <body>
         {% block body %}
-            <nav class="navbar navbar-default" role="navigation">
+            <nav class="navbar navbar-default">
                 <div class="container-fluid">
-                    <span id="logo" class="navbar-left navbar-brand"><a href="/"><img src="img/sshcure_logo.png" /></a></span>
+                    <span id="logo" class="navbar-left navbar-brand"><a href="{{WEBROOT}}"><img src="img/sshcure_logo.png" /></a></span>
                     <p id="logo-text" class="navbar-text">Flow-based intrusion detection for SSH</p>
                     <span id="inst-logo" class="navbar-right navbar-brand"><a href="http://www.utwente.nl"><img src="img/utwente_logo.png" /></a></span>
                 </div>
