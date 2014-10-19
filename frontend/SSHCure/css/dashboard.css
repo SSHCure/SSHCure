@@ -39,8 +39,6 @@
 div.main-block.table table thead {
     background-color: #DDDDDD;
     color: #898989;
-    font-size: 11pt;
-    line-height: 50px;
 }
 div.main-block div[id$='-table'] {
     padding: 0;

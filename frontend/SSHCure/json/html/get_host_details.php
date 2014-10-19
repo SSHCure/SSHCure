@@ -16,15 +16,20 @@
         die();
     }
 
+    // Check whether host has IPv4 or IPv6 address
     if (substr_count($host, '.') == 3) {
         $geo_db_handle = geoip_open("../../".$config['maxmind_IPv4.path'], GEOIP_STANDARD);
+        $host_address_db = ip2long($host);
     } else if (substr_count($host, ':') == 1) {
         $geo_db_handle = geoip_open("../../".$config['maxmind_IPv6.path'], GEOIP_STANDARD);
+        $host_address_db = $host;
     } else {
         $result['status'] = 1;
         echo json_encode($result);
         die();
     }
+
+    $db = new PDO($config['database.dsn']);
 
     /* Perform geolocation */
     $geo_record = geoip_record_by_addr($geo_db_handle, $host);
@@ -44,19 +49,85 @@
 
     geoip_close($geo_db_handle);
 
-    // $db = new PDO($config['database.dsn']);
+    /* Find attacks in which the current host is an attacker */
+    $query_attacks_attacker = "
+    SELECT      a.id,
+                a.attacker_ip,
+                a.start_time,
+                a.certainty
+    FROM        attack a
+    WHERE       a.attacker_ip = :attacker_ip
+    LIMIT       100";
 
-    // $stmnt = $db->prepare($query);
-    // $stmnt->execute();
+    $stmnt = $db->prepare($query_attacks_attacker);
+    $stmnt->bindParam(":attacker_ip", $host_address_db);
+    $stmnt->execute();
 
-    // $db_result = $stmnt->fetchAll(PDO::FETCH_ASSOC);
-    // unset($stmnt);
+    $db_result_attacks_attacker = $stmnt->fetchAll(PDO::FETCH_ASSOC);
+    unset($stmnt);
 
-    // // Prepare query string for easy readability (for debugging purposes)
-    // $query = preg_replace('!\s+!', ' ', $query); // Replaces multiple spaces by single space
-    // $query = str_replace(' ,', ',', $query);
-    // $query = trim($query);
+    $attacks_attacker = array();
+    foreach ($db_result_attacks_attacker as $row) {
+        $record = [];
 
+        if (is_numeric($row['attacker_ip'])) { // IPv4
+            $record['attacker'] = long2ip($row['attacker_ip']);
+        } else { // IPv6
+            $record['attacker'] = $row['attacker_ip'];
+        }
+        
+        $record['start_time'] = $row['start_time'];
+        $record['certainty'] = $row['certainty'];
+
+        array_push($attacks_attacker, $record);
+    }
+
+    // Prepare query string for easy readability (for debugging purposes)
+    $query_attacks_attacker = preg_replace('!\s+!', ' ', $query_attacks_attacker); // Replaces multiple spaces by single space
+    $query_attacks_attacker = str_replace(' ,', ',', $query_attacks_attacker);
+    $query_attacks_attacker = trim($query_attacks_attacker);
+
+    /* Find attacks in which the current host is a target */
+    $query_attacks_target = "
+    SELECT      a.id,
+                a.attacker_ip,
+                a.start_time,
+                a.certainty
+    FROM        attack a
+    INNER JOIN  target t
+            ON  a.id = t.attack_id
+    WHERE       t.target_ip = :target_ip
+    LIMIT       100";
+
+    $stmnt = $db->prepare($query_attacks_target);
+    $stmnt->bindParam(":target_ip", $host_address_db);
+    $stmnt->execute();
+
+    $db_result_attacks_target = $stmnt->fetchAll(PDO::FETCH_ASSOC);
+    unset($stmnt);
+
+    $attacks_target = array();
+    foreach ($db_result_attacks_target as $row) {
+        $record = [];
+
+        if (is_numeric($row['attacker_ip'])) { // IPv4
+            $record['attacker'] = long2ip($row['attacker_ip']);
+        } else { // IPv6
+            $record['attacker'] = $row['attacker_ip'];
+        }
+        
+        $record['start_time'] = $row['start_time'];
+        $record['certainty'] = $row['certainty'];
+
+        array_push($attacks_target, $record);
+    }
+
+    // Prepare query string for easy readability (for debugging purposes)
+    $query_attacks_target = preg_replace('!\s+!', ' ', $query_attacks_target); // Replaces multiple spaces by single space
+    $query_attacks_target = str_replace(' ,', ',', $query_attacks_target);
+    $query_attacks_target = trim($query_attacks_target);
+
+    /* Render page */
     require_once(TWIG_PATH.'/Autoloader.php');
 
     Twig_Autoloader::register();
@@ -65,18 +136,15 @@
     $twig = new Twig_Environment($loader, array());
 
     $result['status'] = 0;
-    $result['data'] = $twig->render('host-details.twig', array('host' => $host, 'host-name' => 'utwente.nl', 'country' => $country, 'city' => $city));
-
-    // foreach ($db_result as $row) {
-    //     $record = [];
-    //     $record['start_time'] = $row['start_time'];
-    //     $record['ongoing'] = $row['end_time'] == 0;
-    //     $record['certainty'] = $row['certainty'];
-    //     $record['attacker'] = long2ip($row['attacker']);
-    //     $record['target_count'] = $row['target_count'];
-
-    //     array_push($result['data'], $record);
-    // }
+    $result['query'] = array($query_attacks_attacker, $query_attacks_target);
+    $result['data'] = $twig->render('host-details.twig', array(
+            'host' => $host,
+            'host-name' => 'utwente.nl',
+            'country' => $country,
+            'city' => $city,
+            'attacks_attacker' => $attacks_attacker,
+            'attacks_target' => $attacks_target
+    ));
 
     echo json_encode($result);
     die();

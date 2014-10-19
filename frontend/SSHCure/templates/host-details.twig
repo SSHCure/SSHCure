@@ -13,10 +13,84 @@
     </ul>
     <div class="tab-content">
         <div class="tab-pane active" id="attacks-target">
+            {% if attacks_target|length >= 1 %}
+                <table id="attacks-target-table" class="list">
+                    <thead>
+                        <td>Phases</td><td>Attacker</td><td>Date</td>
+                    </thead>
+                    <tbody>
+                        {% for attack in attacks_target %}
+                            <tr>
+                                <td>
+                                    <div class="phases">
+                                        {% if attack.certainty in [ 0.25, 0.5, 0.75 ] %}
+                                            <div class="phase scan on"></div>
+                                        {% else %}
+                                            <div class="phase scan"></div>
+                                        {% endif %}
 
+                                        {% if attack.certainty in [ 0.4, 0.5, 0.65, 0.75 ] %}
+                                            <div class="phase bruteforce on"></div>
+                                        {% else %}
+                                            <div class="phase bruteforce"></div>
+                                        {% endif %}
+                                        
+                                        {% if attack.certainty in [ 0.65, 0.75 ] %}
+                                            <div class="phase compromise on"></div>
+                                        {% else %}
+                                            <div class="phase compromise"></div>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                                <td><a class="ip-addr" href="">{{ attack.attacker }}</a></td>
+                                <td>{{ attack.start_time }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <td style="font-style: italic;" colspan="3">No data available...</td>
+            {% endif %}
         </div>
         <div class="tab-pane" id="attacks-attacker">
+            {% if attacks_attacker|length >= 1 %}
+                <table id="attacks-target-table" class="list">
+                    <thead>
+                        <td>Phases</td><td>Attacker</td><td>Date</td>
+                    </thead>
+                    <tbody>
+                        {% for attack in attacks_attacker %}
+                            <tr>
+                                <td>
+                                    <div class="phases">
+                                        {% if attack.certainty in [ 0.25, 0.5, 0.75 ] %}
+                                            <div class="phase scan on"></div>
+                                        {% else %}
+                                            <div class="phase scan"></div>
+                                        {% endif %}
 
+                                        {% if attack.certainty in [ 0.4, 0.5, 0.65, 0.75 ] %}
+                                            <div class="phase bruteforce on"></div>
+                                        {% else %}
+                                            <div class="phase bruteforce"></div>
+                                        {% endif %}
+                                        
+                                        {% if attack.certainty in [ 0.65, 0.75 ] %}
+                                            <div class="phase compromise on"></div>
+                                        {% else %}
+                                            <div class="phase compromise"></div>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                                <td><a class="ip-addr" href="">{{ attack.attacker }}</a></td>
+                                <td>{{ attack.start_time }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <td style="font-style: italic;" colspan="3">No data available...</td>
+            {% endif %}
         </div>
     </div>
 {% endblock %}
