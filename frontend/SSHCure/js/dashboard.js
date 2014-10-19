@@ -92,7 +92,7 @@ function load_attacks_table (type, internal_networks, period) {
                 if (jQuery.inArray(this.certainty, [ 0.25, 0.5, 0.75 ])) {
                     phases.find('div.phase.scan').addClass('on');
                 }
-                if (jQuery.inArray(this.certainty, [ 0.4, 0.5 ])) {
+                if (jQuery.inArray(this.certainty, [ 0.4, 0.5, 0.65, 0.75 ])) {
                     phases.find('div.phase.bruteforce').addClass('on');
                 }
                 if (jQuery.inArray(this.certainty, [ 0.65, 0.75 ])) {
