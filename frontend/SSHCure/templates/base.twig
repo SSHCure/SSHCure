@@ -22,6 +22,19 @@
         {% endblock %}
 
         <script src="js/base.js"></script>
+        <script type="text/javascript">
+            $(document).ready(function (){
+                href = window.location.href;
+                // Regarding the last condition in the following if statement:
+                // when copy-pasting a dashboard-url with a trailing-#, things break
+                // therefore, rewrite it to the normal dashboard url without trailing-#
+                if (href.match(/\/$/) || href.match(/index\.php$/)
+                    || href.match(/action=dashboard#/)) {
+                    href = 'index.php?action=dashboard';
+                }
+                loadPage(href, true);
+            });
+        </script>
     </head>
     <body>
         {% block body %}
