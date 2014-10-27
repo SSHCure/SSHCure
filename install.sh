@@ -97,7 +97,7 @@ cat ${NFSEN_CONF} | grep -v \# | egrep '\$BASEDIR|\$BINDIR|\$LIBEXECDIR|\$HTMLDI
 . ${NFSEN_VARFILE}
 rm -rf ${NFSEN_VARFILE}
 
-SSHCURE_CONF=${FRONTEND_PLUGINDIR}/SSHCure/config/config.php
+SSHCURE_CONF=${FRONTEND_PLUGINDIR}/SSHCure/config.php
 
 # Check permissions to install SSHCure - you must be ${USER} or root
 if [ "$(id -u)" != "$(id -u ${USER})" ] && [ "$(id -u)" != "0" ]; then
@@ -115,7 +115,7 @@ else
     RETRIEVE_TOOL="wget"
 fi
 
-if [ ! -f  ${SSHCURE_REL} -a ! -f ../${SSHCURE_REL} ]; then
+if [ ! -f  ${SSHCURE_REL} -a ! -f ../${SSHCURE_REL} -a ! -d frontend ]; then
     echo "Downloading SSHCure tar ball - http://sshcure.sf.net/"
     ${RETRIEVE_TOOL} -q http://downloads.sourceforge.net/project/sshcure/source/${SSHCURE_REL}
 fi
@@ -250,11 +250,11 @@ fi
 # Update plugin configuration file - config.php. We use ',' as sed delimiter instead of escaping all '/' to '\/'.
 if [ $INSTALL_FRONTEND = 1 ]; then
     echo "Updating plugin configuration file ${SSHCURE_CONF}"
-    LINE=$(grep nfsen.config-file ${SSHCURE_CONF} | awk '{ START=index($0,"="); LENGTH=length($0)-START; print substr($0,START,LENGTH) }' | cut -d"'" -f2)
-    sed -i.tmp "s,$LINE,${NFSEN_CONF},g" ${SSHCURE_CONF}
+    #LINE=$(grep nfsen.config-file ${SSHCURE_CONF} | awk '{ START=index($0,"="); LENGTH=length($0)-START; print substr($0,START,LENGTH) }' | cut -d"'" -f2)
+    #sed -i.tmp "s,$LINE,${NFSEN_CONF},g" ${SSHCURE_CONF}
 
     # Since "$config['backend.path']" is also used in "$config['database.dsn']", we have to search (grep) for "'backend.path'] ="
-    LINE=$(grep "'backend.path'] =" ${SSHCURE_CONF} | awk '{ START=index($0,"="); LENGTH=length($0)-START; print substr($0,START,LENGTH) }' | cut -d"'" -f2)
+    LINE=$(grep "'backend.path'] " ${SSHCURE_CONF} | awk '{ START=index($0,"="); LENGTH=length($0)-START; print substr($0,START,LENGTH) }' | cut -d"'" -f2)
     sed -i.tmp "s,$LINE,${BACKEND_PLUGINDIR}/SSHCure/,g" ${SSHCURE_CONF}
 fi
 
@@ -265,7 +265,7 @@ if grep "SSHCure" ${NFSEN_CONF} > /dev/null; then
     echo "Found 'SSHCure' in ${NFSEN_CONF}; assuming it is already configured"
 else
     echo "Updating NfSen configuration file ${NFSEN_CONF}"
-    
+
     # Check whether we are running Linux of BSD (BSD sed does not support inserting new lines (\n))
     if [ $(uname) = "Linux" ]; then
         sed -i.tmp "/SSHCure/d" ${NFSEN_CONF}
