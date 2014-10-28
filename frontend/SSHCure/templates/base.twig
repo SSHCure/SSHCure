@@ -25,12 +25,14 @@
         <script type="text/javascript">
             $(document).ready(function (){
                 href = window.location.href;
-                // Regarding the last condition in the following if statement:
+                // Regarding the second if statement:
                 // when copy-pasting a dashboard-url with a trailing-#, things break
-                // therefore, rewrite it to the normal dashboard url without trailing-#
-                if (href.match(/\/$/) || href.match(/index\.php$/)
-                    || href.match(/action=dashboard#/)) {
+                // therefore, rewrite it to the normal url without trailing-#
+                if (href.match(/\/$/) || href.match(/index\.php$/)) {
                     href = 'index.php?action=dashboard';
+                }
+                if (href.match(/(.*)#.*/)) {
+                    href = RegExp.$1
                 }
                 loadPage(href, true);
             });
