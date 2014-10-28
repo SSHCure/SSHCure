@@ -141,6 +141,11 @@ function load_attacks_table (type, internal_networks, period) {
                         //TODO parse json, create Targets table
                         $('#incoming-targets-content').text(""+data.data.length);
                     });
+                    url = "json/data/get_attack_graph.php";
+                    params['timezone_offset'] = (new Date()).getTimezoneOffset();
+                    $.getJSON(url, params, function(data) {
+                        //TODO parse json, plot using flot
+                    });
                 });
             });
         }
