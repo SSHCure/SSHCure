@@ -86,7 +86,7 @@ function load_attacks_table (type, internal_networks, period) {
                     $('<div>').addClass('phase bruteforce'),
                     $('<div>').addClass('phase compromise')
                 );
-                
+                var this_attack = this;
                 // Phases
                 if (jQuery.inArray(this.certainty, [ 0.25, 0.5, 0.75 ])) {
                     phases.find('div.phase.scan').addClass('on');
@@ -101,7 +101,7 @@ function load_attacks_table (type, internal_networks, period) {
                 // Date
                 var date = new Date(this.start_time * 1000);
 
-                $('<tr>').append(
+                var tr = $('<tr>').append(
                     $('<td>').append(phases),
                     $('<td>').html("<span class=\"glyphicon glyphicon-flash\"></span>"),
                     $('<td>').append($('<a>')
@@ -127,6 +127,21 @@ function load_attacks_table (type, internal_networks, period) {
                     $('<td>').text(date.toString("ddd. MMM d, yyyy HH:mm")),
                     $('<td>').text(this.target_count)
                 ).appendTo(body);
+                tr.click(function () {
+                    var url = "json/data/get_attack_details.php";
+                    var params = {
+                        'attack_id': this_attack.attack_id
+                    }
+                    $.getJSON(url, params, function(data) {
+                        //TODO parse json, create Attack details stuff
+                        $('#attack-details-content').text(data.data[0]);
+                    });
+                    url = "json/data/get_targets_for_attack.php";
+                    $.getJSON(url, params, function(data) {
+                        //TODO parse json, create Targets table
+                        $('#incoming-targets-content').text(""+data.data.length);
+                    });
+                });
             });
         }
         

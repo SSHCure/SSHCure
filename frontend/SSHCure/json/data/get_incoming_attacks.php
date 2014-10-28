@@ -67,10 +67,11 @@
 
     foreach ($db_result as $row) {
         $record = [];
-        $record['start_time'] = $row['start_time'];
-        $record['ongoing'] = $row['end_time'] == 0;
-        $record['certainty'] = $row['certainty'];
-        $record['attacker'] = long2ip($row['attacker']);
+        $record['attack_id']    = $row['id'];
+        $record['start_time']   = $row['start_time'];
+        $record['ongoing']      = $row['end_time'] == 0;
+        $record['certainty']    = $row['certainty'];
+        $record['attacker']     = long2ip($row['attacker']);
         $record['target_count'] = $row['target_count'];
 
         array_push($result['data'], $record);
