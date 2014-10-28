@@ -18,10 +18,20 @@
             <script src="lib/flot/jquery.flot.min.js"></script>
             <script src="lib/flot/jquery.flot.stack.min.js"></script>
             <script src="lib/flot/jquery.flot.time.min.js"></script>
+
+            <script src="js/base.js"></script>
+            {# Dashboard #}
             <script src="js/dashboard.js"></script>
+            <script src="lib/date.js/date.js"></script>
+            <link href="css/dashboard.css" rel="stylesheet">
+
+            {# Incoming #}
+            <link href="css/incoming.css" rel="stylesheet">
+
+
+
         {% endblock %}
 
-        <script src="js/base.js"></script>
         <script type="text/javascript">
             $(document).ready(function (){
                 href = window.location.href;

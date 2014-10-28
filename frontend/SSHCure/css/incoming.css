@@ -1,0 +1,17 @@
+#incoming-attacks-table tr:hover {
+    background: -moz-linear-gradient(top, #339ef0 0%, #0a83de 100%);
+    background: -webkit-linear-gradient(top, #339ef0 0%,#0a83de 100%);
+    cursor: pointer;
+}
+
+#incoming-attacks-table tr:hover a.ip-addr {
+    color: white;
+}
+
+#incoming-attacks-table tr:hover .scan {
+    border: 1px solid white;
+}
+
+#incoming-attacks-table a.ip-addr:hover {
+    cursor: zoom-in;
+}

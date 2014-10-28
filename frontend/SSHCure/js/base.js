@@ -1,3 +1,4 @@
+var d;
 var loadPage = function(href, replaceState) {
     if (!href.match(/index\.php\?(.*)$/)){
         // something is wrong, we expect index.php urls 
@@ -27,20 +28,30 @@ var loadPage = function(href, replaceState) {
         $('.nav-sidebar li a[href="index.php?action='+action+'"]').parent().addClass('active')
 
         // This switch functions as a $(document).ready for asynchronous page loads
+        if (typeof d !== 'object') {
+            // 'd' should be some sort of stateful thing
+            // containing all the stuff we need across the different sections
+            d = new Dashboard();
+        }
         switch (action) {
             case "dashboard":
-                if (typeof d !== 'object') {
-                    var d = new Dashboard();
-                    d.initialize();
-                }
+                d.initialize();
+                break;
+            case "incoming":
+                load_attacks_table(INCOMING, d.internal_networks);
+                break;
+            case "outgoing":
+                //plot_incoming_attacks_plot(d.internal_networks);
                 break;
         }
     });
 }
 
 $(window).bind('popstate', function(event){
-        console.log(event.originalEvent.state);
+    if(event.originalEvent.state !== null) {
+        console.log("originalEvent.state: " + event.originalEvent.state);
         loadPage(event.originalEvent.state.href, false);
+    }
 });
 
 $(document).ready(function() {

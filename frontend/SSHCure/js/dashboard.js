@@ -1,9 +1,8 @@
 
-var Dashboard = function () {
-    var me = this;
-    var internal_networks = "";
+Dashboard = function () {
+    this.internal_networks = "";
 
-    me.initialize = function () {
+    this.initialize = function () {
         // Retrieve internal domains
         var url = "json/rpc/get_internal_networks.php";
         var params = {};
@@ -18,7 +17,7 @@ var Dashboard = function () {
         });
     };
 
-    return me;
+    return this;
 };
 
 function add_time_window_control_listeners () {
@@ -107,8 +106,8 @@ function load_attacks_table (type, internal_networks, period) {
                     $('<td>').html("<span class=\"glyphicon glyphicon-flash\"></span>"),
                     $('<td>').append($('<a>')
                             .addClass('ip-addr')
-                            .attr('href', '#')
-                            .text(this.attacker))
+                            //.attr('href', '#')
+                            .text(this.attacker)
                             .click(function () {
                                 var url = "json/html/get_host_details.php";
                                 var params = {
@@ -124,7 +123,7 @@ function load_attacks_table (type, internal_networks, period) {
                                         show: true
                                     });
                                 });
-                            }),
+                            })),
                     $('<td>').text(date.toString("ddd. MMM d, yyyy HH:mm")),
                     $('<td>').text(this.target_count)
                 ).appendTo(body);
