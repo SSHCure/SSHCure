@@ -16,9 +16,6 @@ use warnings;
 use Cwd 'abs_path';
 use SSHCure::Utils;
 
-use Exporter;
-our @ISA = 'Exporter';
-
 sub handle_notification {
     my (undef, $attacker_ip, $attack, $new_targets, $notification_id) = @_;
     
@@ -76,4 +73,6 @@ sub handle_notification {
     }
     
     log_info("Notification has been written to '".abs_path($file_name)."' (attack ID: ".$attack_id.")");
-}    
+}
+
+1;
