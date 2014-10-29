@@ -15,8 +15,8 @@ use warnings;
 
 use Mail::Header;
 use Mail::Internet;
-use SSHCure::Utils;
 use POSIX qw(strftime);
+use SSHCure::Utils;
 
 sub handle_notification {
     my (undef, $attacker_ip, $attack, $new_targets, $notification_id) = @_;
