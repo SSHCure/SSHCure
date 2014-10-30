@@ -15,11 +15,8 @@ use warnings;
 
 use Mail::Header;
 use Mail::Internet;
+use POSIX qw(strftime);
 use SSHCure::Utils;
-use POSIX qw(strftime mktime);
-
-use Exporter;
-our @ISA = 'Exporter';
 
 sub handle_notification {
     my (undef, $attacker_ip, $attack, $new_targets, $notification_id) = @_;
