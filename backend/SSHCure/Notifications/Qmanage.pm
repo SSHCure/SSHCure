@@ -24,6 +24,15 @@ my $password = "";
 my $server_url = "https://<host>/admin/rpc";
 # -----
 
+my %OpenBL_boosts = (
+    0.25    => 0.5, # Scan
+    0.4     => 0.3, # Brute-force, no scan
+    0.5     => 0.3, # Brute-force + scan
+    0.65    => 0.2, # Compromise, no scan
+    0.75    => 0.2  # Compromise + scan
+);
+my $max_Qmanage_confidence = 0.9;
+
 sub handle_notification {
     my (undef, $attacker_ip, $attack, $new_targets, $notification_id) = @_;
 
@@ -88,7 +97,7 @@ sub handle_notification {
                 $timestamp_iso8601,
                 $qmanage_category,
                 $qmanage_subcategory,
-                $host_blacklisted ? $$attack{'certainty'} + 0.2 : $$attack{'certainty'},
+                $host_blacklisted ? min($$attack{'certainty'} + $OpenBL_boosts{$$attack{'certainty'}}, $max_Qmanage_confidence) : $$attack{'certainty'},
                 "Host blacklisted by OpenBL: $host_blacklisted\r\nSSHCure attack certainty: ".$$attack{'certainty'},
         );
 
@@ -97,7 +106,7 @@ sub handle_notification {
 
         # Determine compromised hosts (i.e., targets)
         foreach (keys(%$new_targets)) {
-            if (exists $$new_targets{$_}{'certainty'} && $$new_targets{$_}{'certainty'} > 0.65) {
+            if (exists $$new_targets{$_}{'certainty'} && $$new_targets{$_}{'certainty'} > $CFG::CONST{'NOTIFICATIONS'}{'ATTACK_PHASE'}{'COMPROMISE'}) {
                 $host_blacklisted = host_on_openbl_blacklist($_);
                 send_report(
                         $client,
@@ -109,8 +118,7 @@ sub handle_notification {
                         $qmanage_category,
                         $qmanage_subcategory,
 
-                        # Maximum Qmanage confidence is '0.9'
-                        $host_blacklisted ? min($$new_targets{$_}{'certainty'} + 0.2, 0.9) : $$new_targets{$_}{'certainty'},
+                        $host_blacklisted ? min($$new_targets{$_}{'certainty'} + $OpenBL_boosts{$$new_targets{$_}{'certainty'}}, $max_Qmanage_confidence) : $$new_targets{$_}{'certainty'},
                         "Host blacklisted by OpenBL: $host_blacklisted\r\nSSHCure target certainty: ".$$new_targets{$_}{'certainty'},
                 );
             }
@@ -126,7 +134,7 @@ sub handle_notification {
                 $timestamp_iso8601,
                 $qmanage_category,
                 $qmanage_subcategory,
-                $host_blacklisted ? $$attack{'certainty'} + 0.3 : $$attack{'certainty'},
+                $host_blacklisted ? $$attack{'certainty'} + $OpenBL_boosts{$$attack{'certainty'}} : $$attack{'certainty'},
                 "Host blacklisted by OpenBL: $host_blacklisted\r\nSSHCure attack certainty: ".$$attack{'certainty'},
         );
     } elsif ($$attack{'certainty'} >= $CFG::CONST{'NOTIFICATIONS'}{'ATTACK_PHASE'}{'SCAN'}) {
@@ -140,7 +148,7 @@ sub handle_notification {
                 $timestamp_iso8601,
                 $qmanage_category,
                 $qmanage_subcategory,
-                $host_blacklisted ? $$attack{'certainty'} + 0.5 : $$attack{'certainty'},
+                $host_blacklisted ? $$attack{'certainty'} + $OpenBL_boosts{$$attack{'certainty'}} : $$attack{'certainty'},
                 "Host blacklisted by OpenBL: $host_blacklisted\r\nSSHCure attack certainty: ".$$attack{'certainty'},
         );
     } else {
