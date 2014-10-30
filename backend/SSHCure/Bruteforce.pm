@@ -47,7 +47,7 @@ sub bruteforce_detection {
     if (scalar @potential_compromises_next_interval > 0) {
         @potential_compromises = (fmap_concat {
             my $potential_compromise = shift;
-            my ($attacker_ip, $target, $source, $compromise_time, $flow_endtime, $attack_tool, $compromise_port, $compromise_reason, $detection_time) = @$potential_compromise;
+            my ($attacker_ip, $target, $source, $compromise_time, $flow_endtime, $compromise_port, $compromise_reason, $detection_time) = @$potential_compromise;
             my ($target_ip, $target_info) = %$target;
         
             if ($compromise_reason == $CFG::CONST{'COMPROMISE_REASON'}{'INSTANT_LOGOUT_ABORT_DICTIONARY'}
@@ -82,7 +82,7 @@ sub bruteforce_detection {
         # fmap_concat shifts potential_compromises_next_intervals, so we make a copy to retain the list
         my @next_intervals_results = (fmap_concat {
             my $potential_compromise = shift;
-            my ($attacker_ip, $target, $source, $compromise_time, $flow_endtime, $attack_tool, $compromise_port, $compromise_reason, $detection_time) = @$potential_compromise;
+            my ($attacker_ip, $target, $source, $compromise_time, $flow_endtime, $compromise_port, $compromise_reason, $detection_time) = @$potential_compromise;
             my ($target_ip, $target_info) = %$target;
 
             my @conf_potential_compromise = ();
@@ -234,7 +234,7 @@ sub bruteforce_detection {
     # Determine whether multiple (different) compromise reasons have been found for the same attacker/target tuple
     my %attacker_compromise_reasons;
     foreach my $new_compromise (@potential_compromises) {
-        my ($attacker_ip, $target, $source, $compromise_time, $flow_endtime, $attack_tool, $compromise_port, $compromise_reason, $detection_time) = @$new_compromise;
+        my ($attacker_ip, $target, $source, $compromise_time, $flow_endtime, $compromise_port, $compromise_reason, $detection_time) = @$new_compromise;
         my ($target_ip, $target_info) = %$target;
     
         if (exists $attacker_compromise_reasons{$attacker_ip}{$target_ip}) {
@@ -247,7 +247,7 @@ sub bruteforce_detection {
     }
     
     for (my $i = 0; $i < scalar @potential_compromises; $i++) {
-        my ($attacker_ip, $target, $source, $compromise_time, $flow_endtime, $attack_tool, $compromise_port, $compromise_reason, $detection_time) = @{$potential_compromises[$i]};
+        my ($attacker_ip, $target, $source, $compromise_time, $flow_endtime, $compromise_port, $compromise_reason, $detection_time) = @{$potential_compromises[$i]};
         my ($target_ip, $target_info) = %$target;
         
         my @sorted_compromise_reasons = sort(@{$attacker_compromise_reasons{$attacker_ip}{$target_ip}});
@@ -266,7 +266,7 @@ sub bruteforce_detection {
     ##### DEBUG #####
     # my $debug_target_ip = 2186907671;
     # foreach my $compromise (@potential_compromises) {
-    #     my ($attacker_ip, $target, $source, $compromise_time, $flow_endtime, $attack_tool, $compromise_port, $compromise_reason, $detection_time) = @$compromise;
+    #     my ($attacker_ip, $target, $source, $compromise_time, $flow_endtime, $compromise_port, $compromise_reason, $detection_time) = @$compromise;
     #     my ($target_ip, $target_info) = %$target;
         
     #     if ($target_ip == $debug_target_ip) {
@@ -274,7 +274,7 @@ sub bruteforce_detection {
     #     }
     # }
     # foreach my $compromise (@potential_compromises_next_interval) {
-    #     my ($attacker_ip, $target, $source, $compromise_time, $flow_endtime, $attack_tool, $compromise_port, $compromise_reason, $detection_time) = @$compromise;
+    #     my ($attacker_ip, $target, $source, $compromise_time, $flow_endtime, $compromise_port, $compromise_reason, $detection_time) = @$compromise;
     #     my ($target_ip, $target_info) = %$target;
         
     #     if ($target_ip == $debug_target_ip) {
@@ -282,7 +282,7 @@ sub bruteforce_detection {
     #     }
     # }
     # foreach my $compromise (@potential_compromises_next_intervals) {
-    #     my ($attacker_ip, $target, $source, $compromise_time, $flow_endtime, $attack_tool, $compromise_port, $compromise_reason, $detection_time) = @$compromise;
+    #     my ($attacker_ip, $target, $source, $compromise_time, $flow_endtime, $compromise_port, $compromise_reason, $detection_time) = @$compromise;
     #     my ($target_ip, $target_info) = %$target;
         
     #     if ($target_ip == $debug_target_ip) {
@@ -293,7 +293,7 @@ sub bruteforce_detection {
     
     # Loop over the potential compromises and add them if no network-level block is detected
     foreach my $new_compromise (@potential_compromises) {
-        my ($attacker_ip, $target, $source, $compromise_time, $flow_endtime, $attack_tool, $compromise_port, $compromise_reason, $detection_time) = @$new_compromise;
+        my ($attacker_ip, $target, $source, $compromise_time, $flow_endtime, $compromise_port, $compromise_reason, $detection_time) = @$new_compromise;
         
         my ($target_ip, $target_info) = %$target;
         $$target{$target_ip}{'last_act'} = $flow_endtime;
@@ -308,10 +308,10 @@ sub bruteforce_detection {
                 debug sprintf "[NETBLOCK] compromise at %f was before the network-level block at %f, but ended after: not adding as compromise",
                         $compromise_time, $SSHCure::attacks{$attacker_ip}{'blocking_time'};
             } else {
-                add_comp_attacker($attacker_ip, $target, $attack_tool);
+                add_comp_attacker($attacker_ip, $target);
             }
         } else {
-            add_comp_attacker($attacker_ip, $target, $attack_tool);
+            add_comp_attacker($attacker_ip, $target);
         }
     }
 
@@ -513,11 +513,9 @@ sub bruteforce_detection_function {
                             $target{$target_ip}{'last_act'}  = $fl_etime;
                         }
                         
-                        my $attack_tool = identify_attack_tool($avg_conc_conn_starts, $max_conc_conn_starts, $cusum_mean);
-                        
                         # Split up between potential compromises that have to be checked again in upcoming interval(s), and others
                         my $detection_time = time;
-                        my $compromise_info = [ $attacker_ip, \%target, $source, $fl_stime, $fl_etime, $attack_tool, $atk_port, $compromise_reason, $detection_time ];
+                        my $compromise_info = [ $attacker_ip, \%target, $source, $fl_stime, $fl_etime, $atk_port, $compromise_reason, $detection_time ];
                         if ($compromise_reason == $CFG::CONST{'COMPROMISE_REASON'}{'INSTANT_LOGOUT_ABORT_DICTIONARY'}
                                 || $compromise_reason == $CFG::CONST{'COMPROMISE_REASON'}{'MAINTAIN_CONNECTION_ABORT_DICTIONARY'}) {
                             push(@new_potential_compromises_next_interval, $compromise_info);
@@ -544,7 +542,7 @@ sub bruteforce_detection_function {
                             # Determine from which array we have to pop a (potential) compromise
                             for my $list (\@new_potential_compromises, \@new_potential_compromises_next_interval, \@new_potential_compromises_next_intervals) {
                                 if (scalar @$list > 0) {
-                                    my ($last_attacker_ip, $last_target, $source, $last_compromise_time, $last_flow_endtime, $last_attack_tool, $last_compromise_port, $last_compromise_reason, $last_detection_time) = @{@{$list}[-1]};
+                                    my ($last_attacker_ip, $last_target, $source, $last_compromise_time, $last_flow_endtime, $last_compromise_port, $last_compromise_reason, $last_detection_time) = @{@{$list}[-1]};
 
                                     # Only consider last compromise if it is close (in duration) to the considered (non-aggregated) flow record.
                                     # FIXME Consider: In addition, in case the current record is not the last one, the next flow record should not have $ppf >= $CFG::ALGO{'MINIMAL_SSH_AUTH_PPF'}
@@ -560,7 +558,7 @@ sub bruteforce_detection_function {
                             # Remove last added potential compromise from the correct list
                             if ($max_last_detection_time) {
                                 foreach my $list (@pot_comp_lists) {
-                                    my ($last_attacker_ip, $last_target, $source, $last_compromise_time, $last_flow_endtime, $last_attack_tool, $last_compromise_port, $last_compromise_reason, $last_detection_time) = @{@{$list}[-1]};
+                                    my ($last_attacker_ip, $last_target, $source, $last_compromise_time, $last_flow_endtime, $last_compromise_port, $last_compromise_reason, $last_detection_time) = @{@{$list}[-1]};
                                     if ($last_detection_time == $max_last_detection_time) {
                                         pop(@{$list});
                                         last;
@@ -629,28 +627,6 @@ sub get_non_aggr_flow_data {
         my @non_aggr_flow_records = split("\n", shift);
         return Future->wrap(parse_nfdump_pipe(\@non_aggr_flow_records));
     });
-}
-
-sub identify_attack_tool {
-    my ($avg_conc_conn_starts, $max_conc_conn_starts, $cusum_mean) = @_;
-    my $attack_tool = '';
-
-    # Single login attempt per connection
-    if ($max_conc_conn_starts == 1) {
-        $attack_tool = 'ssh-scan';
-    }
-
-    # if ($cusum_mean > 14) {
-    #     # Multiple login attempts per connection
-    #     $attack_tool = 'ncrack';
-    # } else {
-    #     # Single login attempt per connection
-    #     if ($max_conc_conn_starts == 1) {
-    #         $attack_tool = 'ssh-scan';
-    #     }
-    # }
-
-    return $attack_tool;
 }
 
 sub add_compromise_port {

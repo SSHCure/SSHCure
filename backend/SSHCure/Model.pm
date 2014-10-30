@@ -111,20 +111,10 @@ sub add_bf_attacker {
 }
 
 sub add_comp_attacker {
-    my ($attacker_ip, $targets, $attack_tool) = @_;
+    my ($attacker_ip, $targets) = @_;
     
     if (exists $SSHCure::attacks{$attacker_ip}) {
-        # Attacker exists, like it must
         my $existing_attack = $SSHCure::attacks{$attacker_ip};
-        if (not exists $$existing_attack{'attack_tool_name'}) {
-            debug sprintf "[FINGERPRINT] setting attack_tool_name to %s (attacker: %s)", $attack_tool, dec2ip($attacker_ip);
-        } elsif ($$existing_attack{'attack_tool_name'} eq $attack_tool) {
-            debug sprintf "[FINGERPRINT] setting attack_tool_name to %s (attacker: %s)", $attack_tool, dec2ip($attacker_ip);
-        } else {
-            debug sprintf "[FINGERPRINT] different attack_tool_name for existing attack: old: %s vs new: %s (attacker: %s)",
-                    $$existing_attack{'attack_tool_name'}, $attack_tool, dec2ip($attacker_ip);
-        }
-        $$existing_attack{'attack_tool_name'} = $attack_tool if defined $attack_tool;
 
         unless ($$existing_attack{'certainty'} > $CFG::ALGO{'CERT_BRUTEFORCE'}) {
             # attack was already in COMP state, no need to increase the certainty
@@ -290,21 +280,17 @@ sub update_db {
                         SET start_time      = ?,
                             certainty       = ?,
                             attacker_ip     = ?,
-                            target_count    = ?,
-                            attack_tool_name= ?
+                            target_count    = ?
                         WHERE id = '$db_id'";
     } else {
         # Attack is new in DB.
         $sql_attack = " INSERT INTO attack
-                            (start_time, certainty, attacker_ip, target_count, attack_tool_name)
-                        VALUES (?, ?, ?, ?, ?)";
+                            (start_time, certainty, attacker_ip, target_count)
+                        VALUES (?, ?, ?, ?)";
     }
     
-    my $attack_tool_name = '';
-    $attack_tool_name = $attack_info{'attack_tool_name'} if exists $attack_info{'attack_tool_name'};
-    
     my $sth_attack = $SSHCure::DBH->prepare($sql_attack);
-    $sth_attack->execute($attack_info{'start_time'}, $attack_info{'certainty'}, $attacker_ip, $attack_info{'target_count'}, $attack_tool_name) or debug "[MODEL] Oops! $SSHCure::DBI::errstr\nQuery was $sql_attack";
+    $sth_attack->execute($attack_info{'start_time'}, $attack_info{'certainty'}, $attacker_ip, $attack_info{'target_count'}) or debug "[MODEL] Oops! $SSHCure::DBI::errstr\nQuery was $sql_attack";
     
     # get last_inserted_id and overwrite if needed
     $db_id ||= $SSHCure::DBH->last_insert_id("", "", "attack", "");
