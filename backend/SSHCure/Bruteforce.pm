@@ -297,6 +297,7 @@ sub bruteforce_detection {
         
         my ($target_ip, $target_info) = %$target;
         $$target{$target_ip}{'last_act'} = $flow_endtime;
+        $$target{$target_ip}{'compromise_reason'} = $compromise_reason;
         add_compromise_port($$target{$target_ip}, $compromise_port);
         
         if (exists $SSHCure::attacks{$attacker_ip}{'blocking_time'}) {

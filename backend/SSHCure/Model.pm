@@ -24,10 +24,7 @@ our @EXPORT = qw(
     add_bf_attacker
     add_comp_attacker
     remove_timeouts
-    merge_found_compromised_attackers
-    update_db
     set_attacker_blocking_time
-    untargetize_attack
 );
 
 ####################
@@ -35,11 +32,9 @@ our @EXPORT = qw(
 ####################
 
 sub add_scan_attacker {
-    my $attacker_ip = shift;
-    my $targets = shift;
+    my ($attacker_ip, $targets) = @_;
 
-    if (exists $SSHCure::attacks{$attacker_ip}) {
-        # attacker exists
+    if (exists $SSHCure::attacks{$attacker_ip}) { # Attacker exists
         my $existing_attack = $SSHCure::attacks{$attacker_ip};
         merge_targets($existing_attack, $targets, $CFG::ALGO{'CERT_SCAN'});
 
@@ -51,16 +46,22 @@ sub add_scan_attacker {
         update_attack_details($existing_attack);
         update_last_activities($SSHCure::attacks{$attacker_ip}, $targets, 'scan');
         update_db($attacker_ip, $existing_attack, $targets);
-    } else {
-        # new attacker
+    } else { # New attacker
+        my $host_blacklisted = host_on_openbl_blacklist($attacker_ip);
+
         while ((my $target, my $target_info) = each (%$targets)) {
             $target_info->{'certainty'} = $CFG::ALGO{'CERT_SCAN'};
         }
 
-        $SSHCure::attacks{$attacker_ip} = {'targets' => $targets, 'certainty' => $CFG::ALGO{'CERT_SCAN'}};
+        $SSHCure::attacks{$attacker_ip} = {
+            'targets' => $targets,
+            'certainty' => $CFG::ALGO{'CERT_SCAN'}
+        };
+
         update_attack_details($SSHCure::attacks{$attacker_ip});
         update_last_activities($SSHCure::attacks{$attacker_ip}, $targets, 'scan');
-        my $new_db_id = update_db($attacker_ip, $SSHCure::attacks{$attacker_ip}, $targets);
+
+        my $new_db_id = update_db($attacker_ip, $SSHCure::attacks{$attacker_ip}, $targets, $host_blacklisted);
         $SSHCure::attacks{$attacker_ip}{'db_id'} = $new_db_id;
     }
     
@@ -68,11 +69,9 @@ sub add_scan_attacker {
 }
 
 sub add_bf_attacker {
-    my $attacker_ip = shift;
-    my $targets = shift;
+    my ($attacker_ip, $targets) = @_;
     
-    if (exists $SSHCure::attacks{$attacker_ip}) {
-        # Attacker exists
+    if (exists $SSHCure::attacks{$attacker_ip}) { # Attacker exists
         my $existing_attack = $SSHCure::attacks{$attacker_ip};
         if ($$existing_attack{'certainty'} == $CFG::ALGO{'CERT_SCAN'}) {
             # attack is in scan phase, transition to bf phase
@@ -94,8 +93,9 @@ sub add_bf_attacker {
         update_attack_details($existing_attack);
         update_last_activities($SSHCure::attacks{$attacker_ip}, $targets, 'bf');
         update_db($attacker_ip, $SSHCure::attacks{$attacker_ip}, $targets);
-    } else {    
-        # New attacker: no scan phase detected, so add with lower certainty
+    } else { # New attacker: no scan phase detected, so add with lower certainty
+        my $host_blacklisted = host_on_openbl_blacklist($attacker_ip);
+
         $SSHCure::attacks{$attacker_ip} = {'targets' => $targets, 'certainty' => $CFG::ALGO{'CERT_BRUTEFORCE_NO_SCAN'}};
         while ((my $target, my $target_info) = each (%$targets)) {
             $SSHCure::attacks{$attacker_ip}{'targets'}{$target}{'certainty'} = $CFG::ALGO{'CERT_BRUTEFORCE_NO_SCAN'};
@@ -103,7 +103,8 @@ sub add_bf_attacker {
         
         update_attack_details($SSHCure::attacks{$attacker_ip});
         update_last_activities($SSHCure::attacks{$attacker_ip}, $targets, 'bf');
-        my $new_db_id = update_db($attacker_ip, $SSHCure::attacks{$attacker_ip}, $targets);
+
+        my $new_db_id = update_db($attacker_ip, $SSHCure::attacks{$attacker_ip}, $targets, $host_blacklisted);
         $SSHCure::attacks{$attacker_ip}{'db_id'} = $new_db_id;
     }
     
@@ -128,8 +129,7 @@ sub add_comp_attacker {
         update_db($attacker_ip, $existing_attack, $targets);
         notify($attacker_ip, $existing_attack, $targets);
     } else {
-        # error, the bruteforce phase must have been detected
-        log_error "Something went wrong, a compromise has been detected without a brute-force phase";
+        log_error("A compromise has been detected without a brute-force phase");
     }
 }
 
@@ -265,57 +265,77 @@ sub update_last_activities {
 # Database routines
 ####################
 
-sub update_db {
-    my $attacker_ip = $_[0];
-    my %attack_info = %{$_[1]};
-    my %targets = %{$_[2]};
+sub update_db ($$$;$) {
+    my ($attacker_ip, $attack_info, $targets, $attacker_blacklisted) = @_;
+    my ($db_id, $query);
 
-    my $db_id;
-    my $sql_attack;
-
-    if (exists $attack_info{'db_id'}) {
+    if (exists $$attack_info{'db_id'}) {
         # Attack already in DB, use UPDATE for attack table
-        $db_id = $attack_info{'db_id'};
-        $sql_attack = " UPDATE attack
-                        SET start_time      = ?,
-                            certainty       = ?,
-                            attacker_ip     = ?,
-                            target_count    = ?
-                        WHERE id = '$db_id'";
+        $db_id = $$attack_info{'db_id'};
+        $query = "  UPDATE attack
+                    SET start_time      = ?,
+                        certainty       = ?,
+                        attacker_ip     = ?,
+                        target_count    = ?
+                    WHERE id = '$db_id'";
+
+        my $sth_attack = $SSHCure::DBH->prepare($query);
+        $sth_attack->execute($$attack_info{'start_time'}, $$attack_info{'certainty'}, $attacker_ip, $$attack_info{'target_count'});
     } else {
-        # Attack is new in DB.
-        $sql_attack = " INSERT INTO attack
-                            (start_time, certainty, attacker_ip, target_count)
-                        VALUES (?, ?, ?, ?)";
+        # Attack is new in DB
+        $query = "  INSERT INTO attack
+                        (start_time, certainty, attacker_ip, target_count, attacker_blacklisted)
+                    VALUES (?, ?, ?, ?, ?)";
+
+        if (! defined $attacker_blacklisted) {
+            log_error("New attack to be inserted in DB without 'attacker_blacklisted' has been set");
+            $attacker_blacklisted = 0;
+        }
+
+        my $sth_attack = $SSHCure::DBH->prepare($query);
+        $sth_attack->execute($$attack_info{'start_time'}, $$attack_info{'certainty'}, $attacker_ip, $$attack_info{'target_count'}, $attacker_blacklisted) or log_error("Query error!");
     }
-    
-    my $sth_attack = $SSHCure::DBH->prepare($sql_attack);
-    $sth_attack->execute($attack_info{'start_time'}, $attack_info{'certainty'}, $attacker_ip, $attack_info{'target_count'}) or debug "[MODEL] Oops! $SSHCure::DBI::errstr\nQuery was $sql_attack";
     
     # get last_inserted_id and overwrite if needed
     $db_id ||= $SSHCure::DBH->last_insert_id("", "", "attack", "");
 
     # Only store scan phase targets if enabled in config
-    unless ($attack_info{'certainty'} <= $CFG::ALGO{'CERT_SCAN'} && $CFG::STORE_SCAN_TARGETS == 0) {
+    unless ($$attack_info{'certainty'} <= $CFG::ALGO{'CERT_SCAN'} && $CFG::STORE_SCAN_TARGETS == 0) {
         # update victims table
         my $sql_target = "  INSERT OR REPLACE INTO target
                                 (attack_id, target_ip, certainty, last_scan_activity, last_bruteforce_activity,
-                                last_compromise_activity, is_host_blocked, compromise_ports)
-                            VALUES ('$db_id', ?, ?, ?, ?, ?, ?, ?)";
+                                last_compromise_activity, is_host_blocked, compromise_ports, compromise_reason)
+                            VALUES ('$db_id', ?, ?, ?, ?, ?, ?, ?, ?)";
 
         my $sth_target = $SSHCure::DBH->prepare($sql_target);
 
         $SSHCure::DBH->begin_work;
-        while ((my $target_ip, my $target_info) = each (%targets)) {
-            $target_info = $attack_info{'targets'}{$target_ip};
-            my $is_host_blocked = 0;
-            $is_host_blocked = $$target_info{'is_host_blocked'} if exists $$target_info{'is_host_blocked'};
-            $sth_target->execute($target_ip, $$target_info{'certainty'},
-                                    $$target_info{'last_act_scan'},
-                                    $$target_info{'last_act_bf'},
-                                    $$target_info{'last_act_comp'},
-                                    $is_host_blocked,
-                                    $$target_info{'compromise_ports'}) or debug "[MODEL] tried to REPLACE target, certainty: $$target_info{'certainty'} , while attack's certainty: $attack_info{'certainty'}";
+        while ((my $target_ip, my $target_info) = each (%$targets)) {
+            $target_info = $$attack_info{'targets'}{$target_ip};
+
+            my $is_host_blocked;
+            if (exists $$target_info{'is_host_blocked'}) {
+                $is_host_blocked = $$target_info{'is_host_blocked'};
+            } else {
+                $is_host_blocked = 0;
+            }
+
+            my $compromise_reason;
+            if (exists $$target_info{'compromise_reason'}) {
+                $compromise_reason = $$target_info{'compromise_reason'};
+            } else {
+                $compromise_reason = 0;
+            }
+
+            $sth_target->execute($target_ip, 
+                    $$target_info{'certainty'},
+                    $$target_info{'last_act_scan'},
+                    $$target_info{'last_act_bf'},
+                    $$target_info{'last_act_comp'},
+                    $is_host_blocked,
+                    $$target_info{'compromise_ports'},
+                    $compromise_reason
+            );
         }
         $SSHCure::DBH->commit;
     }
@@ -323,20 +343,21 @@ sub update_db {
 }
 
 sub mark_attack_done_in_db {
-    my $atk_id = (shift);
-    my $timestamp = (shift);
+    my ($attack_id, $timestamp) = @_;
     my $sql = "UPDATE attack SET end_time = ?  WHERE id = ?";
     my $sth = $SSHCure::DBH->prepare($sql) or debug("[MODEL] [SQL] [mark_attack_done] prepare failed: $sql");
-    $sth->execute($timestamp, $atk_id);
+    $sth->execute($timestamp, $attack_id);
 }
 
 sub set_attacker_blocking_time {
     my ($attacker_ip, $blocking_time) = @_;
-    my $atk_id = $SSHCure::attacks{$attacker_ip}{'db_id'};
+    my $attack_id = $SSHCure::attacks{$attacker_ip}{'db_id'};
+
     $SSHCure::attacks{$attacker_ip}{'blocking_time'} = $blocking_time;
+
     my $sql = "UPDATE attack SET blocking_time = ? WHERE id = ?";
     my $sth = $SSHCure::DBH->prepare($sql) or debug("[MODEL] [SQL] [set_attacker_blocking_time] prepare failed: $sql");
-    $sth->execute($blocking_time, $atk_id);
+    $sth->execute($blocking_time, $attack_id);
 }
 
 #######################
