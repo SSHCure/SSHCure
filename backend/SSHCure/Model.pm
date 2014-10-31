@@ -138,12 +138,12 @@ sub add_comp_attacker {
 ####################
 
 sub get_target_count_for_attack {
-    my $attack = $_[0];
+    my ($attack) = @_;
     return scalar (keys %{$$attack{'targets'}});
 }
 
 sub update_attack_details {
-    my $attack = $_[0];
+    my ($attack) = @_;
     $$attack{'target_count'} = get_target_count_for_attack($attack);
 }
 
@@ -152,18 +152,18 @@ sub merge_found_compromised_attackers {
     my %h2 = %{$_[1]};
     my %merged = ();
 
-    while ((my $k,my $v) = each(%h1) ) {
+    while ((my $k, my $v) = each(%h1)) {
         $merged{$k} = $v;
     }
 
-    while ((my $k,my $v) = each(%h2) ) {
+    while ((my $k ,my $v) = each(%h2)) {
         if(exists $merged{$k}) {
             $merged{$k} = {merge_ips($merged{$k}, $v)};
         } else {
             $merged{$k} = $v;
         }
-
     }
+
     return %merged;
 }
 
@@ -210,12 +210,14 @@ sub merge_targets {
 
 sub merge_compromise_ports {
     my ($existing, $new) = @_;
+
     return $existing unless defined $new;
     return $new unless defined $existing;
+
     my $combined = $existing . "," . $new;
     
-    # Remove duplicate ports
-    my %unique = map { $_, 1} split(/,/ , $combined);
+    # Remove port duplicates
+    my %unique = map { $_, 1} split(/,/, $combined);
     return join(',' , keys %unique);
 }
 
@@ -239,12 +241,11 @@ sub remove_timeouts {
 }
 
 sub update_last_activities {
-    my $attack = $_[0];
-    my $targets = $_[1];
-    my $phase = $_[2];
+    my ($attack, $targets, $phase) = @_;
 
     $$attack{'start_time'} = time unless exists $$attack{'start_time'};
     $$attack{'end_time'} = 0 unless exists $$attack{'end_time'};
+
     while ((my $target, my $target_info) = each (%$targets)) {
         if (!exists $$attack{'targets'}{$target}{'last_act_' . $phase}) {
             $$attack{'targets'}{$target}{'last_act_' . $phase} = $$target_info{'last_act'};
@@ -293,7 +294,7 @@ sub update_db ($$$;$) {
         }
 
         my $sth_attack = $SSHCure::DBH->prepare($query);
-        $sth_attack->execute($$attack_info{'start_time'}, $$attack_info{'certainty'}, $attacker_ip, $$attack_info{'target_count'}, $attacker_blacklisted) or log_error("Query error!");
+        $sth_attack->execute($$attack_info{'start_time'}, $$attack_info{'certainty'}, $attacker_ip, $$attack_info{'target_count'}, $attacker_blacklisted);
     }
     
     # get last_inserted_id and overwrite if needed
@@ -344,8 +345,9 @@ sub update_db ($$$;$) {
 
 sub mark_attack_done_in_db {
     my ($attack_id, $timestamp) = @_;
+
     my $sql = "UPDATE attack SET end_time = ?  WHERE id = ?";
-    my $sth = $SSHCure::DBH->prepare($sql) or debug("[MODEL] [SQL] [mark_attack_done] prepare failed: $sql");
+    my $sth = $SSHCure::DBH->prepare($sql);
     $sth->execute($timestamp, $attack_id);
 }
 
@@ -356,49 +358,8 @@ sub set_attacker_blocking_time {
     $SSHCure::attacks{$attacker_ip}{'blocking_time'} = $blocking_time;
 
     my $sql = "UPDATE attack SET blocking_time = ? WHERE id = ?";
-    my $sth = $SSHCure::DBH->prepare($sql) or debug("[MODEL] [SQL] [set_attacker_blocking_time] prepare failed: $sql");
+    my $sth = $SSHCure::DBH->prepare($sql);
     $sth->execute($blocking_time, $attack_id);
-}
-
-#######################
-# Development routines
-#######################
-
-sub untargetize_attack {
-    my %attack = %{$_[0]};
-    $attack{'targets'} = undef;
-
-    return \%attack;
-}
-
-sub format_attacks {
-    my $attacks = $_[0];
-    my @output = ("Attacks:");
-
-    while ((my $attacker_ip, my $attack_info) = each (%$attacks)) {
-        my $cert = $$attack_info{'certainty'};
-        my $target_count = $$attack_info{'target_count'};
-        my $starttime = $$attack_info{'start_time'};
-        my $endtime = $$attack_info{'end_time'};
-        push(@output, sprintf("%-20s %-10.2f %-10d %-10.3f %-10.3f", $attacker_ip, $cert, $target_count, $starttime, $endtime));
-    }
-    return join("\n", @output) . "\n";
-}
-
-sub check_last_act_from_targets {
-    my $attack = (shift);
-    my %targets = %{$$attack{'targets'}};
-    my @act_times = ();
-    while ((my $target, my $target_info) = each (%targets)) {
-        push(@act_times, scalar $$target_info{'last_act_scan'}) if exists $$target_info{'last_act_scan'};
-        push(@act_times, scalar $$target_info{'last_act_bf'}) if exists $$target_info{'last_act_bf'};
-        push(@act_times, scalar $$target_info{'last_act_comp'}) if exists $$target_info{'last_act_comp'};
-    }
-    return if scalar @act_times == 0;
-    
-    @act_times = sort @act_times;
-    my $last_act = $act_times[-1];
-    debug "[ST] Attack end time vs targets' activities: $$attack{'end_time'} - $last_act = " . ($$attack{'end_time'} - $last_act);
 }
 
 1;
