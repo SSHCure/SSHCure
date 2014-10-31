@@ -154,15 +154,18 @@ sub parse_nfdump_pipe {
 }
 
 sub parse_nfdump_list {
-    my ($nfdump_output, $parsed_output) = @_;
+    my $nfdump_output = shift;
+    my @nfdump_parsed_output = ();
 
     foreach my $line (@$nfdump_output) {
         chomp($line);
         next if $line eq "" || $line eq "No matched flows" || index($line, 'ERROR') != -1;
 
         my @values = split(/\|\s*/, $line);                                                 # split line into seperate values
-        push(@$parsed_output, \@values);                                                    # add array of values to result-array    
+        push(@nfdump_parsed_output, \@values);                                                    # add array of values to result-array    
     }
+
+    return \@nfdump_parsed_output;
 }
 
 ##############################
