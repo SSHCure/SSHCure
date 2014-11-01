@@ -32,7 +32,7 @@ our @EXPORT = qw (
     log_warning
     
     parse_nfdump_pipe
-    parse_nfdump_list
+    parse_nfdump_custom
     
     save_profiling_data
     save_profiling_value
@@ -153,7 +153,7 @@ sub parse_nfdump_pipe {
     return \@nfdump_parsed_output;
 }
 
-sub parse_nfdump_list {
+sub parse_nfdump_custom {
     my $nfdump_output = shift;
     my @nfdump_parsed_output = ();
 
@@ -161,8 +161,8 @@ sub parse_nfdump_list {
         chomp($line);
         next if $line eq "" || $line eq "No matched flows" || index($line, 'ERROR') != -1;
 
-        my @values = split(/\|\s*/, $line);                                                 # split line into seperate values
-        push(@nfdump_parsed_output, \@values);                                                    # add array of values to result-array    
+        my @values = split(/\|\s*/, $line);     # split line into seperate values
+        push(@nfdump_parsed_output, \@values);  # add array of values to result-array    
     }
 
     return \@nfdump_parsed_output;

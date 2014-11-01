@@ -363,7 +363,6 @@ sub run {
         log_error "No flows left to process, stopping this run. If this message occurs often, check the system time.";
         return;
     }
-    debug "Corrected time-interval: $corrected_interval";
 
     scan_detection($sources, $sources_path, $timeslot, $corrected_interval)->then( sub {
         bruteforce_detection($sources, $sources_path, $timeslot, $corrected_interval);
