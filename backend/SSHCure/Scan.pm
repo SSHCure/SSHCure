@@ -28,8 +28,6 @@ my @cmd_base = ("$NfConf::PREFIX/nfdump", split(" ", "-6Nq"));
 
 sub scan_detection {
     my ($sources, $sources_path, $timeslot, $timeslot_interval) = @_;
-
-    my $start_time = time;
     
     # Find all sources of SSH traffic
     my @cmd = (@cmd_base, "-M", "${sources_path}${sources}",
@@ -45,18 +43,22 @@ sub scan_detection {
         # Find all attackers by counting the number of targets per attacker
         my %attackers = ();
         foreach my $flow_record (@$parsed_flow_records) {
-            if (exists $attackers{@$flow_record[4]}) {
-                $attackers{@$flow_record[4]}->{'target_count'} += 1;
+            my $src_ip = @$flow_record[4];
+            if (exists $attackers{$src_ip}) {
+                $attackers{$src_ip}->{'target_count'} += 1;
             } else {
-                $attackers{@$flow_record[4]}->{'target_count'} = 1;
+                $attackers{$src_ip}->{'target_count'} = 1;
             }
         }
 
         # Find all attacker's targets
         foreach my $flow_record (@$parsed_flow_records) {
             # Check whether current attacker (src IP in current flow record; $flow_record[4]) contacted enough targets
-            if ($attackers{@$flow_record[4]}->{'target_count'} > $CFG::ALGO{'SCAN_MIN_TARGETS'}) {
-                $attackers{@$flow_record[4]}->{'targets'}->{@$flow_record[6]}->{'last_act'} = @$flow_record[2];
+            my $src_ip = @$flow_record[4];
+            if ($attackers{$src_ip}->{'target_count'} > $CFG::ALGO{'SCAN_MIN_TARGETS'}) {
+                my $fl_etime = @$flow_record[2];
+                my $dst_ip = @$flow_record[6];
+                $attackers{$src_ip}->{'targets'}->{$dst_ip}->{'last_act'} = $fl_etime;
             }
         }
 
