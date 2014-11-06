@@ -127,6 +127,9 @@
     $query_attacks_target = str_replace(' ,', ',', $query_attacks_target);
     $query_attacks_target = trim($query_attacks_target);
 
+    // Perform reverse DNS lookup
+    $domain = gethostbyaddr($host);
+
     /* Render page */
     require_once(TWIG_PATH.'/Autoloader.php');
 
@@ -139,7 +142,7 @@
     $result['query'] = array($query_attacks_attacker, $query_attacks_target);
     $result['data'] = $twig->render('host-details.twig', array(
             'host' => $host,
-            'host-name' => 'utwente.nl',
+            'domain' => $domain,
             'country' => $country,
             'city' => $city,
             'attacks_attacker' => $attacks_attacker,
