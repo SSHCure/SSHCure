@@ -13,8 +13,8 @@
 #
 #########################################################
 
-SSHCURE_VER=3.0
-SSHCURE_REL=SSHCure_v${SSHCURE_VER}.tar.gz
+VERSION=3.0
+SSHCURE_REL=SSHCure_v${VERSION}.tar.gz
 TMP_DIR=SSHCure
 GEO_DB=GeoLiteCity.dat.gz
 GEOv6_DB=GeoLiteCityv6.dat.gz
@@ -78,6 +78,25 @@ fi
 echo "SSHCure installation script"
 echo "---------------------------"
 
+# Check PHP dependencies
+PHP_JSON=$(php -m | grep 'json' 2> /dev/null)
+PHP_MBSTRING=$(php -m 2> /dev/null | grep 'mbstring')
+PHP_PDOSQLITE=$(php -m 2> /dev/null | grep 'pdo_sqlite$') # The dollar-sign ($) makes sure that 'pdo_sqlite2' is not accepted
+PHP_SOCKETS=$(php -m 2> /dev/null | grep '^sockets$')
+PHP_XML=$(php -m 2> /dev/null | grep '^xml$')
+
+if [ "$PHP_JSON" != "json" ]; then
+    err "The PHP 'JSON' module is missing.\nDon't forget to restart your Web server after installing the package."
+elif [ "$PHP_MBSTRING" != "mbstring" ]; then
+    err "The PHP 'mbstring' module is missing.\nDon't forget to restart your Web server after installing the package."
+elif [ "$PHP_PDOSQLITE" != "pdo_sqlite" ]; then
+    err "The PHP PDO SQLite v3 module is missing.\nDon't forget to restart your Web server after installing the package."
+elif [ "$PHP_SOCKETS" != "sockets" ]; then
+    err "The PHP 'sockets' module is missing.\nDon't forget to restart your Web server after installing the package."
+elif [ "$PHP_XML" != "xml" ]; then
+    err "The PHP 'xml' module is missing.\nDon't forget to restart your Web server after installing the package."
+fi
+
 # Discover NfSen configuration
 NFSEN_VARFILE=/tmp/nfsen-tmp.conf
 if [ ! -n "$(ps axo command | grep [n]fsend | grep -v nfsend-comm)" ]; then
@@ -115,23 +134,30 @@ else
     RETRIEVE_TOOL="wget"
 fi
 
-if [ ! -f  ${SSHCURE_REL} -a ! -f ../${SSHCURE_REL} ]; then
+if [ ! -f ${SSHCURE_REL} ]; then
     echo "Downloading SSHCure tar ball - http://sshcure.sf.net/"
     ${RETRIEVE_TOOL} -q http://downloads.sourceforge.net/project/sshcure/source/${SSHCURE_REL}
-fi
 
-# Move one directory-level up, if necessary, to be consistent with the case in which the tar-ball is unpacked (else-clause)
-if [ -f dependency_check.pm ]; then
-    cd ..
+    if [ ! -f ${SSHCURE_REL} ]; then
+        err "Could not download SSHCure tar ball; please check whether the version (v${VERSION}) is still available for download"
+    fi
 fi
 
 # Unpack SSHCure
 if [ -d ${TMP_DIR} ]; then
+    # Assume tar-ball was already extracted before
     echo "Extracted SSHCure files found in $(pwd)/${TMP_DIR}"
+elif [ -d backend -a -d frontend ]; then
+    # Assume tar-ball was already extracted before and we're already inside the 'SSHCure' directory
+    # Move one directory-level up, if necessary, to be consistent with the IF and ELSE clauses
+    cd ..
 else
     echo "Unpacking files..."
     tar zxf ${SSHCURE_REL} --directory=.
-    mv SSHCure ${TMP_DIR}
+
+    if [ ! -d ${TMP_DIR} ]; then
+        mv SSHCure ${TMP_DIR}
+    fi
 fi
 
 # Check Perl dependencies
@@ -144,25 +170,6 @@ if [ $PERL_DEP_CHECK_RETURN_CODE = 0 ]; then
     echo "All Perl dependencies are available on the system. Continuing installation..."
 else
     err_line "Some Perl dependencies are missing or outdated. Aborting installation..."
-fi
-
-# Check PHP dependencies
-PHP_JSON=$(php -m | grep 'json' 2> /dev/null)
-PHP_MBSTRING=$(php -m 2> /dev/null | grep 'mbstring')
-PHP_PDOSQLITE=$(php -m 2> /dev/null | grep 'pdo_sqlite$') # The dollar-sign ($) makes sure that 'pdo_sqlite2' is not accepted
-PHP_SOCKETS=$(php -m 2> /dev/null | grep '^sockets$')
-PHP_XML=$(php -m 2> /dev/null | grep '^xml$')
-
-if [ "$PHP_JSON" != "json" ]; then
-    err "The PHP 'JSON' module is missing.\nDon't forget to restart your Web server after installing the package."
-elif [ "$PHP_MBSTRING" != "mbstring" ]; then
-    err "The PHP 'mbstring' module is missing.\nDon't forget to restart your Web server after installing the package."
-elif [ "$PHP_PDOSQLITE" != "pdo_sqlite" ]; then
-    err "The PHP PDO SQLite v3 module is missing.\nDon't forget to restart your Web server after installing the package."
-elif [ "$PHP_SOCKETS" != "sockets" ]; then
-    err "The PHP 'sockets' module is missing.\nDon't forget to restart your Web server after installing the package."
-elif [ "$PHP_XML" != "xml" ]; then
-    err "The PHP 'xml' module is missing.\nDon't forget to restart your Web server after installing the package."
 fi
 
 if [ ! -f ${GEO_DB} ]; then
@@ -194,7 +201,7 @@ if [ $INSTALL_BACKEND = 1 -a -d ${BACKEND_PLUGINDIR}/SSHCure ]; then
 fi
 
 # Install backend and frontend plugin files
-echo "Installing SSHCure ${SSHCURE_VER} to ${FRONTEND_PLUGINDIR}/SSHCure"
+echo "Installing SSHCure ${VERSION} to ${FRONTEND_PLUGINDIR}/SSHCure"
 if [ $INSTALL_FRONTEND = 1 ]; then
     cp -r ./${TMP_DIR}/frontend/* ${FRONTEND_PLUGINDIR}
 fi
@@ -224,7 +231,7 @@ rm -rf ${GEOv6_DB}
 # Check whether an old SSHCure version was found and ask whether backend configuration and data structures should be retained
 if [ $INSTALL_BACKEND = 1 -a -d ${SSHCURE_BACKUPDIR_BACKEND} ]; then
     OLD_VER=$(cat ${SSHCURE_BACKUPDIR_BACKEND}/../SSHCure.pm | grep -m 1 SSHCURE_VERSION | cut -d"\"" -f2)
-    if [ ${OLD_VER} = ${SSHCURE_VER} ]; then
+    if [ ${OLD_VER} = ${VERSION} ]; then
         while true; do
             read -p "Do you wish to keep the backend configuration and data structures from your previous installation [y,n] (default: y)? " input
             case $input in

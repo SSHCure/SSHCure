@@ -36,9 +36,6 @@ check 2.5; for installation verification, check 2.6):
         - LWP::UserAgent (Debian/Ubuntu: libdbd-sqlite3-perl, libjson-perl, libwww-perl; RHEL/CentOS: perl-DBD-SQLite, perl-JSON, perl-libwww-perl)
         - Net::IP (Debian/Ubuntu: libnet-ip-perl; RHEL/CentOS: perl-Net-IP)
 
-- INVEA-TECH's FlowMon Probe (version >= 5.0) (http://www.invea-tech.com/products-and-services/flowmon/flowmon-probes)
-- INVEA-TECH's FlowMon Collector (version >= 5.0) (http://www.invea-tech.com/products-and-services/flowmon/flowmon-collectors)
-
 2.2) Automated tar ball installation (latest stable, recommended)
 
 - Download installation script:
@@ -52,7 +49,7 @@ check 2.5; for installation verification, check 2.6):
 2.3) Manual tar ball installation (latest stable)
 
 - Download tar ball from SourceForge repository:
-    $ wget http://downloads.sourceforge.net/project/sshcure/source/SSHCure_v2.2.tar.gz
+    $ wget http://downloads.sourceforge.net/project/sshcure/source/SSHCure_v2.4.1.tar.gz
 
 - Download MaxMind GeoLite City database:
     $ wget http://geolite.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz
@@ -61,7 +58,7 @@ check 2.5; for installation verification, check 2.6):
     $ wget http://geolite.maxmind.com/download/geoip/database/GeoLiteCityv6-beta/GeoLiteCityv6.dat.gz
 
 - Unpack installation package:
-    $ tar zxf SSHCure_v2.2 --directory=.
+    $ tar zxf SSHCure_v2.4.1.tar.gz --directory=.
 
 - Install plugin files:
     $ cp -r SSHCure/frontend/* /var/www/nfsen/plugins/
