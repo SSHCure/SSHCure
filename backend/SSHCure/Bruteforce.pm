@@ -164,7 +164,7 @@ sub bruteforce_detection {
     }
     
     # Detection
-    return if scalar $preselection_tuples == 0;
+    return if $preselection_tuples == 0;
 
     my @new_attackers = ();
     foreach my $source (@splitted_sources) {
@@ -337,7 +337,7 @@ sub bruteforce_detection_function {
     my @new_potential_compromises_next_intervals;
     my %target;
 
-    # Get all the SSH flows from src to dst, ordered by start time
+    # Get all the SSH flows between attacker and target, ordered by start time
     my @flow_records = split("\n", $raw_nfdump_output);
     my $parsed_flows = parse_nfdump_pipe(\@flow_records);
     my $flow_count = scalar @$parsed_flows;
@@ -370,7 +370,6 @@ sub bruteforce_detection_function {
     my ($top_ppf, $top_ppf_flowcount, $top_ppf_percentage, $highest_ppf) = get_histogram_stats(\%ppf_histogram);
     my ($avg_conc_conn_starts, $max_conc_conn_starts) = get_concurrent_connection_stats(\%conn_starts);
 
-    # Determine CUSUM mean, if any makes sense
     unless ($top_ppf >= $CFG::ALGO{'BRUTEFORCE_MIN_PPF'} && $top_ppf <= $CFG::ALGO{'BRUTEFORCE_MAX_PPF'}) {
         # The top ppf is not in a 'valid BF range', this tuple can not yield new BF/COMP attackers
         return Future->wrap();
@@ -408,7 +407,7 @@ sub bruteforce_detection_function {
         
         (fmap_void {
             my $flow_record = shift;
-            my ($ip_version, $fl_stime, $fl_etime, $proto, $attacker_ip, $atk_port, $target_ip, $target_port, $flags, $ppf) = @$flow_record;
+            my ($ip_version, $fl_stime, $fl_etime, $proto, $attacker_ip, $atk_port, $target_ip, $target_port, $flags, $ppf, $bytes) = @$flow_record;
             my $duration = $fl_etime - $fl_stime;
 
             $current_flow_index++;
