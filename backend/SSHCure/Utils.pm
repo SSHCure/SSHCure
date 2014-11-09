@@ -47,7 +47,6 @@ our @EXPORT = qw (
     ACK_only
     RST_only
     ASF_only
-    APS_only
     AF_only
     APS
     FIN
@@ -350,10 +349,6 @@ sub RST_only {
 
 sub ASF_only {
     return $_[0] == 0b010011;
-}
-
-sub APS_only {
-    return $_[0] == 0b011010;
 }
 
 sub AF_only {

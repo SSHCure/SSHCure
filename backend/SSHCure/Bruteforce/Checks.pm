@@ -424,14 +424,15 @@ sub check_maintain_connection_continue_dictionary {
 sub check_APS_only_flow {
     # 'Aggregated flow record' has been produced using 'nfdump -a'
     my ($aggr_flow_record) = @_;
-    my ($fl_stime, $fl_etime, $protocol,
-            $attacker_ip_0, $attacker_ip_1, $attacker_ip_2, $attacker_ip_3, $attacker_port,
-            $target_ip_0, $target_ip_1, $target_ip_2, $target_ip_3, $target_port,
+    my ($ip_version, $fl_stime, $fl_etime, $protocol,
+            $attacker_ip, $attacker_port, $target_ip, $target_port,
             $flags, $packets, $bytes) = @{$aggr_flow_record};
+
+    my $APS_only_flow = ($flags == 0b011010);
 
     # We have to use the aggregated flow record here, since we have to look for connections that remain open (i.e., APS-only) beyond
     # the current data chunk. In case it is closed within the current chunk, it is potentially a type of 'maintain connection'.
-    return Future->wrap(APS_only($flags) && $packets >= $CFG::ALGO{'MINIMAL_SSH_AUTH_PPF'});
+    return Future->wrap($APS_only_flow && $packets >= $CFG::ALGO{'MINIMAL_SSH_AUTH_PPF'});
 }
 
 # check_login_grace_time is only to be called when an open connection has been observed

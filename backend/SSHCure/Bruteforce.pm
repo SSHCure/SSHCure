@@ -344,10 +344,9 @@ sub bruteforce_detection_function {
 
     # The 2nd part of the if-condition below is for situations in which a (last) fraction of the attack lies in a new data chunk
     if ($flow_count < $CFG::ALGO{'BRUTEFORCE_CUSUM_STREAK_THRESHOLD'} && !(
-                exists $SSHCure::attacks{$presel_attacker_ip} &&
-                exists $SSHCure::attacks{$presel_attacker_ip}{'targets'}{$presel_target_ip} &&
-                exists $SSHCure::attacks{$presel_attacker_ip}{'targets'}{$presel_target_ip}{'certainty'} >= $CFG::ALGO{'CERT_BRUTEFORCE_NO_SCAN'}
-            )) {
+            exists $SSHCure::attacks{$presel_attacker_ip} &&
+            exists $SSHCure::attacks{$presel_attacker_ip}{'targets'}{$presel_target_ip} &&
+            exists $SSHCure::attacks{$presel_attacker_ip}{'targets'}{$presel_target_ip}{'certainty'} >= $CFG::ALGO{'CERT_BRUTEFORCE_NO_SCAN'})) {
         # Skip further processing as soon as possible
         return Future->wrap();
     }
