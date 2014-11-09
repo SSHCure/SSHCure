@@ -51,6 +51,14 @@ sub scan_detection {
             }
         }
 
+        # Check whether scan attack was reported before and is still ongoing
+        foreach my $attacker (keys %attackers) {
+            # Attack 'certainty' key does always exist if attack is present in 'attacks' hash
+            if (exists $SSHCure::attacks{$attacker} && $SSHCure::attacks{$attacker}{'certainty'} ~~ [0.25, 0.5, 0.75]) {
+                $attackers{$attacker}->{'target_count'} += scalar keys($SSHCure::attacks{$attacker}{'targets'});
+            }
+        }
+
         # Find all attacker's targets
         foreach my $flow_record (@$parsed_flow_records) {
             # Check whether current attacker (src IP in current flow record; $flow_record[4]) contacted enough targets

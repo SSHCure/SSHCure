@@ -27,7 +27,7 @@
 
     # Other algorithm values used in the detection
     'SCAN_MAX_PPF'                                  => 2,
-    'SCAN_MIN_TARGETS'                              => 25,
+    'SCAN_MIN_TARGETS'                              => 10,
     'BRUTEFORCE_MIN_PPF'                            => 11,
     'BRUTEFORCE_MAX_PPF'                            => 51,
     'BRUTEFORCE_CUSUM_DETERMINATION_THRESHOLD'      => 2,
