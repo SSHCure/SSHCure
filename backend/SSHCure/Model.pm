@@ -247,11 +247,12 @@ sub update_last_activities {
     $$attack{'end_time'} = 0 unless exists $$attack{'end_time'};
 
     while ((my $target, my $target_info) = each (%$targets)) {
-        if (!exists $$attack{'targets'}{$target}{'last_act_' . $phase}) {
-            $$attack{'targets'}{$target}{'last_act_' . $phase} = $$target_info{'last_act'};
+        if (! exists $$attack{'targets'}{$target}{'last_act_' . $phase}) {
+            $$attack{'targets'}{$target}{'last_act_'.$phase} = $$target_info{'last_act'};
         } else {
-            $$attack{'targets'}{$target}{'last_act_' . $phase} = $$target_info{'last_act'} if $$target_info{'last_act'} > $$attack{'targets'}{$target}{'last_act_' . $phase};
+            $$attack{'targets'}{$target}{'last_act_'.$phase} = $$target_info{'last_act'} if $$target_info{'last_act'} > $$attack{'targets'}{$target}{'last_act_'.$phase};
         }
+
         $$attack{'end_time'} = $$target_info{'last_act'} if $$target_info{'last_act'} > $$attack{'end_time'};
         
         if (exists $$target_info{'first_act'}) {

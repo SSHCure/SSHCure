@@ -527,7 +527,7 @@ sub bruteforce_detection_function {
 
                     # If PPF != cusum_mean (so in case of a potential block), @$non_aggr_flow_records is always set
                     for my $non_aggr_flow_record (@$non_aggr_flow_records) {
-                        my ($fl_stime, $fl_etime, $proto, $attacker_ip, $attacker_port, $target_ip, $target_port, $flags, $ppf) = @$non_aggr_flow_record;
+                        my ($ip_version, $fl_stime, $fl_etime, $proto, $attacker_ip, $atk_port, $target_ip, $target_port, $flags, $ppf, $bytes) = @$non_aggr_flow_record;
 
                         # Check for blocks/rate limiting. AF-only is to avoid removing APS + AF constructions
                         # FIXME - Check '-1' in statement below
