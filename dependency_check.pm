@@ -112,6 +112,14 @@ my %perl_dependencies = (
             'OpenBSD'   => 'p5-Try-Tiny',
         }
     },
+    'XML::Writer' => {
+        'packages'      => {
+            'CentOS'    => 'perl-XML-Writer',
+            'Debian'    => 'libxml-writer-perl',
+            'FreeBSD'   => 'p5-XML-Writer',
+            'OpenBSD'   => 'p5-XML-Writer',
+        }
+    },
 );
 
 # Check whether modules are installed and whether version requirements are met
