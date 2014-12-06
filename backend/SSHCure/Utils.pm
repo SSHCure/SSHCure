@@ -327,8 +327,12 @@ sub get_ip_version {
         $version = 4;
     } elsif (($address =~ tr/://) > 1) {
         $version = 6;
+    } elsif ($address =~ /^\d+$/) {
+        # Assume the IP address is passed in decimal form
+        return get_ip_version(dec2ip($address));
     } else {
         # Do nothing (return -1)
+        log_warning("Could not determine IP version of '$address'");
     }
 
     return $version;
