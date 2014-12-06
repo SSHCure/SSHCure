@@ -327,7 +327,7 @@ sub get_ip_version {
         $version = 4;
     } elsif (($address =~ tr/://) > 1) {
         $version = 6;
-    } elsif ($address =~ /^\d+$/) {
+    } elsif ($address =~ /^\d+$/ && $address < 4294967295) {
         # Assume the IP address is passed in decimal form
         return get_ip_version(dec2ip($address));
     } else {
