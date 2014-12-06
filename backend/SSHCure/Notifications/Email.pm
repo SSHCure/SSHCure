@@ -24,7 +24,7 @@ sub handle_notification {
     # Convert IP number to address
     $attacker_ip = dec2ip($attacker_ip);
     
-    # Resolve name of host running SSHCure
+    # Get name of host running SSHCure
     my $sshcure_host = qx(hostname -f);
     $sshcure_host =~ s/^\s+|\s+\n?$//g;
     
@@ -82,9 +82,14 @@ sub handle_notification {
     my $formatted_target_list = join("\n", @target_list);
 
     my $start_time = strftime("%A, %B %d, %Y %H:%M", localtime($$attack{'start_time'}));
-    my $end_time = '(ongoing)';
+    my $end_time;
+
+    # Since the attack's end time is updated after every interval (in case the attack is active),
+    # we have to check whether the attack has really ended. This is done by the first condition.
     if ($CFG::NOTIFICATIONS{$notification_id}{'when'} eq $CFG::CONST{'NOTIFICATIONS'}{'WHEN'}{'ATTACK_END'} && $$attack{'end_time'} > 0) {
         $end_time = strftime("%A, %B %d, %Y %H:%M", localtime($$attack{'end_time'}));
+    } else {
+        $end_time = '(ongoing)';
     }
     
     my @body =<<END;
