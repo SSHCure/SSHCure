@@ -39,6 +39,24 @@ sub handle_notification {
     # Convert current time to ISO 8601 timestamp
     my $current_time_iso8601 = strftime("%Y-%m-%dT%H:%M:%S".$time_zone, localtime(time));
 
+    # Determine attack type and severity
+    my $type; my $severity;
+    if ($$attack{'certainty'} >= $CFG::CONST{'NOTIFICATIONS'}{'ATTACK_PHASE'}{'COMPROMISE'}) {
+        $type = 'compromise';
+        $severity = 'high';
+    } elsif ($$attack{'certainty'} >= $CFG::CONST{'NOTIFICATIONS'}{'ATTACK_PHASE'}{'BRUTEFORCE'}) {
+        $type = 'brute-force attack';
+        $severity = 'medium';
+    } elsif ($$attack{'certainty'} >= $CFG::CONST{'NOTIFICATIONS'}{'ATTACK_PHASE'}{'SCAN'}) {
+        $type = 'network scan';
+        $severity = 'low';
+    } else {
+        # Do nothing
+        return;
+    }
+
+    my $confidence = $severity;
+
     # Generate XML file
     my $output_string = XML::Writer::String->new(); # FIXME Remove
     my $doc = new XML::Writer(OUTPUT => $output_string); # FIXME Remove argument
@@ -68,8 +86,11 @@ sub handle_notification {
                     $doc->endTag();
                 }
 
-                $doc->startTag('Assessment');
-
+                $doc->startTag('Assessment', 'occurrence' => 'actual');
+                    $doc->startTag('Impact', 'severity' => $severity, 'type' => 'ext-value', 'ext-type' => $type);
+                    $doc->endTag();
+                    $doc->startTag('Confidence', 'rating' => $confidence);
+                    $doc->endTag();
                 $doc->endTag();
 
                 $doc->startTag('Contact', 'role' => 'creator', 'type' => 'ext-value', 'ext-type' => 'application');
