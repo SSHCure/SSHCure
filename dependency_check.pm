@@ -72,20 +72,12 @@ my %perl_dependencies = (
             'OpenBSD'   => 'p5-libwww',
         }
     },
-    'Mail::Header' => {
+    'MIME::Lite' => {
         'packages'      => {
-            'CentOS'    => 'perl-MailTools',
-            'Debian'    => 'libmailtools-perl',
-            'FreeBSD'   => 'p5-Mail-Tools',
-            'OpenBSD'   => 'p5-Mail-Tools',
-        }
-    },
-    'Mail::Internet' => {
-        'packages'      => {
-            'CentOS'    => 'perl-MailTools',
-            'Debian'    => 'libmailtools-perl',
-            'FreeBSD'   => 'p5-Mail-Tools',
-            'OpenBSD'   => 'p5-Mail-Tools',
+            'CentOS'    => 'perl-MIME-Lite',
+            'Debian'    => 'libmime-lite-perl',
+            'FreeBSD'   => 'p5-MIME-Lite',
+            'OpenBSD'   => 'p5-MIME-Lite',
         }
     },
     'Net::IP' => {

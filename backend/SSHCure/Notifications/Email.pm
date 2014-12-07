@@ -13,8 +13,7 @@ package SSHCure::Notifications::Email;
 use strict;
 use warnings;
 
-use Mail::Header;
-use Mail::Internet;
+use MIME::Lite;
 use POSIX qw(strftime);
 use SSHCure::Utils;
 
@@ -33,15 +32,15 @@ sub handle_notification {
     $attacker_hostname = ($attacker_hostname eq $attacker_ip) ? "" : "($attacker_hostname)"; # Either show the reverse in parentheses, or don't show anything at all
     
     # Get attack phase name (certainty -> name), based on notification config (as the attack may move to a next phase before the notification was sent)
-    my $attack_level = "attack";
+    my $attack_type;
     my @target_list;
     if ($CFG::NOTIFICATIONS{$notification_id}{'filter_type'} eq $CFG::CONST{'NOTIFICATIONS'}{'FILTER_TYPE'}{'ATTACKER'}){
         if ($$attack{'certainty'} >= $CFG::CONST{'NOTIFICATIONS'}{'ATTACK_PHASE'}{'COMPROMISE'}){
-            $attack_level = "compromise " . $attack_level;
+            $attack_type = "compromise";
         } elsif ($$attack{'certainty'} >= $CFG::CONST{'NOTIFICATIONS'}{'ATTACK_PHASE'}{'BRUTEFORCE'}){
-            $attack_level = "brute-force " . $attack_level;
+            $attack_type = "brute-force attack";
         } elsif ($$attack{'certainty'} >= $CFG::CONST{'NOTIFICATIONS'}{'ATTACK_PHASE'}{'SCAN'}){
-            $attack_level = "scan " . $attack_level;
+            $attack_type = "scan attack";
         }
         @target_list = keys(%$new_targets);
     } else {
@@ -60,11 +59,11 @@ sub handle_notification {
         }
         # transform $max_certainty into a string
         if ($max_certainty >= $CFG::CONST{'NOTIFICATIONS'}{'ATTACK_PHASE'}{'COMPROMISE'}){
-            $attack_level = "compromise " . $attack_level;
+            $attack_type = "compromise";
         } elsif ($max_certainty >= $CFG::CONST{'NOTIFICATIONS'}{'ATTACK_PHASE'}{'BRUTEFORCE'}){
-            $attack_level = "brute-force " . $attack_level;
+            $attack_type = "brute-force attack";
         } elsif ($max_certainty >= $CFG::CONST{'NOTIFICATIONS'}{'ATTACK_PHASE'}{'SCAN'}){
-            $attack_level = "scan " . $attack_level;
+            $attack_type = "brute-force attack";
         }
     }
  
@@ -92,8 +91,8 @@ sub handle_notification {
         $end_time = '(ongoing)';
     }
     
-    my @body =<<END;
-A $attack_level has been detected by SSHCure on $sshcure_host, matching notification trigger '$notification_id'.
+    my $mail_body =<<END;
+A $attack_type has been detected by SSHCure on $sshcure_host, matching notification trigger '$notification_id'.
 ---
 
 Start time: $start_time
@@ -106,41 +105,22 @@ $formatted_target_list
 
 ---
 This message has been generated automatically by SSHCure.
+
 END
 
-    my @mail_head = (
-        "From: "    . $CFG::NOTIFICATIONS{$notification_id}{'notification_sender'},
-        "To: "      . $CFG::NOTIFICATIONS{$notification_id}{'notification_destination'},
-        "Subject: " . "[SSHCure] " . ucfirst($attack_level) . " detected ($notification_id)"
+    # Generate e-mail message for transporting IODEF attack report (using MIME)
+    my $msg = MIME::Lite->new(
+        From        => $CFG::NOTIFICATIONS{$notification_id}{'notification_sender'},
+        To          => $CFG::NOTIFICATIONS{$notification_id}{'notification_destination'},
+        Subject     => '[SSHCure] '.ucfirst($attack_type).' detected ('.$notification_id.')',
+        Type        => 'text/plain',
+        Data        => $mail_body
     );
 
-    my $mail_header = new Mail::Header(\@mail_head);
-
-    my $mail = new Mail::Internet(
-        Header => $mail_header,
-        Body   => \@body
-    );
-
-    my @sent_to = $mail->smtpsend(
-        Host     => $NfConf::SMTP_SERVER,
-        Hello    => $NfConf::SMTP_SERVER,
-        MailFrom => $CFG::NOTIFICATIONS{$notification_id}{'notification_destination'}
-    );
-    
-    # An error has occured as the e-mail was not sent to any
-    my @receivers = split(',', $CFG::NOTIFICATIONS{$notification_id}{'notification_destination'});
-    if (@sent_to == @receivers) {
-        log_info("Notification has been sent to '".$CFG::NOTIFICATIONS{$notification_id}{'notification_destination'}."' (attack ID: ".$$attack{'db_id'}.")");
+    if ($msg->send('smtp', $NfConf::SMTP_SERVER)) {
+        log_info("E-mail notification has been sent to '".$CFG::NOTIFICATIONS{$notification_id}{'notification_destination'}."' (attack ID: ".$$attack{'db_id'}.")");
     } else {
-        # Find receivers that failed to receive the notification
-        my @failed_receivers;
-        foreach my $receiver (@receivers) {
-            unless (grep {$_ =~ $receiver} @sent_to) {
-                push(@failed_receivers, $receiver);
-            }
-        }
-        
-        log_error("Notification could not be sent to the following recipients: ".join(", ", @failed_receivers));
+        log_info("Could not send e-mail notification to '".$CFG::NOTIFICATIONS{$notification_id}{'notification_destination'}."' (attack ID: ".$$attack{'db_id'}.")");
     }
 }
 
