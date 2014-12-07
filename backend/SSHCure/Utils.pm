@@ -578,21 +578,22 @@ sub config_sanity_check {
         }
         
         # Notification sender + destination (http://www.regular-expressions.info/email.html)
-        if ($$config{'notification_type'} eq $CFG::CONST{'NOTIFICATIONS'}{'TYPE'}{'EMAIL'}) {
+        if ($$config{'notification_type'} eq $CFG::CONST{'NOTIFICATIONS'}{'TYPE'}{'EMAIL'}
+                || $$config{'notification_type'} eq $CFG::CONST{'NOTIFICATIONS'}{'TYPE'}{'IODEF'}) {
             # Sender
             unless ($$config{'notification_sender'} ne '' && $$config{'notification_sender'} =~ tr/@// == 1) {
-                log_error("Notification configuration '".$notification_id."' should have exactly one e-mail address");
+                log_error("Notification configuration '".$notification_id."' should have exactly one sender e-mail address");
                 return 0;
             }
             
             # Destination
             unless ($$config{'notification_destination'} ne '') {
-                log_error("Notification configuration '".$notification_id."' should not be empty");
+                log_error("Destination address field of notification configuration '".$notification_id."' should not be empty");
                 return 0;
             }
-            
-            unless ($$config{'notification_destination'} =~ tr/@// == (($$config{'notification_destination'} =~ tr/<// + $$config{'notification_destination'} =~ tr/>//)) / 2) {
-                log_error("Every notification_destination in notification configuration '".$notification_id."' should be enclosed with brackets (e.g., '<name1\@domain.com>,<name2\@domain.com>')");
+
+            unless (($$config{'notification_destination'} =~ tr/@//) == ($$config{'notification_destination'} =~ tr/,//) - 1) {
+                log_error("Syntax error in destination address field of notification configuration '".$notification_id."'");
                 return 0;
             }
         } elsif ($$config{'notification_type'} eq $CFG::CONST{'NOTIFICATIONS'}{'TYPE'}{'LOG'}) {
@@ -607,6 +608,8 @@ sub config_sanity_check {
                 log_error("Notification configuration '".$notification_id."' should not be empty");
                 return 0;
             }
+        } else {
+            # Do nothing
         }
     }
 
