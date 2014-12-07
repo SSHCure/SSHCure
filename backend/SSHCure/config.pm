@@ -74,20 +74,20 @@ $STORE_SCAN_TARGETS = 1;
     #     # Indicates the kind of notification to be sent.
     #     # Supported values:
     #     #   - $CONST{'NOTIFICATIONS'}{'TYPE'}{'EMAIL'}
+    #     #   - $CONST{'NOTIFICATIONS'}{'TYPE'}{'IODEF'}
     #     #   - $CONST{'NOTIFICATIONS'}{'TYPE'}{'LOG'}
     #     #   - $CONST{'NOTIFICATIONS'}{'TYPE'}{'QMANAGE'}
     #     'notification_type'         => $CONST{'NOTIFICATIONS'}{'TYPE'}{'EMAIL'},
     #     
     #     # Indicates the sender of the notification. It can be just a single e-mail address and only needs to be 
-    #     # configured for email notifications, and can be left empty in case anything other than 'e-mail' has
-    #     # been selected as the notification type.
+    #     # configured for email notifications, and can be left empty in case anything other than 'e-mail' or 'IODEF' has
+    #     # been configured as the notification type.
     #     'notification_sender'       => 'sshcure@domain.com',
     #     
-    #     # Comma-separated list of notification destinations. When 'e-mail' has been selected as the notification
-    #     # type, the destinations are e-mail addresses. Every e-mail address has to be put between brackets ('<' and '>').
-    #     # When 'log' file has been selected, it's the (absolute) log file location on the file system. Leave
-    #     # empty in case of other notification types.
-    #     'notification_destination'  => '<admin@domain.com>'
+    #     # Comma-separated list of notification destinations. When 'e-mail' or 'IODEF' have been selected as the notification
+    #     # type, the destinations are e-mail addresses. When 'log' file has been selected, it's the (absolute) log file
+    #     # location on the file system. Leave empty in case of other notification types.
+    #     'notification_destination'  => 'noc@domain.com'
     # },
     # 'NOTIFICATION_CONFIG_EXAMPLE_2' => {
     #     'filter'                    => '1.2.3.4/16',
@@ -96,7 +96,16 @@ $STORE_SCAN_TARGETS = 1;
     #     'when'                      => $CONST{'NOTIFICATIONS'}{'WHEN'}{'ATTACK_END'},
     #     'notification_type'         => $CONST{'NOTIFICATIONS'}{'TYPE'}{'EMAIL'},
     #     'notification_sender'       => 'sshcure@domain.com',
-    #     'notification_destination'  => '<admin@domain.com>,<noc@domain.com>'
+    #     'notification_destination'  => 'admin@domain.com,noc@domain.com'
+    # }
+    # 'NOTIFICATION_CONFIG_EXAMPLE_IODEF' => {
+    #     'filter'                    => '1.2.3.4/16',
+    #     'filter_type'               => $CONST{'NOTIFICATIONS'}{'FILTER_TYPE'}{'TARGET'},
+    #     'attack_phase'              => $CONST{'NOTIFICATIONS'}{'ATTACK_PHASE'}{'COMPROMISE'},
+    #     'when'                      => $CONST{'NOTIFICATIONS'}{'WHEN'}{'ATTACK_END'},
+    #     'notification_type'         => $CONST{'NOTIFICATIONS'}{'TYPE'}{'IODEF'},
+    #     'notification_sender'       => 'sshcure@domain.com',
+    #     'notification_destination'  => 'soc@domain.com' 
     # }
     # 'NOTIFICATION_CONFIG_EXAMPLE_QMANAGE' => {
     #     'filter'                    => '1.2.3.4/16',
