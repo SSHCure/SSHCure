@@ -8,6 +8,7 @@ Release notes [v3.0]:
 - [FEATURE] Overhauled front-end, with particular focus on incoming vs. outgoing attacks
 - [FEATURE] Integration with QuarantaineNet Qmanage by sending reports to Qmanage's XML-RPC interface
 - [FEATURE] IODEF notifications using MIME e-mail messages
+- [FEATURE] X-ARF notifications using MIME e-mail messages
 - [FEATURE] Integration with OpenBL SSH blacklist
 - [FEATURE] Full IPv6 support
 
