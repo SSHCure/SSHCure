@@ -281,6 +281,11 @@ sub ip_addr_in_range {
         $last_address = @{$cache_elem}[1];
     } else {
         my $prefix_obj = new Net::IP($prefix);
+        if (!$prefix_obj) {
+            log_error("Could not create Net::IP object (prefix: ".$prefix.")");
+            return 0;
+        }
+        
         $first_address = scalar $prefix_obj->intip();
         
         # intip() does not return properly in case a '/0' prefix is used
