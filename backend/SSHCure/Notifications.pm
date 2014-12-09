@@ -18,6 +18,7 @@ use SSHCure::Notifications::Email;
 use SSHCure::Notifications::IODEF;
 use SSHCure::Notifications::Log;
 use SSHCure::Notifications::Qmanage;
+use SSHCure::Notifications::XARF;
 use SSHCure::Utils;
 
 use Exporter;

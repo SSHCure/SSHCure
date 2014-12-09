@@ -77,6 +77,7 @@ $STORE_SCAN_TARGETS = 1;
     #     #   - $CONST{'NOTIFICATIONS'}{'TYPE'}{'IODEF'}
     #     #   - $CONST{'NOTIFICATIONS'}{'TYPE'}{'LOG'}
     #     #   - $CONST{'NOTIFICATIONS'}{'TYPE'}{'QMANAGE'}
+    #     #   - $CONST{'NOTIFICATIONS'}{'TYPE'}{'XARF'}
     #     'notification_type'         => $CONST{'NOTIFICATIONS'}{'TYPE'}{'EMAIL'},
     #     
     #     # Indicates the sender of the notification. It can be just a single e-mail address and only needs to be 
@@ -97,7 +98,7 @@ $STORE_SCAN_TARGETS = 1;
     #     'notification_type'         => $CONST{'NOTIFICATIONS'}{'TYPE'}{'EMAIL'},
     #     'notification_sender'       => 'sshcure@domain.com',
     #     'notification_destination'  => 'admin@domain.com,noc@domain.com'
-    # }
+    # },
     # 'NOTIFICATION_CONFIG_EXAMPLE_IODEF' => {
     #     'filter'                    => '1.2.3.4/16',
     #     'filter_type'               => $CONST{'NOTIFICATIONS'}{'FILTER_TYPE'}{'TARGET'},
@@ -106,7 +107,7 @@ $STORE_SCAN_TARGETS = 1;
     #     'notification_type'         => $CONST{'NOTIFICATIONS'}{'TYPE'}{'IODEF'},
     #     'notification_sender'       => 'sshcure@domain.com',
     #     'notification_destination'  => 'soc@domain.com' 
-    # }
+    # },
     # 'NOTIFICATION_CONFIG_EXAMPLE_QMANAGE' => {
     #     'filter'                    => '1.2.3.4/16',
     #     'filter_type'               => $CONST{'NOTIFICATIONS'}{'FILTER_TYPE'}{'TARGET'},
@@ -115,6 +116,15 @@ $STORE_SCAN_TARGETS = 1;
     #     'notification_type'         => $CONST{'NOTIFICATIONS'}{'TYPE'}{'QMANAGE'},
     #     'notification_sender'       => '',    # (leave empty)
     #     'notification_destination'  => ''     # (leave empty)
+    # },
+    # 'NOTIFICATION_CONFIG_EXAMPLE_XARF' => {
+    #     'filter'                    => '1.2.3.4/16',
+    #     'filter_type'               => $CONST{'NOTIFICATIONS'}{'FILTER_TYPE'}{'TARGET'},
+    #     'attack_phase'              => $CONST{'NOTIFICATIONS'}{'ATTACK_PHASE'}{'COMPROMISE'},
+    #     'when'                      => $CONST{'NOTIFICATIONS'}{'WHEN'}{'ATTACK_END'},
+    #     'notification_type'         => $CONST{'NOTIFICATIONS'}{'TYPE'}{'XARF'},
+    #     'notification_sender'       => 'sshcure@domain.com',
+    #     'notification_destination'  => 'soc@domain.com'
     # }
 );
 

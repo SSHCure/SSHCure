@@ -101,6 +101,7 @@ my $SSHCURE_DATA_DIR = "$NfConf::BACKEND_PLUGINDIR/SSHCure/data";
             'IODEF'             => "IODEF",
             'LOG'               => "Log",
             'QMANAGE'           => "Qmanage",
+            'XARF'              => "XARF",
         },
         'WHEN' => {
             'ATTACK_START'      => 0,
