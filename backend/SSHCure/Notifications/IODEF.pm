@@ -37,7 +37,7 @@ sub handle_notification {
     my $attacker_hostname = ip2hostname($attacker_ip);
     $attacker_hostname = ($attacker_hostname eq $attacker_ip) ? "" : "($attacker_hostname)"; # Either show the reverse in parentheses, or don't show anything at all
 
-    # Determine attack IP address version
+    # Determine attacker IP address version
     my $ip_version = get_ip_version($attacker_ip);
 
     # Convert attack start time to ISO 8601 timestamp
@@ -174,7 +174,7 @@ Attacker: $attacker_ip $attacker_hostname
 An attack report in IODEF format (XML) is attached to this message.
 
 ---
-This message has been generated automatically by SSHCure.
+This message has been generated automatically by SSHCure $SSHCure::SSHCURE_VERSION.
 
 END
 

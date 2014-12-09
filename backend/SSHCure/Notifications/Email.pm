@@ -109,7 +109,7 @@ Targets:
 $formatted_target_list
 
 ---
-This message has been generated automatically by SSHCure.
+This message has been generated automatically by SSHCure $SSHCure::SSHCURE_VERSION.
 
 END
 
