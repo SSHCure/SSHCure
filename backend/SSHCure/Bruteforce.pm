@@ -602,7 +602,7 @@ sub port_number_reuse {
     # Check for port number reuse by checking for the number of flow records having the APS-flags set
     my $records_with_APS = 0;
     for my $non_aggr_flow_record (@$non_aggr_flow_records) {
-        my ($t_start, $t_end, $protocol, $s_ip, $s_port, $d_ip, $d_port, $flags, $packets, $bytes) = @$non_aggr_flow_record;
+        my ($ip_version, $t_start, $t_end, $protocol, $s_ip, $s_port, $d_ip, $d_port, $flags, $packets, $bytes) = @$non_aggr_flow_record;
         if (APS($flags)) {
             $records_with_APS++;
         }
