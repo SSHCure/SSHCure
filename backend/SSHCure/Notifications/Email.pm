@@ -41,7 +41,10 @@ sub handle_notification {
             $attack_type = "brute-force attack";
         } elsif ($$attack{'certainty'} >= $CFG::CONST{'NOTIFICATIONS'}{'ATTACK_PHASE'}{'SCAN'}){
             $attack_type = "scan attack";
+        } else {
+            # Do nothing
         }
+
         @target_list = keys(%$new_targets);
     } else {
         # FILTER_TYPE == TARGET
@@ -63,7 +66,9 @@ sub handle_notification {
         } elsif ($max_certainty >= $CFG::CONST{'NOTIFICATIONS'}{'ATTACK_PHASE'}{'BRUTEFORCE'}){
             $attack_type = "brute-force attack";
         } elsif ($max_certainty >= $CFG::CONST{'NOTIFICATIONS'}{'ATTACK_PHASE'}{'SCAN'}){
-            $attack_type = "brute-force attack";
+            $attack_type = "scan attack";
+        } else {
+            # Do nothing
         }
     }
  
