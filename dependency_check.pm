@@ -23,6 +23,14 @@ my %CONST = (
 );
 
 my %perl_dependencies = (
+    'DBI' => {
+        'packages'      => {
+            'CentOS'    => 'perl-DBI',
+            'Debian'    => 'libdbd-sqlite3-perl',
+            'FreeBSD'   => 'p5-DBI',
+            'OpenBSD'   => 'p5-DBI',
+        }
+    },
     'Future::Utils' => {
         'packages'      => {
             'CentOS'    => 'perl-Future',
