@@ -47,6 +47,16 @@ sub add_scan_attacker {
         update_last_activities($SSHCure::attacks{$attacker_ip}, $targets, 'scan');
         update_db($attacker_ip, $existing_attack, $targets);
     } else { # New attacker
+        # Check whether attack is inbound or outbound
+        my $attack_direction = $CFG::CONST{'ATTACK_DIRECTION'}{'INBOUND'};
+        foreach my $network (split(/,/, $CFG::INTERNAL_NETWORKS)) {
+            if (ip_addr_in_range($attacker_ip, $network)) {
+                $attack_direction = $CFG::CONST{'ATTACK_DIRECTION'}{'OUTBOUND'};
+                last;
+            }
+        }
+
+        # Check whether attacker has been blacklisted by OpenBL
         my $host_blacklisted = host_on_openbl_blacklist($attacker_ip);
 
         while ((my $target, my $target_info) = each (%$targets)) {
@@ -61,7 +71,7 @@ sub add_scan_attacker {
         update_attack_details($SSHCure::attacks{$attacker_ip});
         update_last_activities($SSHCure::attacks{$attacker_ip}, $targets, 'scan');
 
-        my $new_db_id = update_db($attacker_ip, $SSHCure::attacks{$attacker_ip}, $targets, $host_blacklisted);
+        my $new_db_id = update_db($attacker_ip, $SSHCure::attacks{$attacker_ip}, $targets, $attack_direction, $host_blacklisted);
         $SSHCure::attacks{$attacker_ip}{'db_id'} = $new_db_id;
     }
     
@@ -94,6 +104,16 @@ sub add_bf_attacker {
         update_last_activities($SSHCure::attacks{$attacker_ip}, $targets, 'bf');
         update_db($attacker_ip, $SSHCure::attacks{$attacker_ip}, $targets);
     } else { # New attacker: no scan phase detected, so add with lower certainty
+        # Check whether attack is inbound or outbound
+        my $attack_direction = $CFG::CONST{'ATTACK_DIRECTION'}{'INBOUND'};
+        foreach my $network (split(/,/, $CFG::INTERNAL_NETWORKS)) {
+            if (ip_addr_in_range($attacker_ip, $network)) {
+                $attack_direction = $CFG::CONST{'ATTACK_DIRECTION'}{'OUTBOUND'};
+                last;
+            }
+        }
+
+        # Check whether attacker has been blacklisted by OpenBL
         my $host_blacklisted = host_on_openbl_blacklist($attacker_ip);
 
         $SSHCure::attacks{$attacker_ip} = {'targets' => $targets, 'certainty' => $CFG::ALGO{'CERT_BRUTEFORCE_NO_SCAN'}};
@@ -104,7 +124,7 @@ sub add_bf_attacker {
         update_attack_details($SSHCure::attacks{$attacker_ip});
         update_last_activities($SSHCure::attacks{$attacker_ip}, $targets, 'bf');
 
-        my $new_db_id = update_db($attacker_ip, $SSHCure::attacks{$attacker_ip}, $targets, $host_blacklisted);
+        my $new_db_id = update_db($attacker_ip, $SSHCure::attacks{$attacker_ip}, $targets, $attack_direction, $host_blacklisted);
         $SSHCure::attacks{$attacker_ip}{'db_id'} = $new_db_id;
     }
     
@@ -267,8 +287,8 @@ sub update_last_activities {
 # Database routines
 ####################
 
-sub update_db ($$$;$) {
-    my ($attacker_ip, $attack_info, $targets, $attacker_blacklisted) = @_;
+sub update_db ($$$;$$) {
+    my ($attacker_ip, $attack_info, $targets, $attack_direction, $attacker_blacklisted) = @_;
     my ($db_id, $query);
 
     if (exists $$attack_info{'db_id'}) {
@@ -286,16 +306,21 @@ sub update_db ($$$;$) {
     } else {
         # Attack is new in DB
         $query = "  INSERT INTO attack
-                        (start_time, certainty, attacker_ip, target_count, attacker_blacklisted)
-                    VALUES (?, ?, ?, ?, ?)";
+                        (start_time, certainty, direction, attacker_ip, target_count, attacker_blacklisted)
+                    VALUES (?, ?, ?, ?, ?, ?)";
 
+        # 'attack_direction' and 'attacker_blacklisted' are optional function arguments that only need to be set for new attacks. 
+        if (! defined $attack_direction) {
+            log_error("New attack to be inserted in DB without 'attack_direction' being set");
+            $attack_direction = $CFG::CONST{'ATTACK_DIRECTION'}{'INBOUND'};
+        }
         if (! defined $attacker_blacklisted) {
-            log_error("New attack to be inserted in DB without 'attacker_blacklisted' has been set");
+            log_error("New attack to be inserted in DB without 'attacker_blacklisted' being set");
             $attacker_blacklisted = 0;
         }
 
         my $sth_attack = $SSHCure::DBH->prepare($query);
-        $sth_attack->execute($$attack_info{'start_time'}, $$attack_info{'certainty'}, $attacker_ip, $$attack_info{'target_count'}, $attacker_blacklisted);
+        $sth_attack->execute($$attack_info{'start_time'}, $$attack_info{'certainty'}, $attack_direction, $attacker_ip, $$attack_info{'target_count'}, $attacker_blacklisted);
     }
     
     # get last_inserted_id and overwrite if needed
@@ -303,7 +328,7 @@ sub update_db ($$$;$) {
 
     # Only store scan phase targets if enabled in config
     unless ($$attack_info{'certainty'} <= $CFG::ALGO{'CERT_SCAN'} && $CFG::STORE_SCAN_TARGETS == 0) {
-        # update victims table
+        # Update table 'target'
         my $sql_target = "  INSERT OR REPLACE INTO target
                                 (attack_id, target_ip, certainty, last_scan_activity, last_bruteforce_activity,
                                 last_compromise_activity, is_host_blocked, compromise_ports, compromise_reason)

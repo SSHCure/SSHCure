@@ -112,6 +112,11 @@ my $SSHCURE_DATA_DIR = "$NfConf::BACKEND_PLUGINDIR/SSHCure/data";
             'MAX_PER_CONFIG'    => 10,
         },
     },
+
+    'ATTACK_DIRECTION' => {
+        'INBOUND'   => 0,
+        'OUTBOUND'  => 1,
+    },
     
     # Reasons for an attack to be blocked
     'BLOCKED' => {
