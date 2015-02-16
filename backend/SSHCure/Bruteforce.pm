@@ -454,7 +454,7 @@ sub bruteforce_detection_function {
                 my $control_f;
                 my $compromise_reason = $CFG::CONST{'COMPROMISE_REASON'}{'NO_COMPROMISE'};
 
-                if ($ppf >= $CFG::ALGO{'MINIMAL_SSH_AUTH_PPF'} && SYN($flags)) {
+                if ($ppf >= $CFG::ALGO{'MIN_SSH_AUTH_PPF'} && SYN($flags)) {
                     # fmap_void shifts parsed_flows, so if (scalar @$parsed_flows == 0), this means that $flow_record is the last one in $parsed_flows
                     my $last_flow_record = (scalar @$parsed_flows == 0) ? $flow_record : @$parsed_flows[-1];
 
@@ -531,7 +531,7 @@ sub bruteforce_detection_function {
 
                         # Check for blocks/rate limiting. AF-only is to avoid removing APS + AF constructions
                         # FIXME - Check '-1' in statement below
-                        if ($ppf < $CFG::ALGO{'MINIMAL_SSH_AUTH_PPF'} - 1 && !AF_only($flags)) {
+                        if ($ppf < $CFG::ALGO{'MIN_SSH_AUTH_PPF'} - 1 && !AF_only($flags)) {
                             $target{$target_ip}{'is_host_blocked'} = $CFG::CONST{'BLOCKED'}{'FAIL2BAN'};
                             $target{$target_ip}{'block_time'} = $fl_stime;
 
@@ -544,7 +544,7 @@ sub bruteforce_detection_function {
                                     my ($last_attacker_ip, $last_target, $source, $last_compromise_time, $last_flow_endtime, $last_compromise_port, $last_compromise_reason, $last_detection_time) = @{@{$list}[-1]};
 
                                     # Only consider last compromise if it is close (in duration) to the considered (non-aggregated) flow record.
-                                    # FIXME Consider: In addition, in case the current record is not the last one, the next flow record should not have $ppf >= $CFG::ALGO{'MINIMAL_SSH_AUTH_PPF'}
+                                    # FIXME Consider: In addition, in case the current record is not the last one, the next flow record should not have $ppf >= $CFG::ALGO{'MIN_SSH_AUTH_PPF'}
                                     if ($fl_stime - $last_compromise_time < 40) {
                                         push(@last_detection_times, $last_detection_time);
                                         push(@pot_comp_lists, $list);

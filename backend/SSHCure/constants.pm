@@ -36,8 +36,7 @@
     'BRUTEFORCE_COMPROMISE_MIN_PPF_DEVIATION'       => 5,
     'CONSIDER_MULTIPLE_CONNECTION_CLOSINGS_AS_COMP' => 0,
     'MAX_OPEN_CONNECTION_DURATION'                  => 60 * 60, # in seconds
-
-    'MINIMAL_SSH_AUTH_PPF'                          => 11,
+    'MIN_SSH_AUTH_PPF'                              => 11,
     
     # Default values used by OpenSSH SSH daemon
     'OPENSSH_LOGIN_GRACE_TIME'                      => 120, # in seconds
