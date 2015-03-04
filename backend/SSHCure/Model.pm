@@ -43,7 +43,7 @@ sub add_scan_attacker {
             $$existing_attack{'certainty'} += ($CFG::ALGO{'CERT_BRUTEFORCE'} - $CFG::ALGO{'CERT_BRUTEFORCE_NO_SCAN'});
         }
 
-        update_attack_details($existing_attack);
+        update_attack_target_count($existing_attack);
         update_last_activities($SSHCure::attacks{$attacker_ip}, $targets, 'scan');
         update_db($attacker_ip, $existing_attack, $targets);
     } else { # New attacker
@@ -68,7 +68,7 @@ sub add_scan_attacker {
             'certainty' => $CFG::ALGO{'CERT_SCAN'}
         };
 
-        update_attack_details($SSHCure::attacks{$attacker_ip});
+        update_attack_target_count($SSHCure::attacks{$attacker_ip});
         update_last_activities($SSHCure::attacks{$attacker_ip}, $targets, 'scan');
 
         my $new_db_id = update_db($attacker_ip, $SSHCure::attacks{$attacker_ip}, $targets, $attack_direction, $host_blacklisted);
@@ -100,7 +100,7 @@ sub add_bf_attacker {
             }
         }
         
-        update_attack_details($existing_attack);
+        update_attack_target_count($existing_attack);
         update_last_activities($SSHCure::attacks{$attacker_ip}, $targets, 'bf');
         update_db($attacker_ip, $SSHCure::attacks{$attacker_ip}, $targets);
     } else { # New attacker: no scan phase detected, so add with lower certainty
@@ -121,7 +121,7 @@ sub add_bf_attacker {
             $SSHCure::attacks{$attacker_ip}{'targets'}{$target}{'certainty'} = $CFG::ALGO{'CERT_BRUTEFORCE_NO_SCAN'};
         }
         
-        update_attack_details($SSHCure::attacks{$attacker_ip});
+        update_attack_target_count($SSHCure::attacks{$attacker_ip});
         update_last_activities($SSHCure::attacks{$attacker_ip}, $targets, 'bf');
 
         my $new_db_id = update_db($attacker_ip, $SSHCure::attacks{$attacker_ip}, $targets, $attack_direction, $host_blacklisted);
@@ -142,9 +142,9 @@ sub add_comp_attacker {
             $$existing_attack{'certainty'} += $CFG::ALGO{'CERT_COMPROMISE_ADDITION'};
         }
         
-        update_attack_details($existing_attack);
         merge_targets($existing_attack, $targets, $$existing_attack{'certainty'});
 
+        update_attack_target_count($existing_attack);
         update_last_activities($existing_attack, $targets, 'comp');
         update_db($attacker_ip, $existing_attack, $targets);
         notify($attacker_ip, $existing_attack, $targets);
@@ -182,7 +182,7 @@ sub merge_found_compromised_attackers {
     return %merged;
 }
 
-sub update_attack_details {
+sub update_attack_target_count {
     my ($attack) = @_;
     $$attack{'target_count'} = get_target_count_for_attack($attack);
 }
