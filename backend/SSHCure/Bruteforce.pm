@@ -24,7 +24,6 @@ use IO::Async::Function;
 use IO::Async::Future;
 
 use Future::Utils qw(fmap_concat fmap_void);
-
 use List::Util qw(max);
 
 use Exporter;
@@ -476,7 +475,7 @@ sub bruteforce_detection_function {
                         # Perform checks that don't rely on non-aggregated flow data
                         check_APS_only_flow($flow_record),
                         check_instant_logout_abort_dictionary(\@cmd_base, $sources_path, $source, $flow_record, $last_flow, $cusum_mean, \%ppf_histogram),
-                        check_maintain_connection_abort_dictionary(\@cmd_base, $sources_path, $source, $flow_record, $last_flow, $highest_duration, $cusum_mean),
+                        check_maintain_connection_abort_dictionary(\@cmd_base, $sources_path, $source, $flow_record, $last_flow, $highest_duration, $top_duration, $cusum_mean),
                     )->then(sub {
                         my ($login_grace_time, $instant_logout_continue_dictionary, $maintain_connection_continue_dictionary, $APS_only_flow, $instant_logout_abort_dictionary, $maintain_connection_abort_dictionary) = @_;
 

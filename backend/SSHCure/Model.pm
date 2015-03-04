@@ -35,17 +35,17 @@ sub add_scan_attacker {
     my ($attacker_ip, $targets) = @_;
 
     if (exists $SSHCure::attacks{$attacker_ip}) { # Attacker exists
-        my $existing_attack = $SSHCure::attacks{$attacker_ip};
-        merge_targets($existing_attack, $targets, $CFG::ALGO{'CERT_SCAN'});
+        my $attack = $SSHCure::attacks{$attacker_ip};
+        merge_targets($attack, $targets, $CFG::ALGO{'CERT_SCAN'});
 
         # If the existing attack is not scan, but it was detected without a scan phase earlier on (i.e., certainty is 0.4 or 0.65), add the difference (i.e. 0.10)
-        if ($$existing_attack{'certainty'} > $CFG::ALGO{'CERT_SCAN'} && ($$existing_attack{'certainty'} != $CFG::ALGO{'CERT_BRUTEFORCE'} && $$existing_attack{'certainty'} != $CFG::ALGO{'CERT_COMPROMISE'})) {
-            $$existing_attack{'certainty'} += ($CFG::ALGO{'CERT_BRUTEFORCE'} - $CFG::ALGO{'CERT_BRUTEFORCE_NO_SCAN'});
+        if ($$attack{'certainty'} > $CFG::ALGO{'CERT_SCAN'} && ($$attack{'certainty'} != $CFG::ALGO{'CERT_BRUTEFORCE'} && $$attack{'certainty'} != $CFG::ALGO{'CERT_COMPROMISE'})) {
+            $$attack{'certainty'} += ($CFG::ALGO{'CERT_BRUTEFORCE'} - $CFG::ALGO{'CERT_BRUTEFORCE_NO_SCAN'});
         }
 
-        update_attack_target_count($existing_attack);
+        update_attack_target_count($attack);
         update_last_activities($SSHCure::attacks{$attacker_ip}, $targets, 'scan');
-        update_db($attacker_ip, $existing_attack, $targets);
+        update_db($attacker_ip, $attack, $targets);
     } else { # New attacker
         # Check whether attack is inbound or outbound
         my $attack_direction = $CFG::CONST{'ATTACK_DIRECTION'}{'INBOUND'};
@@ -82,25 +82,25 @@ sub add_bf_attacker {
     my ($attacker_ip, $targets) = @_;
     
     if (exists $SSHCure::attacks{$attacker_ip}) { # Attacker exists
-        my $existing_attack = $SSHCure::attacks{$attacker_ip};
-        if ($$existing_attack{'certainty'} == $CFG::ALGO{'CERT_SCAN'}) {
+        my $attack = $SSHCure::attacks{$attacker_ip};
+        if ($$attack{'certainty'} == $CFG::ALGO{'CERT_SCAN'}) {
             # attack is in scan phase, transition to bf phase
-            $$existing_attack{'certainty'} = $CFG::ALGO{'CERT_BRUTEFORCE'};
+            $$attack{'certainty'} = $CFG::ALGO{'CERT_BRUTEFORCE'};
             $SSHCure::attacks{$attacker_ip}{'certainty'} = $CFG::ALGO{'CERT_BRUTEFORCE'};
-            merge_targets($existing_attack, $targets, $CFG::ALGO{'CERT_BRUTEFORCE'});
+            merge_targets($attack, $targets, $CFG::ALGO{'CERT_BRUTEFORCE'});
         } else {
-            if ($$existing_attack{'certainty'} == $CFG::ALGO{'CERT_BRUTEFORCE'}
-                    || $$existing_attack{'certainty'} == $CFG::ALGO{'CERT_BRUTEFORCE_NO_SCAN'}) {
+            if ($$attack{'certainty'} == $CFG::ALGO{'CERT_BRUTEFORCE'}
+                    || $$attack{'certainty'} == $CFG::ALGO{'CERT_BRUTEFORCE_NO_SCAN'}) {
                 # Attack in bf, use existing certainty (might be with or without scan)
-                merge_targets($existing_attack, $targets, $$existing_attack{'certainty'});
-            } elsif ($$existing_attack{'certainty'} == $CFG::ALGO{'CERT_COMPROMISE'}
-                    || $$existing_attack{'certainty'} == $CFG::ALGO{'CERT_COMPROMISE_NO_SCAN'}) {
+                merge_targets($attack, $targets, $$attack{'certainty'});
+            } elsif ($$attack{'certainty'} == $CFG::ALGO{'CERT_COMPROMISE'}
+                    || $$attack{'certainty'} == $CFG::ALGO{'CERT_COMPROMISE_NO_SCAN'}) {
                 # Existing attacker, not in scan nor BF phase. Merge targets (merge routine will preserve the certainty, which is in the compromise ranges)
-                merge_targets($existing_attack, $targets, $$existing_attack{'certainty'} - $CFG::ALGO{'CERT_COMPROMISE_ADDITION'});
+                merge_targets($attack, $targets, $$attack{'certainty'} - $CFG::ALGO{'CERT_COMPROMISE_ADDITION'});
             }
         }
         
-        update_attack_target_count($existing_attack);
+        update_attack_target_count($attack);
         update_last_activities($SSHCure::attacks{$attacker_ip}, $targets, 'bf');
         update_db($attacker_ip, $SSHCure::attacks{$attacker_ip}, $targets);
     } else { # New attacker: no scan phase detected, so add with lower certainty
@@ -135,19 +135,19 @@ sub add_comp_attacker {
     my ($attacker_ip, $targets) = @_;
     
     if (exists $SSHCure::attacks{$attacker_ip}) {
-        my $existing_attack = $SSHCure::attacks{$attacker_ip};
+        my $attack = $SSHCure::attacks{$attacker_ip};
 
-        unless ($$existing_attack{'certainty'} > $CFG::ALGO{'CERT_BRUTEFORCE'}) {
+        unless ($$attack{'certainty'} > $CFG::ALGO{'CERT_BRUTEFORCE'}) {
             # attack was already in COMP state, no need to increase the certainty
-            $$existing_attack{'certainty'} += $CFG::ALGO{'CERT_COMPROMISE_ADDITION'};
+            $$attack{'certainty'} += $CFG::ALGO{'CERT_COMPROMISE_ADDITION'};
         }
         
-        merge_targets($existing_attack, $targets, $$existing_attack{'certainty'});
+        merge_targets($attack, $targets, $$attack{'certainty'});
 
-        update_attack_target_count($existing_attack);
-        update_last_activities($existing_attack, $targets, 'comp');
-        update_db($attacker_ip, $existing_attack, $targets);
-        notify($attacker_ip, $existing_attack, $targets);
+        update_attack_target_count($attack);
+        update_last_activities($attack, $targets, 'comp');
+        update_db($attacker_ip, $attack, $targets);
+        notify($attacker_ip, $attack, $targets);
     } else {
         log_error("A compromise has been detected without a brute-force phase");
     }

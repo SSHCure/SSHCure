@@ -254,7 +254,7 @@ sub check_instant_logout_continue_dictionary {
 # If the maintened connection ends, when all other activity ends, it is likely to be a compromise.
 sub check_maintain_connection_abort_dictionary {
     # 'Aggregated flow record' has been produced using 'nfdump -a'
-    my ($cmd_base, $sources_path, $source, $aggr_flow_record, $last_flow, $highest_duration, $cusum_mean) = @_;
+    my ($cmd_base, $sources_path, $source, $aggr_flow_record, $last_flow, $highest_duration, $top_duration, $cusum_mean) = @_;
     my ($ip_version, $fl_stime, $fl_etime, $protocol,
             $attacker_ip, $attacker_port, $target_ip, $target_port,
             $flags, $packets, $bytes) = @{$aggr_flow_record};
@@ -271,6 +271,9 @@ sub check_maintain_connection_abort_dictionary {
 
     # The potential compromise flow should have a duration in [$highest_duration - 1, $highest_duration + 1]
     return Future->wrap(0) unless ($fl_etime - $fl_stime >= $highest_duration - 1 && $fl_etime - $fl_stime <= $highest_duration + 1);
+
+    # The potential compromise flow's duration should never be the top duration, and must therefore not be in [$top_duration - 1, $top_duration + 1]
+    return Future->wrap(0) if ($fl_etime - $fl_stime >= $top_duration - 1 && $fl_etime - $fl_stime <= $top_duration + 1);
 
     # This check can only be performed if other targets exist in this attack and when they are known.
     return Future->wrap(0) unless (exists $SSHCure::attacks{$attacker_ip});
@@ -323,6 +326,7 @@ sub check_maintain_connection_abort_dictionary {
         ($ip_version, $fl_stime, $fl_etime, $protocol,
                 $attacker_ip, $attacker_port, $target_ip, $target_port,
                 $flags, $packets, $bytes) = @{$flow};
+        
         return Future->wrap(abs($last_activity_to_target - $fl_etime) < 1);
     });
 }
