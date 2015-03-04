@@ -439,7 +439,7 @@ sub bruteforce_detection_function {
             
             # Check whether other targets in the same attack have been marked_as_bf
             my $other_targets_marked_as_bf = 0;
-            if (!$marked_as_bf && exists $SSHCure::attacks{$attacker_ip}) {
+            if ($CFG::ALGO{'BRUTEFORCE_OTHER_TARGETS_PASS'} && !$marked_as_bf && exists $SSHCure::attacks{$attacker_ip}) {
                 for my $target (keys %{$SSHCure::attacks{$attacker_ip}{'targets'}}) {
                     my $target_info = $SSHCure::attacks{$attacker_ip}{'targets'}{$target};
                     if (exists $$target_info{'certainty'} && $$target_info{'certainty'} >= $CFG::ALGO{'CERT_BRUTEFORCE_NO_SCAN'}) {                        

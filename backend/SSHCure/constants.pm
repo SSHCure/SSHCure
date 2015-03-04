@@ -32,8 +32,9 @@
     'BRUTEFORCE_MAX_PPF'                            => 51,
     'BRUTEFORCE_CUSUM_DETERMINATION_THRESHOLD'      => 2,
     'BRUTEFORCE_CUSUM_STREAK_THRESHOLD'             => 5,
-    'BRUTEFORCE_MIN_TARGET_COMPARISON_COUNT'        => 3,
     'BRUTEFORCE_COMPROMISE_MIN_PPF_DEVIATION'       => 5,
+    'BRUTEFORCE_MIN_TARGET_COMPARISON_COUNT'        => 3,
+    'BRUTEFORCE_OTHER_TARGETS_PASS'                 => 0,
     'CONSIDER_MULTIPLE_CONNECTION_CLOSINGS_AS_COMP' => 0,
     'MAX_OPEN_CONNECTION_DURATION'                  => 60 * 60, # in seconds
     'MIN_SSH_AUTH_PPF'                              => 11,

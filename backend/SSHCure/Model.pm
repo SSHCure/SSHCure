@@ -159,12 +159,7 @@ sub add_comp_attacker {
 
 sub get_target_count_for_attack {
     my ($attack) = @_;
-    return scalar (keys %{$$attack{'targets'}});
-}
-
-sub update_attack_details {
-    my ($attack) = @_;
-    $$attack{'target_count'} = get_target_count_for_attack($attack);
+    return scalar(keys %{$$attack{'targets'}});
 }
 
 sub merge_found_compromised_attackers {
@@ -185,6 +180,11 @@ sub merge_found_compromised_attackers {
     }
 
     return %merged;
+}
+
+sub update_attack_details {
+    my ($attack) = @_;
+    $$attack{'target_count'} = get_target_count_for_attack($attack);
 }
 
 ####################
