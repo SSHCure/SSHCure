@@ -432,7 +432,7 @@ sub check_APS_only_flow {
 
     # We have to use the aggregated flow record here, since we have to look for connections that remain open (i.e., APS-only) beyond
     # the current data chunk. In case it is closed within the current chunk, it is potentially a type of 'maintain connection'.
-    return Future->wrap($APS_only_flow && $packets >= $CFG::ALGO{'MINIMAL_SSH_AUTH_PPF'});
+    return Future->wrap($APS_only_flow && $packets >= $CFG::ALGO{'MIN_SSH_AUTH_PPF'});
 }
 
 # check_login_grace_time is only to be called when an open connection has been observed
