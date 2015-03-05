@@ -176,15 +176,21 @@ div.modal-content {
 /* Tables */
 table.list thead {
     font-size: 11pt;
-    line-height: 50px;
+    line-height: 35px;
+    text-align: left;
+}
+
+table.list td {
+    padding: 0 8px;
 }
 
 table.list tbody td {
     border: 1pt solid #EEEEEE;
+    text-align: left;
 }
 
 table.list tbody tr {
-    line-height: 40px;
+    line-height: 25px;
 }
 
 table.list tbody tr:last-child td {
@@ -199,10 +205,19 @@ table.list tbody tr td:last-child {
     border-right: 0;
 }
 
+/* Tables */
+div.main-block table thead {
+    background-color: #DDDDDD;
+    color: #898989;
+}
+div.main-block div[id$='-table'] {
+    padding: 0;
+}
+
 /* Phases */
 div.phases {
     margin: 0 auto;
-    width: 60px;
+    /*width: 60px;*/
 }
 
 div.phase {

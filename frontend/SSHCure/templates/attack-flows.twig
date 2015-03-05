@@ -1,0 +1,27 @@
+<div style="height: inherit">
+<table>
+    <thead style="position: relative; display: block">
+    <tr>
+        <td>Time</td>
+        <td>Duration</td>
+        <td>Flow</td>
+        <td>Flags</td>
+        <td>Packets</td>
+        <td>Bytes</td>
+    </tr>
+    </thead>
+    <tbody style="display: block; overflow: auto; height: 180px;">
+    {% for flow in flows %}
+        <tr>
+            <td>{{ flow.start_time | date('G:i:s')}}</td>
+            <td>{{ flow.duration }}</td>
+            <td>{{ flow.source_ip }}&nbsp;&#8594;&nbsp;{{ flow.destination_ip}}&nbsp;({{flow.source_port }}&nbsp;&#8594;&nbsp;{{ flow.destination_port}})</td>
+            <td>{{ flow.flags }}</td>
+            <td>{{ flow.packets }}</td>
+            <td>{{ flow.bytes }}</td>
+        </tr>
+
+    {% endfor %}
+    </tbody>
+</table>
+</div>

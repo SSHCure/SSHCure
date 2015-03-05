@@ -1,0 +1,45 @@
+{% import _self as helper %}
+{% macro phases(certainty) %}
+    <div class="phases">
+        <div class = "phase scan {{ certainty in [0.25, 0.50, 0.75] ? 'on' : 'off' }}"></div>
+        <div class = "phase bruteforce {{ certainty in [0.40, 0.50, 0.75] ? 'on' : 'off' }}"></div>
+        <div class = "phase compromise {{ certainty in [0.75] ? 'on' : 'off' }}"></div>
+    </div>
+{% endmacro %}
+
+<div id='targets-overview-table'>
+    <table class="list">
+        <thead>
+            <td>Phases</td>
+            <td>Blocked</td>
+            <td>Target</td>
+            <td>Flow data</td>
+        </thead>
+        <tr>
+            <td colspan="3">
+                <div style="max-height: 200px; overflow-y: scroll">
+                    <table id="target-table" class="list">
+                        {% for target in targets %}
+                            <tr data-href="index.php?action=incoming&attack_id={{target.attack_id}}&target_ip={{target.target_ip}}">
+                                <td>{{ helper.phases(target.certainty) }}</td>
+                                <td class="blocked">
+                                {% if target.is_host_blocked %}
+                                    <span class="glyphicon glyphicon-ok-circle"></span>
+                                {% endif %}
+                                </td>
+                                <td>
+                                {#<a href="index.php?action=incoming&attack_id={{target.attack_id}}&target_ip={{target.target_ip}}" class="ip-addr">{{ target.target_ip }}</a></td>#}
+                                <a class="ip-addr">{{ target.target_ip }}</a></td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            </td>
+            <td style="padding: 0px">
+                <div id="attack-flow-data" style="width: 100%">Select a target from the overview on the left</div>
+            </td>
+        </tr>
+    </table>
+    
+</div>
+
