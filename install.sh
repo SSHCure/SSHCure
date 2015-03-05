@@ -5,7 +5,7 @@
 # Installation script for SSHCure.
 #
 # Author(s):    Rick Hofstede   <r.j.hofstede@utwente.nl>
-#               Pavel Celeda    <celeda@invea-tech.com>
+#               Luuk Hendriks   <luuk.hendriks@utwente.nl>
 #
 # LICENSE TERMS - 3-clause BSD license
 #
@@ -13,19 +13,10 @@
 #
 #########################################################
 
-SSHCURE_VER=3.0
-SSHCURE_REL=SSHCure_v${SSHCURE_VER}.tar.gz
-TMP_DIR=SSHCure
 GEO_DB=GeoLiteCity.dat.gz
 GEOv6_DB=GeoLiteCityv6.dat.gz
 
 err () {
-    printf "ERROR: ${*}\n"
-    exit 1
-}
-
-err_line () {
-    echo "-----"
     printf "ERROR: ${*}\n"
     exit 1
 }
@@ -78,6 +69,30 @@ fi
 echo "SSHCure installation script"
 echo "---------------------------"
 
+# Check for availability of (frontend/backend) source files
+if [ ! -d "frontend" -o ! -d "backend" -o ! -f "dependency_check.pm" ]; then
+    err "Could not find the required installation files. Please clone the repository at https://github.com/SSHCure/SSHCure.git, and rerun this installer."
+fi
+
+# Check PHP dependencies
+PHP_JSON=$(php -m | grep 'json' 2> /dev/null)
+PHP_MBSTRING=$(php -m 2> /dev/null | grep 'mbstring')
+PHP_PDOSQLITE=$(php -m 2> /dev/null | grep 'pdo_sqlite$') # The dollar-sign ($) makes sure that 'pdo_sqlite2' is not accepted
+PHP_SOCKETS=$(php -m 2> /dev/null | grep '^sockets$')
+PHP_XML=$(php -m 2> /dev/null | grep '^xml$')
+
+if [ "$PHP_JSON" != "json" ]; then
+    err "The PHP 'JSON' module is missing.\nDon't forget to restart your Web server after installing the package."
+elif [ "$PHP_MBSTRING" != "mbstring" ]; then
+    err "The PHP 'mbstring' module is missing.\nDon't forget to restart your Web server after installing the package."
+elif [ "$PHP_PDOSQLITE" != "pdo_sqlite" ]; then
+    err "The PHP PDO SQLite v3 module is missing.\nDon't forget to restart your Web server after installing the package."
+elif [ "$PHP_SOCKETS" != "sockets" ]; then
+    err "The PHP 'sockets' module is missing.\nDon't forget to restart your Web server after installing the package."
+elif [ "$PHP_XML" != "xml" ]; then
+    err "The PHP 'xml' module is missing.\nDon't forget to restart your Web server after installing the package."
+fi
+
 # Discover NfSen configuration
 NFSEN_VARFILE=/tmp/nfsen-tmp.conf
 if [ ! -n "$(ps axo command | grep [n]fsend | grep -v nfsend-comm)" ]; then
@@ -99,6 +114,18 @@ rm -rf ${NFSEN_VARFILE}
 
 SSHCURE_CONF=${FRONTEND_PLUGINDIR}/SSHCure/config/config.php
 
+# Check Perl dependencies
+printf "Checking Perl dependencies...\n\n"
+./dependency_check.pm 2> /dev/null
+PERL_DEP_CHECK_RETURN_CODE=$?
+echo ""
+
+if [ $PERL_DEP_CHECK_RETURN_CODE = 0 ]; then
+    echo "All Perl dependencies are available on the system. Continuing installation..."
+else
+    err "Some Perl dependencies are missing or outdated. Aborting installation..."
+fi
+
 # Check permissions to install SSHCure - you must be ${USER} or root
 if [ "$(id -u)" != "$(id -u ${USER})" ] && [ "$(id -u)" != "0" ]; then
     err "You do not have sufficient permissions to install SSHCure on this machine!"
@@ -113,56 +140,6 @@ if [ $(uname) = "FreeBSD" -o $(uname) = "OpenBSD" ]; then
     RETRIEVE_TOOL="fetch"
 else
     RETRIEVE_TOOL="wget"
-fi
-
-if [ ! -f  ${SSHCURE_REL} -a ! -f ../${SSHCURE_REL} ]; then
-    echo "Downloading SSHCure tar ball - http://sshcure.sf.net/"
-    ${RETRIEVE_TOOL} -q http://downloads.sourceforge.net/project/sshcure/source/${SSHCURE_REL}
-fi
-
-# Move one directory-level up, if necessary, to be consistent with the case in which the tar-ball is unpacked (else-clause)
-if [ -f dependency_check.pm ]; then
-    cd ..
-fi
-
-# Unpack SSHCure
-if [ -d ${TMP_DIR} ]; then
-    echo "Extracted SSHCure files found in $(pwd)/${TMP_DIR}"
-else
-    echo "Unpacking files..."
-    tar zxf ${SSHCURE_REL} --directory=.
-    mv SSHCure ${TMP_DIR}
-fi
-
-# Check Perl dependencies
-printf "Checking Perl dependencies...\n\n"
-./${TMP_DIR}/dependency_check.pm 2> /dev/null
-PERL_DEP_CHECK_RETURN_CODE=$?
-echo ""
-
-if [ $PERL_DEP_CHECK_RETURN_CODE = 0 ]; then
-    echo "All Perl dependencies are available on the system. Continuing installation..."
-else
-    err_line "Some Perl dependencies are missing or outdated. Aborting installation..."
-fi
-
-# Check PHP dependencies
-PHP_JSON=$(php -m | grep 'json' 2> /dev/null)
-PHP_MBSTRING=$(php -m 2> /dev/null | grep 'mbstring')
-PHP_PDOSQLITE=$(php -m 2> /dev/null | grep 'pdo_sqlite$') # The dollar-sign ($) makes sure that 'pdo_sqlite2' is not accepted
-PHP_SOCKETS=$(php -m 2> /dev/null | grep '^sockets$')
-PHP_XML=$(php -m 2> /dev/null | grep '^xml$')
-
-if [ "$PHP_JSON" != "json" ]; then
-    err "The PHP 'JSON' module is missing.\nDon't forget to restart your Web server after installing the package."
-elif [ "$PHP_MBSTRING" != "mbstring" ]; then
-    err "The PHP 'mbstring' module is missing.\nDon't forget to restart your Web server after installing the package."
-elif [ "$PHP_PDOSQLITE" != "pdo_sqlite" ]; then
-    err "The PHP PDO SQLite v3 module is missing.\nDon't forget to restart your Web server after installing the package."
-elif [ "$PHP_SOCKETS" != "sockets" ]; then
-    err "The PHP 'sockets' module is missing.\nDon't forget to restart your Web server after installing the package."
-elif [ "$PHP_XML" != "xml" ]; then
-    err "The PHP 'xml' module is missing.\nDon't forget to restart your Web server after installing the package."
 fi
 
 if [ ! -f ${GEO_DB} ]; then
@@ -194,12 +171,12 @@ if [ $INSTALL_BACKEND = 1 -a -d ${BACKEND_PLUGINDIR}/SSHCure ]; then
 fi
 
 # Install backend and frontend plugin files
-echo "Installing SSHCure ${SSHCURE_VER} to ${FRONTEND_PLUGINDIR}/SSHCure"
+echo "Installing SSHCure ${VERSION} to ${FRONTEND_PLUGINDIR}/SSHCure"
 if [ $INSTALL_FRONTEND = 1 ]; then
-    cp -r ./${TMP_DIR}/frontend/* ${FRONTEND_PLUGINDIR}
+    cp -r ./frontend/* ${FRONTEND_PLUGINDIR}
 fi
 if [ $INSTALL_BACKEND = 1 ]; then
-    cp -r ./${TMP_DIR}/backend/* ${BACKEND_PLUGINDIR}
+    cp -r ./backend/* ${BACKEND_PLUGINDIR}
 fi
 
 # Unpack geoLocation databases
@@ -207,24 +184,19 @@ MAXMIND_PATH=${FRONTEND_PLUGINDIR}/SSHCure/lib/MaxMind
 echo "Installing MaxMind GeoLite City database to ${MAXMIND_PATH}"
 gunzip -c ${GEO_DB} > ${MAXMIND_PATH}/$(basename ${GEO_DB} .gz)
 if [ $? != 0 ]; then
-    err_line "The MaxMind GeoLite City database has not been downloaded successfully. You may have been graylisted by MaxMind because of subsequent download retries. Please try again later."
+    err "The MaxMind GeoLite City database has not been downloaded successfully. You may have been graylisted by MaxMind because of subsequent download retries. Please try again later."
 fi
 
 echo "Installing MaxMind GeoLite City (IPv6) database to ${MAXMIND_PATH}"
 gunzip -c ${GEOv6_DB} > ${MAXMIND_PATH}/$(basename ${GEOv6_DB} .gz)
 if [ $? != 0 ]; then
-    err_line "The MaxMind GeoLite City (IPv6) database has not been downloaded successfully. You may have been graylisted by MaxMind because of subsequent download retries. Please try again later."
+    err "The MaxMind GeoLite City (IPv6) database has not been downloaded successfully. You may have been graylisted by MaxMind because of subsequent download retries. Please try again later."
 fi
-
-# Deleting temporary files
-# rm -rf ${TMP_DIR}
-rm -rf ${GEO_DB}
-rm -rf ${GEOv6_DB}
 
 # Check whether an old SSHCure version was found and ask whether backend configuration and data structures should be retained
 if [ $INSTALL_BACKEND = 1 -a -d ${SSHCURE_BACKUPDIR_BACKEND} ]; then
     OLD_VER=$(cat ${SSHCURE_BACKUPDIR_BACKEND}/../SSHCure.pm | grep -m 1 SSHCURE_VERSION | cut -d"\"" -f2)
-    if [ ${OLD_VER} = ${SSHCURE_VER} ]; then
+    if [ ${OLD_VER} = ${VERSION} ]; then
         while true; do
             read -p "Do you wish to keep the backend configuration and data structures from your previous installation [y,n] (default: y)? " input
             case $input in

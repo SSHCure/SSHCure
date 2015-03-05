@@ -32,7 +32,7 @@ our @EXPORT = qw (
     log_warning
     
     parse_nfdump_pipe
-    parse_nfdump_list
+    parse_nfdump_custom
     
     save_profiling_data
     save_profiling_value
@@ -47,7 +47,6 @@ our @EXPORT = qw (
     ACK_only
     RST_only
     ASF_only
-    APS_only
     AF_only
     APS
     FIN
@@ -153,16 +152,19 @@ sub parse_nfdump_pipe {
     return \@nfdump_parsed_output;
 }
 
-sub parse_nfdump_list {
-    my ($nfdump_output, $parsed_output) = @_;
+sub parse_nfdump_custom {
+    my $nfdump_output = shift;
+    my @nfdump_parsed_output = ();
 
     foreach my $line (@$nfdump_output) {
         chomp($line);
         next if $line eq "" || $line eq "No matched flows" || index($line, 'ERROR') != -1;
 
-        my @values = split(/\|\s*/, $line);                                                 # split line into seperate values
-        push(@$parsed_output, \@values);                                                    # add array of values to result-array    
+        my @values = split(/\|\s*/, $line);     # split line into seperate values
+        push(@nfdump_parsed_output, \@values);  # add array of values to result-array    
     }
+
+    return \@nfdump_parsed_output;
 }
 
 ##############################
@@ -279,6 +281,11 @@ sub ip_addr_in_range {
         $last_address = @{$cache_elem}[1];
     } else {
         my $prefix_obj = new Net::IP($prefix);
+        if (!$prefix_obj) {
+            log_error("Could not create Net::IP object (prefix: ".$prefix.")");
+            return 0;
+        }
+        
         $first_address = scalar $prefix_obj->intip();
         
         # intip() does not return properly in case a '/0' prefix is used
@@ -325,8 +332,12 @@ sub get_ip_version {
         $version = 4;
     } elsif (($address =~ tr/://) > 1) {
         $version = 6;
+    } elsif ($address =~ /^\d+$/ && $address < 4294967295) {
+        # Assume the IP address is passed in decimal form
+        return get_ip_version(dec2ip($address));
     } else {
         # Do nothing (return -1)
+        log_warning("Could not determine IP version of '$address'");
     }
 
     return $version;
@@ -347,10 +358,6 @@ sub RST_only {
 
 sub ASF_only {
     return $_[0] == 0b010011;
-}
-
-sub APS_only {
-    return $_[0] == 0b011010;
 }
 
 sub AF_only {
@@ -576,21 +583,22 @@ sub config_sanity_check {
         }
         
         # Notification sender + destination (http://www.regular-expressions.info/email.html)
-        if ($$config{'notification_type'} eq $CFG::CONST{'NOTIFICATIONS'}{'TYPE'}{'EMAIL'}) {
+        if ($$config{'notification_type'} eq $CFG::CONST{'NOTIFICATIONS'}{'TYPE'}{'EMAIL'}
+                || $$config{'notification_type'} eq $CFG::CONST{'NOTIFICATIONS'}{'TYPE'}{'IODEF'}) {
             # Sender
             unless ($$config{'notification_sender'} ne '' && $$config{'notification_sender'} =~ tr/@// == 1) {
-                log_error("Notification configuration '".$notification_id."' should have exactly one e-mail address");
+                log_error("Notification configuration '".$notification_id."' should have exactly one sender e-mail address");
                 return 0;
             }
             
             # Destination
             unless ($$config{'notification_destination'} ne '') {
-                log_error("Notification configuration '".$notification_id."' should not be empty");
+                log_error("Destination address field of notification configuration '".$notification_id."' should not be empty");
                 return 0;
             }
-            
-            unless ($$config{'notification_destination'} =~ tr/@// == (($$config{'notification_destination'} =~ tr/<// + $$config{'notification_destination'} =~ tr/>//)) / 2) {
-                log_error("Every notification_destination in notification configuration '".$notification_id."' should be enclosed with brackets (e.g., '<name1\@domain.com>,<name2\@domain.com>')");
+
+            unless (($$config{'notification_destination'} =~ tr/@//) == ($$config{'notification_destination'} =~ tr/,//) - 1) {
+                log_error("Syntax error in destination address field of notification configuration '".$notification_id."'");
                 return 0;
             }
         } elsif ($$config{'notification_type'} eq $CFG::CONST{'NOTIFICATIONS'}{'TYPE'}{'LOG'}) {
@@ -605,6 +613,8 @@ sub config_sanity_check {
                 log_error("Notification configuration '".$notification_id."' should not be empty");
                 return 0;
             }
+        } else {
+            # Do nothing
         }
     }
 

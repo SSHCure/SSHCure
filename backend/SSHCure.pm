@@ -363,14 +363,11 @@ sub run {
         log_error "No flows left to process, stopping this run. If this message occurs often, check the system time.";
         return;
     }
-    debug "Corrected time-interval: $corrected_interval";
 
     scan_detection($sources, $sources_path, $timeslot, $corrected_interval)->then( sub {
         bruteforce_detection($sources, $sources_path, $timeslot, $corrected_interval);
     })->then( sub {
-        # Turn off the 'compromise' detection for now; the BF detector does this currently (most sanely)
-        # compromise_detection($sources, $timeslot, $corrected_interval, \@timeslot_intervals);
-        Future->wrap();
+        compromise_detection($sources, $sources_path, $timeslot, $corrected_interval);
     })->get();
 
     if (VALIDATION_MODE) {

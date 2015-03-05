@@ -27,17 +27,17 @@
 
     # Other algorithm values used in the detection
     'SCAN_MAX_PPF'                                  => 2,
-    'SCAN_MIN_FLOWS'                                => 10,
+    'SCAN_MIN_TARGETS'                              => 10,
     'BRUTEFORCE_MIN_PPF'                            => 11,
     'BRUTEFORCE_MAX_PPF'                            => 51,
     'BRUTEFORCE_CUSUM_DETERMINATION_THRESHOLD'      => 2,
     'BRUTEFORCE_CUSUM_STREAK_THRESHOLD'             => 5,
-    'BRUTEFORCE_MIN_TARGET_COMPARISON_COUNT'        => 3,
     'BRUTEFORCE_COMPROMISE_MIN_PPF_DEVIATION'       => 5,
+    'BRUTEFORCE_MIN_TARGET_COMPARISON_COUNT'        => 3,
+    'BRUTEFORCE_OTHER_TARGETS_PASS'                 => 0,
     'CONSIDER_MULTIPLE_CONNECTION_CLOSINGS_AS_COMP' => 0,
     'MAX_OPEN_CONNECTION_DURATION'                  => 60 * 60, # in seconds
-
-    'MINIMAL_SSH_AUTH_PPF'                          => 11,
+    'MIN_SSH_AUTH_PPF'                              => 11,
     
     # Default values used by OpenSSH SSH daemon
     'OPENSSH_LOGIN_GRACE_TIME'                      => 120, # in seconds
@@ -98,8 +98,10 @@ my $SSHCURE_DATA_DIR = "$NfConf::BACKEND_PLUGINDIR/SSHCure/data";
         },
         'TYPE' => {
             'EMAIL'             => "Email",
+            'IODEF'             => "IODEF",
             'LOG'               => "Log",
             'QMANAGE'           => "Qmanage",
+            'XARF'              => "XARF",
         },
         'WHEN' => {
             'ATTACK_START'      => 0,
@@ -110,6 +112,11 @@ my $SSHCURE_DATA_DIR = "$NfConf::BACKEND_PLUGINDIR/SSHCure/data";
             'MAX_OVERALL'       => 0,
             'MAX_PER_CONFIG'    => 10,
         },
+    },
+
+    'ATTACK_DIRECTION' => {
+        'INBOUND'   => 0,
+        'OUTBOUND'  => 1,
     },
     
     # Reasons for an attack to be blocked

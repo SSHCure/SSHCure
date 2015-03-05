@@ -2,7 +2,7 @@
     <div>
         <table id="overview-table">
             <tbody>
-                <tr><td class="field-name left">IP address</td><td>{{ host }}</td><td class="field-name right">Domain name</td><td>{{ host-name }}</td></tr>
+                <tr><td class="field-name left">IP address</td><td>{{ host }}</td><td class="field-name right">Domain name</td><td>{{ domain }}</td></tr>
                 <tr><td class="field-name left">Country</td><td>{{ country }}</td><td class="field-name right">City</td><td>{{ city }}</td></tr>
             </tbody>
         </table>
@@ -54,7 +54,7 @@
         </div>
         <div class="tab-pane" id="attacks-attacker">
             {% if attacks_attacker|length >= 1 %}
-                <table id="attacks-target-table" class="list">
+                <table id="attacks-attacker-table" class="list">
                     <thead>
                         <td>Phases</td><td>Attacker</td><td>Date</td>
                     </thead>

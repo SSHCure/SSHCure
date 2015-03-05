@@ -23,6 +23,14 @@ my %CONST = (
 );
 
 my %perl_dependencies = (
+    'DBI' => {
+        'packages'      => {
+            'CentOS'    => 'perl-DBI',
+            'Debian'    => 'libdbd-sqlite3-perl',
+            'FreeBSD'   => 'p5-DBI',
+            'OpenBSD'   => 'p5-DBI',
+        }
+    },
     'Future::Utils' => {
         'packages'      => {
             'CentOS'    => 'perl-Future',
@@ -72,20 +80,12 @@ my %perl_dependencies = (
             'OpenBSD'   => 'p5-libwww',
         }
     },
-    'Mail::Header' => {
+    'MIME::Lite' => {
         'packages'      => {
-            'CentOS'    => 'perl-MailTools',
-            'Debian'    => 'libmailtools-perl',
-            'FreeBSD'   => 'p5-Mail-Tools',
-            'OpenBSD'   => 'p5-Mail-Tools',
-        }
-    },
-    'Mail::Internet' => {
-        'packages'      => {
-            'CentOS'    => 'perl-MailTools',
-            'Debian'    => 'libmailtools-perl',
-            'FreeBSD'   => 'p5-Mail-Tools',
-            'OpenBSD'   => 'p5-Mail-Tools',
+            'CentOS'    => 'perl-MIME-Lite',
+            'Debian'    => 'libmime-lite-perl',
+            'FreeBSD'   => 'p5-MIME-Lite',
+            'OpenBSD'   => 'p5-MIME-Lite',
         }
     },
     'Net::IP' => {
@@ -110,6 +110,14 @@ my %perl_dependencies = (
             'Debian'    => 'libtry-tiny-perl',
             'FreeBSD'   => 'p5-Try-Tiny',
             'OpenBSD'   => 'p5-Try-Tiny',
+        }
+    },
+    'XML::Writer' => {
+        'packages'      => {
+            'CentOS'    => 'perl-XML-Writer',
+            'Debian'    => 'libxml-writer-perl',
+            'FreeBSD'   => 'p5-XML-Writer',
+            'OpenBSD'   => 'p5-XML-Writer',
         }
     },
 );

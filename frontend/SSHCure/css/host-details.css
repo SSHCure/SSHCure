@@ -53,3 +53,10 @@ table#overview-table td.field-name {
 .tab-pane > table.list > thead {
     color: #9C9C9C;
 }
+
+/* Content tables */
+#attacks-target-table, #attacks-attacker-table {
+    display: block;
+    height: 600px;
+    overflow-y: scroll;
+}
