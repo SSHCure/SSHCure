@@ -61,7 +61,7 @@ sub scan_detection {
 
         # Find all attacker's targets
         foreach my $flow_record (@$parsed_flow_records) {
-            # Check whether current attacker (src IP in current flow record; $flow_record[4]) contacted enough targets
+            # Check whether current attacker (src IP address in current flow record; $flow_record[4]) contacted more than 'SCAN_MIN_TARGETS' targets
             my $src_ip = @$flow_record[4];
             if ($attackers{$src_ip}->{'target_count'} > $CFG::ALGO{'SCAN_MIN_TARGETS'}) {
                 my $fl_etime = @$flow_record[2];

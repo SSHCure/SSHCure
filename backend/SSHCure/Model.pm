@@ -193,7 +193,7 @@ sub update_attack_target_count {
 
 sub merge_targets {
     # %{$_[0]} is existing hash
-    # %{$_[1]} is new, to merge
+    # %{$_[1]} is hash to merge
     my $new_certainty = $_[2];
 
     # It seems that 'merging' a single target with itself (i.e., updating it) can result in bogus attack start times.
@@ -218,12 +218,34 @@ sub merge_targets {
                     $existing_target_info->{$k} = $v;
                 }
             }
-            if (!exists $_[0]{'targets'}{$target_ip}{'certainty'} || $new_certainty > $_[0]{'targets'}{$target_ip}{'certainty'}) {
-                $_[0]{'targets'}{$target_ip}{'certainty'} = $new_certainty;
+
+            # Only adapt target certainty if attack certainty is higher than target certainty
+            if ($new_certainty > $_[0]{'targets'}{$target_ip}{'certainty'}) {
+                if ($_[0]{'targets'}{$target_ip}{'certainty'} == $CFG::ALGO{'CERT_BRUTEFORCE_NO_SCAN'}) {
+                    # Adapt target certainty if attack certainty implies presence of scan (while scan is not present)
+                    if ($new_certainty == $CFG::ALGO{'CERT_COMPROMISE'}) {
+                        $_[0]{'targets'}{$target_ip}{'certainty'} = $CFG::ALGO{'CERT_COMPROMISE_NO_SCAN'};
+                    } else {
+                        # Do nothing
+                    }
+                } elsif ($_[0]{'targets'}{$target_ip}{'certainty'} == $CFG::ALGO{'CERT_COMPROMISE_NO_SCAN'} && $new_certainty == $CFG::ALGO{'CERT_COMPROMISE'}) {
+                    # Do nothing
+                } else {
+                    $_[0]{'targets'}{$target_ip}{'certainty'} = $new_certainty;
+                }
             }
         } else {
-            $_[0]{'targets'}{$target_ip} = $target_info; 
-            $_[0]{'targets'}{$target_ip}{'certainty'} = $new_certainty;
+            $_[0]{'targets'}{$target_ip} = $target_info;
+
+            # If a target is added with a certainty > 0.4 while it is not present in this hash (else-branch),
+            # it means that it was not scanned before. We therefore have to adapt the certainty.
+            if ($new_certainty == $CFG::ALGO{'CERT_BRUTEFORCE'}) {
+                $_[0]{'targets'}{$target_ip}{'certainty'} = $CFG::ALGO{'CERT_BRUTEFORCE_NO_SCAN'};
+            } elsif ($new_certainty == $CFG::ALGO{'CERT_COMPROMISE'}) {
+                $_[0]{'targets'}{$target_ip}{'certainty'} = $CFG::ALGO{'CERT_COMPROMISE_NO_SCAN'};
+            } else {
+                $_[0]{'targets'}{$target_ip}{'certainty'} = $new_certainty;
+            }
         }
     }
 }
@@ -237,7 +259,7 @@ sub merge_compromise_ports {
     my $combined = $existing . "," . $new;
     
     # Remove port duplicates
-    my %unique = map { $_, 1} split(/,/, $combined);
+    my %unique = map {$_, 1} split(/,/, $combined);
     return join(',' , keys %unique);
 }
 
@@ -267,10 +289,10 @@ sub update_last_activities {
     $$attack{'end_time'} = 0 unless exists $$attack{'end_time'};
 
     while ((my $target, my $target_info) = each (%$targets)) {
-        if (! exists $$attack{'targets'}{$target}{'last_act_' . $phase}) {
-            $$attack{'targets'}{$target}{'last_act_'.$phase} = $$target_info{'last_act'};
-        } else {
+        if (exists $$attack{'targets'}{$target}{'last_act_' . $phase}) {
             $$attack{'targets'}{$target}{'last_act_'.$phase} = $$target_info{'last_act'} if $$target_info{'last_act'} > $$attack{'targets'}{$target}{'last_act_'.$phase};
+        } else {
+            $$attack{'targets'}{$target}{'last_act_'.$phase} = $$target_info{'last_act'};
         }
 
         $$attack{'end_time'} = $$target_info{'last_act'} if $$target_info{'last_act'} > $$attack{'end_time'};
