@@ -1,17 +1,127 @@
-#incoming-attacks-table tr:hover {
+div[id$='-attacks-table'] tr:hover ,
+div[id$='-attacks-table'] tr.selected,
+#target-table tr:hover,
+#target-table tr.selected
+{
     background: -moz-linear-gradient(top, #339ef0 0%, #0a83de 100%);
     background: -webkit-linear-gradient(top, #339ef0 0%,#0a83de 100%);
     cursor: pointer;
 }
 
-#incoming-attacks-table tr:hover a.ip-addr {
+
+div[id$='-attacks-table'] tr:hover a.ip-addr,
+div[id$='-attacks-table'] tr.selected a.ip-addr,
+#target-table tr:hover a.ip-addr,
+#target-table tr.selected a.ip-addr
+{
     color: white;
 }
 
-#incoming-attacks-table tr:hover .scan {
+div[id$='-attacks-table'] tr:hover .phase,
+div[id$='-attacks-table'] tr.selected .phase,
+#target-table tr:hover .phase,
+#target-table tr.selected .phase
+{
     border: 1px solid white;
 }
 
 #incoming-attacks-table a.ip-addr:hover {
     cursor: zoom-in;
+}
+
+#attack-profile-plot-container {
+    background: white;
+    padding: 20px;
+}
+#attack-profile-plot {
+    height: 220px;
+}
+
+#attack-details-header {
+    border-bottom: 2px solid #888;
+    padding-bottom: 10px;
+}
+
+#attack-details-table {
+    margin: 10px 0;
+    max-width:  1080px
+}
+#attack-details-table td {
+    text-align: left;
+}
+#attack-details-table th {
+    width: 120px;
+}
+
+
+/*  Flow data */
+#attack-flow-data {
+    /* height: 200px; */
+}
+
+#targets-overview-table #attack-flow-data td:nth-child(1){
+    width: 100px;
+}
+#targets-overview-table #attack-flow-data td:nth-child(2) {
+    width: 100px;
+}
+#targets-overview-table #attack-flow-data td:nth-child(3) {
+    width: 400px;
+}
+#targets-overview-table #attack-flow-data td:nth-child(4) {
+    width: 70px;
+}
+#targets-overview-table #attack-flow-data td:nth-child(5) {
+    width: 70px;
+}
+#targets-overview-table #attack-flow-data td:nth-child(6) {
+    width: 70px;
+}
+
+/* Target list */
+
+#targets-overview-table table.list td:not([colspan="3"]):nth-child(1){
+    width: 100px;
+}
+#targets-overview-table table.list td:nth-child(2) {
+    width: 70px;
+}
+#targets-overview-table table.list td:nth-child(3) {
+    width: 150px;
+}
+#targets-overview-table table.list td:nth-child(4) {
+    width: 600px;
+}
+
+
+
+div[id$='-attacks-table'] td.active {
+    text-align: center;
+    width: 30px;
+}
+#targets-overview-table td.blocked {
+    color: #61a900;
+    text-align: center;
+}
+
+
+#incoming-attacks-page #incoming-attacks table.list td:first-child,
+#incoming-attacks-page #incoming-attacks h1
+{
+    padding-left: 30px;
+    margin-top: 0;
+}
+
+#incoming-attacks-page #incoming-attacks table.list tr td:last-child {
+    padding-right: 20px;
+}
+
+#incoming-targets-content {
+    padding: 0;
+}
+
+
+/* TODO: is this really the right place to do this/ */
+html {
+    background: #d1d1d1;
 }

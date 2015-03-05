@@ -8,6 +8,7 @@
 #attacks-plot-header {
     height: 40px;
     padding-right: 13px;
+    background: white;
 }
 
 #attacks-plot-legend {
@@ -36,6 +37,7 @@
 }
 
 /* Tables */
+/*
 div.main-block.table table thead {
     background-color: #DDDDDD;
     color: #898989;
@@ -43,3 +45,4 @@ div.main-block.table table thead {
 div.main-block div[id$='-table'] {
     padding: 0;
 }
+*/

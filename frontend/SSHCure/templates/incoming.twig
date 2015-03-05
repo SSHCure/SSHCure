@@ -1,9 +1,10 @@
 {% extends "base.twig" %}
 
 {% block main %}
+<div id="incoming-attacks-page">
     <div class="container-fluid">
-        <div class="row">
-            <div class="col-sm-12 col-md-12">
+        <div class="row" style="background: white">
+            <div class="col-sm-12 col-md-12" style="padding: 0px">
                 <div id="incoming-attacks" class="main-block">
                     <h1>Incoming attacks</h1>
                     <div id="incoming-attacks-table" style="display: none;"></div>
@@ -11,22 +12,24 @@
                 </div>
             </div>
         </div>
-        <div class="row">
+        <div class="row" style="background: #d1d1d1">
             <div class="col-sm-12 col-md-12">
-                <div id="attack-details" class="main-block">
-                    <h1>Attack details</h1>
-                    <div id="attack-details-content"></div>
+                <div id="attack-details">
+                    <h1 id="attack-details-header">Attack details</h1>
+                    <div id="attack-details-content">Select an attack from the overview</div>
+                    <div id="attack-profile-plot"></div>
                     {#<div class="loading"><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span>Loading...</div>#}
                 </div>
             </div>
         </div>
-        <div class="row">
+        <div class="row" style="background: #d1d1d1;">
             <div class="col-sm-12 col-md-12">
-                <div id="incoming-targets" class="main-block">
+                <div id="incoming-targets" class="main-block" style="display: none;">
                     <h1>Targets</h1>
                     <div id="incoming-targets-content"></div>
                 </div>
             </div>
         </div>
     </div>
+</div>
 {% endblock %}

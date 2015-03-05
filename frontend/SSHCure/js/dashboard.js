@@ -52,16 +52,17 @@ function add_time_window_control_listeners () {
 
 function load_attacks_table (type, internal_networks, period) {
     var url;
+    var action;
 
-    if (type == INCOMING) {
-        url = "json/data/get_incoming_attacks.php";
-    } else {
-        url = "json/data/get_outgoing_attacks.php";
+    action = 'incoming';
+    url = "json/data/get_attacks.php";
+
+    var params = {};
+    if (type != INCOMING) {
+        params['outgoing'] = 1;
+        action = 'outgoing';
     }
-
-    var params = {
-        'internal_networks': internal_networks
-    };
+    console.log('load_attacks_table with params:' + params);
 
     $.getJSON(url, params, function (data, textStatus, jqXHR) {
         var table = $('<table>').addClass('list');
@@ -88,22 +89,27 @@ function load_attacks_table (type, internal_networks, period) {
                 );
                 var this_attack = this;
                 // Phases
-                if (jQuery.inArray(this.certainty, [ 0.25, 0.5, 0.75 ])) {
-                    phases.find('div.phase.scan').addClass('on');
+                this.certainty = parseFloat(this.certainty);
+                if ($.inArray(this.certainty, [ 0.25, 0.5, 0.75 ]) != -1) {
+                    phases.find('.scan').addClass('on');
                 }
-                if (jQuery.inArray(this.certainty, [ 0.4, 0.5, 0.65, 0.75 ])) {
-                    phases.find('div.phase.bruteforce').addClass('on');
+                if ($.inArray(this.certainty, [ 0.4, 0.5, 0.65, 0.75 ]) >= 0) {
+                    phases.find('.bruteforce').addClass('on');
                 }
-                if (jQuery.inArray(this.certainty, [ 0.65, 0.75 ])) {
-                    phases.find('div.phase.compromise').addClass('on');
+                if ($.inArray(this.certainty, [ 0.65, 0.75 ]) >= 0) {
+                    phases.find('.compromise').addClass('on');
                 }
 
                 // Date
                 var date = new Date(this.start_time * 1000);
-
+                var active_span = "<span></span>";
+                if (this.ongoing) {
+                    active_span = "<span class=\"glyphicon glyphicon-flash\"></span>";
+                }
                 var tr = $('<tr>').append(
                     $('<td>').append(phases),
-                    $('<td>').html("<span class=\"glyphicon glyphicon-flash\"></span>"),
+                    //$('<td>').html("<span class=\"glyphicon glyphicon-flash\"></span>"),
+                    $('<td>').addClass('active').html(active_span),
                     $('<td>').append($('<a>')
                             .addClass('ip-addr')
                             //.attr('href', '#')
@@ -127,25 +133,12 @@ function load_attacks_table (type, internal_networks, period) {
                     $('<td>').text(date.toString("ddd. MMM d, yyyy HH:mm")),
                     $('<td>').text(this.target_count)
                 ).appendTo(body);
+                tr.data('href', 'index.php?action=' + action + '&attack_id=' + this_attack.attack_id);
                 tr.click(function () {
-                    var url = "json/data/get_attack_details.php";
-                    var params = {
-                        'attack_id': this_attack.attack_id
-                    }
-                    $.getJSON(url, params, function(data) {
-                        //TODO parse json, create Attack details stuff
-                        $('#attack-details-content').text(data.data[0]);
-                    });
-                    url = "json/data/get_targets_for_attack.php";
-                    $.getJSON(url, params, function(data) {
-                        //TODO parse json, create Targets table
-                        $('#incoming-targets-content').text(""+data.data.length);
-                    });
-                    url = "json/data/get_attack_graph.php";
-                    params['timezone_offset'] = (new Date()).getTimezoneOffset();
-                    $.getJSON(url, params, function(data) {
-                        //TODO parse json, plot using flot
-                    });
+                    loadAttackDetails($(this));   
+                    loadAttackTargets($(this));   
+                    $(this).addClass("selected").siblings().removeClass("selected");
+                    //loadAttackGraph($(this));
                 });
             });
         }
@@ -165,6 +158,23 @@ function load_attacks_table (type, internal_networks, period) {
             table.appendTo($('#outgoing-attacks-table'));
         }
     });
+}
+
+function _handle_get_attack_details (data) {
+    $('#attack-details h1').text("Attack details of " + data.data[0]['attacker_ip']);
+    var details_table;
+    details_table = "<table>\
+                        <tr>\
+                            <td>Attacker</td><td>derp</td>\
+                            <td>Start time</td><td>nu</td>\
+                            <td>Total flows</td><td>heelveelK</td>\
+                            <td>Total bytes</td><td>meerK</td>\
+                        </tr>\
+                        <tr>\
+                        </tr>\
+                        </table>";
+    $('#attack-details-content').html(details_table);
+
 }
 
 function load_top_targets_table (type) {
