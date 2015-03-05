@@ -54,17 +54,15 @@ function load_attacks_table (type, internal_networks, period) {
     var url;
     var action;
 
-    if (type == INCOMING) {
-        url = "json/data/get_incoming_attacks.php";
-        action= 'incoming';
-    } else {
-        url = "json/data/get_outgoing_attacks.php";
+    action = 'incoming';
+    url = "json/data/get_attacks.php";
+
+    var params = {};
+    if (type != INCOMING) {
+        params['outgoing'] = 1;
         action = 'outgoing';
     }
-
-    var params = {
-        'internal_networks': internal_networks
-    };
+    console.log('load_attacks_table with params:' + params);
 
     $.getJSON(url, params, function (data, textStatus, jqXHR) {
         var table = $('<table>').addClass('list');
