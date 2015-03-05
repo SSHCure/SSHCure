@@ -1,5 +1,5 @@
-#incoming-attacks-table tr:hover ,
-#incoming-attacks-table tr.selected,
+div[id$='-attacks-table'] tr:hover ,
+div[id$='-attacks-table'] tr.selected,
 #target-table tr:hover,
 #target-table tr.selected
 {
@@ -9,16 +9,16 @@
 }
 
 
-#incoming-attacks-table tr:hover a.ip-addr,
-#incoming-attacks-table tr.selected a.ip-addr,
+div[id$='-attacks-table'] tr:hover a.ip-addr,
+div[id$='-attacks-table'] tr.selected a.ip-addr,
 #target-table tr:hover a.ip-addr,
 #target-table tr.selected a.ip-addr
 {
     color: white;
 }
 
-#incoming-attacks-table tr:hover .phase,
-#incoming-attacks-table tr.selected .phase,
+div[id$='-attacks-table'] tr:hover .phase,
+div[id$='-attacks-table'] tr.selected .phase,
 #target-table tr:hover .phase,
 #target-table tr.selected .phase
 {

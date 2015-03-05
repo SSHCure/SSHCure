@@ -18,10 +18,16 @@
     }
 
     $block = (isset($_GET['block'])) ? $_GET['block'] : NULL;
-    $template = $twig->loadTemplate($action.'.twig');
+
+    $filename = $action.'.twig';
+    if ($action == 'incoming' || $action == 'outgoing') {
+        $filename = 'incoming_outgoing.twig';
+    }
+    $template = $twig->loadTemplate($filename);
 
     $template_args = array();
-    $template_args['WEBROOT'] = $config['web.root'];
+    $template_args['WEBROOT']   = $config['web.root'];
+    $template_args['action']    = $action;
 
     if (is_null($block)) {
         $template_args['action'] = $action;
