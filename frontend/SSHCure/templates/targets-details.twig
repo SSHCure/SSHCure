@@ -2,8 +2,8 @@
 {% macro phases(certainty) %}
     <div class="phases">
         <div class = "phase scan {{ certainty in [0.25, 0.50, 0.75] ? 'on' : 'off' }}"></div>
-        <div class = "phase bruteforce {{ certainty in [0.40, 0.50, 0.75] ? 'on' : 'off' }}"></div>
-        <div class = "phase compromise {{ certainty in [0.75] ? 'on' : 'off' }}"></div>
+        <div class = "phase bruteforce {{ certainty in [0.40, 0.50, 0.65, 0.75] ? 'on' : 'off' }}"></div>
+        <div class = "phase compromise {{ certainty in [0.65, 0.75] ? 'on' : 'off' }}"></div>
     </div>
 {% endmacro %}
 
@@ -38,7 +38,11 @@
                 </div>
             </td>
             <td style="padding: 0px">
-                <div id="attack-flow-data" style="width: 100%">Select a target from the overview on the left</div>
+                <div id="attack-flow-data" style="width: 100%">
+                    <span class="notice notice-center">
+                        Select a target from the overview on the left
+                    </span>
+                </div>
             </td>
         </tr>
     </table>

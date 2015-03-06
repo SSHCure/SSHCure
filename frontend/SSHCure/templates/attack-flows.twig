@@ -4,7 +4,8 @@
     <tr>
         <td>Time</td>
         <td>Duration</td>
-        <td>Flow</td>
+        <td>IP addresses</td>
+        <td>Ports</td>
         <td>Flags</td>
         <td>Packets</td>
         <td>Bytes</td>
@@ -15,7 +16,8 @@
         <tr>
             <td>{{ flow.start_time | date('G:i:s')}}</td>
             <td>{{ flow.duration }}</td>
-            <td>{{ flow.source_ip }}&nbsp;&#8594;&nbsp;{{ flow.destination_ip}}&nbsp;({{flow.source_port }}&nbsp;&#8594;&nbsp;{{ flow.destination_port}})</td>
+            <td>{{ flow.source_ip }}&nbsp;&#8594;&nbsp;{{ flow.destination_ip}}</td>
+            <td>{{ flow.source_port }}&nbsp;&#8594;&nbsp;{{ flow.destination_port}}</td>
             <td>{{ flow.flags }}</td>
             <td>{{ flow.packets }}</td>
             <td>{{ flow.bytes }}</td>

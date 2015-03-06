@@ -16,6 +16,7 @@
                         a.attacker_ip AS attacker,
                         a.target_count AS target_count
             FROM        attack a
+            WHERE       a.direction = 0
             ORDER BY    a.certainty DESC,
                         a.start_time DESC,
                         a.target_count DESC
@@ -41,7 +42,7 @@
                         a.attacker_ip AS attacker,
                         a.target_count AS target_count
             FROM        attack a
-            WHERE       $networks_filter
+            WHERE       a.direction = 1
             ORDER BY    a.certainty DESC,
                         a.start_time DESC,
                         a.target_count DESC
