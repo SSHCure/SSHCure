@@ -1,0 +1,76 @@
+\cleardoublepage
+
+\section{Troubleshooting \& FAQ}
+\label{sec:troubleshooting_faq}
+
+If you encounter any problems with SSHCure, please perform the following steps:
+
+\begin{enumerate}
+	\item Make sure to run SSHCure from within NfSen, instead of as a standalone application. This means that you have to run SSHCure from the \emph{Plugins} tab in NfSen.
+	
+	\item When loading SSHCure, it performs numerous checks in the backend. If any problem has been detected, a warning will be shown at the top of the Dashboard page.
+	
+	\item Clear the cache of your Web browser.
+\end{enumerate}
+
+Despite the fact that SSHCure has been developed with great care, you might encounter errors and/or find bugs. It could also be possible that you have ideas for improvement of SSHCure. Please help us improving SSHCure by sending an e-mail. Last but not least, we are happy to help you configuring SSHCure for use in your environment.
+
+\vspace{3mm}
+E-mail: \url{r.j.hofstede@utwente.nl}
+\vspace{3mm}
+	
+Please do always provide as much information and details as possible when making a support request. Your support is honestly appreciated!
+
+\subsection{Profiling}
+
+SSHCure maintains a `profiling database' with anonymous statistics on its performance. You can check out its contents yourselves as follows:
+
+{\tt\small
+\begin{verbatim}
+$ printf ".header on\n.mode column\n select * from profile;" 
+                | sqlite3 /data/nfsen/plugins/SSHCure/data/SSHCure_profile.sqlite3
+
+time        db_size   run_time    target_count_scan  target_count_bf  target_count_do  maintenance_failed
+----------  --------  ----------  -----------------  ---------------  ---------------  ------------------
+1364198400  500       25          4000000            1000             3                0                 
+
+\end{verbatim}
+}
+
+The following parameters are stored in the `profile' table of the database:
+
+\begin{description}
+	\item [time] -- UNIX timestamp of the moment in which the record has been created.
+	
+	\item [db\_size] -- Size of the SSHCure database (\textit{SSHCure.sqlite3}) in bytes.
+	
+	\item [run\_time] -- Processing time of the SSHCure backend (every five minutes) in seconds.
+	
+	\item [target\_count\_scan] -- Number of scan targets in the SSHCure database.
+	
+	\item [target\_count\_bf] -- Number of brute-force targets in the SSHCure database.
+	
+	\item [target\_count\_do] -- Number of die-off targets in the SSHCure database.
+	
+	\item [maintenance\_failed] -- Indicates whether a database maintenance run has failed (\textsc{1}) or not (\textsc{0}). A reason for a run to fail can be that the processing time of the SSHCure backend is too long (see `run\_time').
+	
+	\item [ignored\_records\_close\_outlier] -- Number of flow records within the current \textit{nfdump} file that have starting times within a 24 hour window of the \textit{nfdump} file timestamp, but are still clear outliers with respect to the current \textit{nfdump} file. These flow records are ignored in the intrusion detection process.
+	
+	\item [ignored\_records\_far\_outlier] -- Number of flow records within the current \textit{nfdump} file that have starting times outside a 24 hour window of the \textit{nfdump} file timestamp. These flow records are ignored in the intrusion detection process.
+\end{description}
+
+As the profiling database maintained by SSHCure contains solely anonymous usage statistics, we'd like to ask you to send\footnote{You can find the contact information at the top of this page.} it to us periodically. This will help us to optimize SSHCure for deployment in a wider range of systems/setups.
+
+\subsection{Run lock}
+
+SSHCure uses a `run lock' mechanism as of version 2.0. This means that if the SSHCure backend is executed while the previous execution has not yet completed, backend execution is skipped. This particular event is written to syslog as follows:
+
+\begin{center}
+\textit{SSHCure: Previous run has not finished yet (or a stale lock file exists); skipping data processing...}
+\end{center}
+
+The `run lock' is stored in the \textit{/data/} directory of SSHCure's backend, together with the database files. In case you suspect that for whatever reason the `run lock' has not been successfully deleted, you can remove the \textit{run.lock} file.
+
+\subsection{Network traffic from SSHCure backend: Version check}
+
+As of version 2.2, SSHCure's backend performs a version check on initialization (i.e., when the NfSen daemon is started). As such, an HTTP POST message is sent out to retrieve the latest version. In case you find SSHCure generating an outbound connection, this is the reason. SSHCure is able to deal with HTTP(S) proxies, configured by means of environment variables.

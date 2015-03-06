@@ -600,14 +600,24 @@ sub port_number_reuse {
 
     # Check for port number reuse by checking for the number of flow records having the APS-flags set
     my $records_with_APS = 0;
+
+    # Check for port number reuse by checkout for flows for which a SYN packet may not be metered/observed. Example:
+    # 2015-03-06 15:13:03.914     4.400 TCP     113.195.145.12:43216 ->    130.89.173.42:22    .AP.SF   0       15     2163     1
+    # 2015-03-06 15:13:07.914     4.250 TCP     113.195.145.12:50494 ->    130.89.173.42:22    .AP.SF   0       15     2163     1
+    # 2015-03-06 15:13:15.864    17.000 TCP     113.195.145.12:35652 ->    130.89.173.42:22    .AP.SF   0       20     3094     1
+    # 2015-03-06 15:13:33.514     3.200 TCP     113.195.145.12:35652 ->    130.89.173.42:22    .AP..F   0       10     1232     1
+    my $records_with_APF = 0;
+
     for my $non_aggr_flow_record (@$non_aggr_flow_records) {
         my ($ip_version, $t_start, $t_end, $protocol, $s_ip, $s_port, $d_ip, $d_port, $flags, $packets, $bytes) = @$non_aggr_flow_record;
-        if (APS($flags)) {
-            $records_with_APS++;
-        }
+
+        $records_with_APS++ if (APS($flags));
+        $records_with_APF++ if (no_SYN($flags) && APF($flags));
+
+        print " [port_number_reuse] Port: $s_port, APS: $records_with_APS, APF: $records_with_APF\n" if $s_ip == 1908642060 && $d_ip == 2186915114;
     }
 
-    return ($records_with_APS > 1);
+    return ($records_with_APS > 1 || ($records_with_APS + $records_with_APF) % 2 == 0) ? 1 : 0;
 }
 
 sub get_non_aggr_flow_data {

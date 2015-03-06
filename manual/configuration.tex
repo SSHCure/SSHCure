@@ -1,0 +1,136 @@
+\section{Configuration} \label{sec:configuration}
+
+In most setups it will suffice to configure SSHCure in the backend, leaving the frontend configuration untouched. This chapter will therefore first describe the configuration in the backend in Chapter~\ref{subsec:backend_configuration}, followed by the frontend configuration in Chapter~\ref{subsec:frontend_configuration}.
+
+\subsection{Backend} \label{subsec:backend_configuration}
+
+All backend configuration options discussed in this section can be found in the backend configuration file \textit{config.pm}.
+
+\subsubsection{NfSen sources}
+
+Many NfSen-based flow collectors receive flow data from multiple flow exporters. By default, SSHCure considers the flow data from all available sources for its processing. This may, however, not yield the optimal setup and detection results for two reasons:
+
+\begin{enumerate}
+	\item Flows may pass multiple observation points, which will result in multiple records for the same flow. This interferes with the detection algorithms of SSHCure.
+	\item Processing times increase as more data is used for processing.
+\end{enumerate}
+
+As a best-practice, you should use only ingress/egress flow data from your edge routers/links. This can be accomplished by configuring the name of the desired data sources in the file \textit{config.pm}. The appropriate setting name is OVERRIDE\_SOURCE, which can contain one or more source names. For example, if two sources named \textit{router1} and \textit{router2} should be used by SSHCure, you can configure it as follows: \\
+
+OVERRIDE\_SOURCE = ``router1:router2'' \hfill (note the colon for separating the names) \\
+
+SSHCure's frontend will automatically use this setting as well, when retrieving flow records from the backend or calculating statistics, for example.
+
+\subsubsection{Notifications}
+
+Notifications can be a simple way for informing operators/CERTs about ongoing attacks. SSHCure currently supports email and log file notifications. The configuration of notifications in \textit{config.pm} consists of a list of \textit{notification configs}. Every \textit{notification config} has a name  and the following parameters:
+
+\begin{description}[font=\normalfont]
+	\item [filter] -- Specifies for which host or set of hosts this \textit{notification config} is specified. It can be a comma-separated list of both IP addresses and IP prefixes (and mixed). Example values: \textit{`1.2.3.4'}, \textit{`1.2.3.4, 5.6.7.8'} or \textit{`1.2.3.4,5.6.7.8/16'}
+	
+	\item [filter\_type] -- Indicates whether a notification should be sent when the host or set of hosts specified as \textit{filter} should have the role of attacker or target. All supported values are listed in \textit{config.pm}.
+	
+	\item [attack\_phase] -- Indicates whether the notification should be sent when the host or set of hosts specified as \textit{filter} enter the scan, brute-force, or compromise phase. Note that phase names are cumulative, meaning that the \textit{notification config} will be triggered for the specified attack\_phase and every attack phase that is more `advanced'. For example, when scan attacks are specified, in fact all attacks will be considered for notification; when compromise attacks are specified, only compromise attacks are considered. All supported values are listed in \textit{config.pm}.
+	
+	\item [when] -- Indicates whether the notification should be sent as soon as an attack has started (attack start), ended (attack end), or upon every change (attack update) per 5 minutes (i.e., per processing interval). As such, when notifications should be sent upon every attack update, they are sent upon attack start and attack end. All supported values are listed in \textit{config.pm}.
+	
+	\item [notification\_type] -- Indicates the type of notification that should be sent. Only e-mail and log files are currently supported. All supported values are listed in \textit{config.pm}.
+	
+	\item [notification\_sender] -- When e-mail has been specified as the \textit{notification\_type}, this field should have a single sender e-mail address. However, when log files are the preferred medium for notifications, this field should be left empty.
+	
+	\item [notification\_destination] -- When e-mail has been specified as the \textit{notification\_type}, this field should have a comma-separated list of receiver e-mail addresses, each of them enclosed with brackets (e.g., \textit{`<admin@domain.com>' or `<admin@domain.com>,<noc@domain.com>'}. When log files are the preferred medium for notifications, this field should have the absolute path (including file name) of the log file.
+\end{description}
+
+The final step in the configuration of e-mail notifications is to make sure that your server can connect to an SMTP server. If \$SMTP\_SERVER in \textit{nfsen.conf} is configured as ``localhost'' (which is the default setting), you have to make sure that you're running an SMTP server on your machine. This can be Exim4-light with a `smart-host' configuration, for example.
+
+In case you have configured to write notifications to a log file, the layout of the log file is as follows: \\
+
+\begin{center}
+<attack\_id>,<attack\_level>,<attack\_start>,<attack\_end>,\\<attacker\_ip>,<target\_count>,<compromised\_target\_list> \\
+\end{center}
+
+Here, \textit{<attack\_id>} is the ID of the attack used in the database, \textit{<attack\_level>} can be \textit{scan}, \textit{brute-force} or \textit{compromise}, \textit{<attack\_start>} and \textit{<attack\_end>} are the start and end times of the attack expressed in UNIX time, respectively, \textit{<attacker\_ip>} is the attacker's IP address in decimal notation, \textit{<target\_count>} the number of targets involved in the attack, and \textit{<compromised\_target\_list>} a semi-colon-separated list of compromised targets in decimal notation (or an empty String in case no target was compromised).
+
+Please note that SSHCure performs a sanity check of the notification configuration in \textit{config.pm} upon every (re)start of SSHCure (triggered by a (re)start of the NfSen daemon). It is advised to check syslog for any errors or inconsistencies when (re)starting SSHCure for the first time after a configuration change.
+
+\subsubsection{Database maintenance}
+
+One of the key features of SSHCure is to provide an overview of hosts that participated in an attack in the role of attacker or target. To be able to do this, targets need to be stored in the database. Since the number of hosts can be very large for each attack, the size of the database will grow rapidly once SSHCure has been deployed on a high-speed link. To avoid performance problems, SSHCure supports a database routine which expires (old) database entries and performs overall database maintenance. The following settings are related to the database maintenance:
+
+\begin{description}[font=\normalfont]
+	\item [MAINTENANCE\_TRIGGER] -- Indicates when the maintenance routine should be executed. It consists of a list of values, where each of the values consists of two parts:
+	
+	\begin{enumerate}
+		\item Day of the week. Monday has index `1', Sunday has `7'. Each index consists of a single digit.
+		
+		\item Hour of the day. Each index consists of two digits (including leading zero).
+	\end{enumerate}
+	
+	Both parts should be separated by a colon (:). Example: the value `(``3:03'', ``7:03'')' runs the maintenance routine each Wednesday and Sunday at 3 AM.
+	
+	\item [MAINTENANCE\_TIME\_NEEDED] -- An estimation of the duration of the maintenance in your setup in  seconds. As this depends a lot on processing speed and HDD throughput of your machine, we advise to keep the default value (120).
+	
+	\item [QUICK] -- If quick database maintenance is enabled, the maintenance routine skips database reindexing and cleaning. As such, the maintenance will finish significantly faster. For optimal database performance, however, it is recommended to disable quick database maintenance.
+\end{description}
+
+In case you want to make SSHCure perform database maintenance right-away (besides the specified maintenance times), you can touch a file named \textit{force\_db\_maintenance} in SSHCure's backend data directory. As soon as SSHCure detects this file during the next processing interval, the file will be removed automatically and database maintenance will be performed.
+
+The SSHCure frontend is aware of expired targets and will indicate to the user that some information is incomplete due to database maintenance.
+
+\subsubsection{IP address whitelisting}
+
+SSHCure supports IP address whitelisting, which can be used in cases where benign SSH activity is reported as malicious by SSHCure. The whitelist configuration is divided into a \textit{source} and \textit{destination} component; IP addresses and/or IP address prefixes listed as \textit{source}, will never be reported as an attacker, while those listed as \textit{destination} will never be reported as target.
+
+\subsection{Frontend} \label{subsec:frontend_configuration}
+
+The frontend configuration is split over two files: \textit{config.php} and \textit{defaults.php}. Both files are located in the \textit{/config/} directory of the SSHCure frontend. In most situations, you will not need to modify any of the frontend configuration files. However, in case you want to change the internals of the SSHCure frontend, we advise you to take the following steps:
+
+\begin{enumerate}
+	\item Check the existing settings in \textit{config.php}. The most common settings are listed there. If the requested setting is not listed in \textit{config.php}, more to Step~2.
+	
+	\item Check the settings in \textit{defaults.php}. This file contains all available frontend settings. In case you want to modify any of them, please copy the corresponding line(s) to \textit{config.php}. The settings in \textit{defaults.php} will be overridden by the settings listed in \textit{config.php}.
+
+\end{enumerate}
+
+\noindent
+Please find here a short description on the most relevant settings.
+
+\begin{description}
+	\item [nfsen.config-file] -- Path to your \textit{nfsen.conf} file. The default value will fit most setups.
+	
+	\item [backend.path] -- Path to your SSHCure backend files. The default value will fit most setups.
+	
+	\item [anonymize-ips] -- If enabled, SSHCure will anonymise all IP addresses in the frontend using CryptoPAN\footnote{IP address anonymization using CryptoPAN requires the \textit{IP::Anonymous} Perl module to be installed.}. Please note that SSHCure has not been designed to be an end-user tool and therefore IP address anonymization performed by SSHCure does not provide any SSHCure. You should only use it for the sake of demonstrations, screenshots, etc.
+	
+	\item [ip-data-anonymized] -- Enable this setting if your flow data has already been anonymized before arriving at your flow collector. It will disabled geolocation reverse DNS lookups in the frontend.
+	
+	\item [attackprofile.maxpoints] -- The Attack Details page (see Chapter~\ref{sec:using_sshcure} for more details) shows a plot of the attack profile (contacted hosts vs. time). This setting specifies the maximum number of dots in this plot. The more dots you specify, the longer it will take for your page to load. Please note that the plotting activity is completely frontend-based. Therefore, powerful machines using up-to-date Web browsers can handle more points.
+	
+	\item [targets.maxnumber] -- The Attack Details page (see Chapter~\ref{sec:using_sshcure} for more details) provides a list of attack targets. As many targets can be involved in an attack, it is wise to limit the number of targets shown in this list. Powerful machines using up-to-date Web browsers can handle longer lists. Please note that the list is sorted such that the most important attack targets are shown.
+\end{description}
+
+\subsection{NfSen} \label{subsec:nfsen_configuration}
+
+Besides the required configuration steps as described in the \textit{readme} file, there are several configuration best-practices that will boost SSHCure's performance significantly.
+
+\subsubsection{Dedicated profile}
+
+If SSHCure is configured to run on the `live' profile, it considers all the data from all your sources in the SSH detection process. This is not always useful, for several reasons. For example, the dataset in the `live' profile may be very large. To reduce the size of data to be analyzed dramatically, it is advised to use a dedicated profile for SSHCure. Such a profile can be created from the NfSen Web interface as follows:
+
+\begin{enumerate}
+	\item Navigate to the `Stats' tab.
+	\item Enter a name for the new profile (e.g., ``SSHCure'').
+	\item Select type `Real Profile'.
+	\item Select the applicable data sources.
+	\item Set a filter for your SSH traffic: ``proto tcp and (port 22 or port 25 or port 80 or port 443 or port 6667 or port 6697)''.
+\end{enumerate}
+
+The next step is to change the profile reconfiguration in \textit{nfsen.conf} so that SSHCure is solely run on the newly created profile. You can do so by opening your \textit{nfsen.conf} file and scroll down to the \textsc{@plugins} array. After a successful installation of SSHCure, the array should include one line related to SSHCure, such as: \\ 
+
+[ `live', `SSHCure' ] \hfill (instead of `live' you may have used `*') \\
+
+Now change `live' (or `*') into `SSHCure' to let SSHCure solely work on your dedicated profile. After saving \textit{nfsen.conf}, don't forget to restart the NfSen daemon to let the settings take effect.
+
+\subsubsection{Flow record duplicates}
+
+In case you run SSHCure on an NfSen profile with multiple sources, please make sure that flows are never exported by more than one source (i.e., make sure your NfSen profile does not contain duplicate flow records). Duplicate flow records will affect the accuracy of SSHCure's detection algorithm.

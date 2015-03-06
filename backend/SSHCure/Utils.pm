@@ -49,6 +49,7 @@ our @EXPORT = qw (
     ASF_only
     AF_only
     APS
+    APF
     FIN
     RST
     SYN
@@ -366,6 +367,10 @@ sub AF_only {
 
 sub APS {
     return ($_[0] & 0b011010) == 0b011010;
+}
+
+sub APF {
+    return ($_[0] & 0b011001) == 0b011001;
 }
 
 sub FIN {
