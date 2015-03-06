@@ -1,0 +1,29 @@
+\section{Installation} \label{sec:installation}
+
+This chapter outlines details on the installation of SSHCure, which have not been included in the readme file (\emph{readme.txt}). We refer to this file for the regular installation instructions.
+
+\subsection{Installation Requirements} \label{subsec:installation_requirements}
+
+In order to achieve the best experience when using SSHCure, the following components should be installed:
+
+\begin{itemize}
+	\item NfSen
+	\item Perl, together with the following modules: DBD SQLite, IP::Net, JSON, LWP
+	\item PHP 5.2.4 or newer, together with the following modules: \textit{mbstring}, \textit{PDO SQLite3}
+\end{itemize}
+
+These requirements translate to the following packages:
+
+\begin{table}[!h]
+	\renewcommand{\arraystretch}{1.3}
+	\centering
+	\begin{tabular}{r || c | c | c}
+									&	\textbf{Debian/Ubuntu}		&	\textbf{RHEL/CentOS} 	&	\textbf{FreeBSD} \\ \hline \hline
+		PHP \textit{mbstring} module		&							&	\texttt{php-mbstring} 		&	\texttt{} \\ \hline
+		PHP \textit{PDO SQLite3} module	&	\texttt{php5-sqlite}			&	\texttt{php-pdo} 		&	\texttt{} \\ \hline
+		Perl DBD SQLite module			&	\texttt{libdbd-sqlite3-perl}		&	\texttt{perl-DBD-SQLite}	&	\texttt{p5-DBD-SQLite} \\ \hline
+		Perl IP::Net module				& 	\texttt{libnet-ip-perl}			&	\texttt{perl-Net-IP} 		&	\texttt{p5-Net-IP} \\ \hline
+		Perl JSON module				& 	\texttt{libjson-perl}			&	\texttt{perl-JSON} 		&	\texttt{p5-JSON} \\ \hline
+		Perl LWP module				&	\texttt{libwww-perl}			&	\texttt{perl-libwww-perl} 	&	\texttt{p5-libwww} \\ \hline
+	\end{tabular}
+\end{table}

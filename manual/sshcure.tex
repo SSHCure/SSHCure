@@ -1,0 +1,112 @@
+\documentclass[a4paper,10pt]{article}
+\usepackage[paper=a4paper,top=2.5cm,bottom=2.5cm,left=2.5cm,right=2.5cm,bottom=2.5cm,foot=1cm]{geometry}
+
+\usepackage{chngpage}
+\usepackage{graphicx}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[usenames,dvipsnames]{color}
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage{pdfpages}
+\usepackage{float}
+\usepackage{array}
+\usepackage{verbatim}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+
+\pagestyle{headings}
+
+%% -- document formating -- begin -- %%
+\makeatletter				% section title formating
+\renewcommand\section{\@startsection {section}{1}{\z@}%
+                   {-3.5ex \@plus -1ex \@minus -.2ex}%
+                   {2.3ex \@plus.2ex}%
+                   {\normalfont\sffamily\Large\bfseries\color{BrickRed}}}
+\renewcommand\subsection{\@startsection{subsection}{2}{\z@}%
+                   {-3.25ex\@plus -1ex \@minus -.2ex}%
+                   {1.5ex \@plus .2ex}%
+                   {\normalfont\sffamily\large\bfseries\color{BrickRed}}}
+\renewcommand\subsubsection{\@startsection{subsubsection}{3}{\z@}%
+                   {-3.25ex\@plus -1ex \@minus -.2ex}%
+                   {1.5ex \@plus .2ex}%
+                   {\normalfont\normalsize\sffamily\bfseries\color{BrickRed}}}
+\makeatother
+
+\newenvironment{itemize*}%
+{\begin{itemize}%
+    \setlength{\itemsep}{0pt}%
+    \setlength{\parskip}{0pt}%
+}{\end{itemize}}
+
+% ----- The next line is important when dealing with alpha channels
+% see http://bmeps.sourceforge.net/examples.html
+\pdfpageattr {/Group << /S /Transparency /I true /CS /DeviceRGB>>}
+
+%% -- document formating -- end -- %%
+
+\renewcommand{\headrulewidth}{0pt}
+\fancyhead[L]{\sffamily\footnotesize User Manual}
+\fancyhead[C]{}
+\fancyhead[R]{\sffamily\footnotesize SSHCure -- A Flow-Based SSH Intrusion Detection System}
+\fancyfoot[L]{\sffamily\footnotesize Rick Hofstede, Luuk Hendriks}
+\fancyfoot[C]{}
+\fancyfoot[R]{\sffamily\footnotesize Page \thepage/\pageref{totalpages}}
+
+\begin{document}
+
+% Title Page
+\pdfbookmark[1]{Title Page}{pdf_first_page}
+\pagestyle{empty}
+\sffamily\Large
+
+\begin{center}
+	\vspace*{1cm} \includegraphics[width=0.7\linewidth]{img/UT_Logo_Black_RGB_EN}
+
+	\vspace{4cm} {\fontsize{60pt}{80pt}\selectfont\bfseries\color{BrickRed} SSHCure}
+
+	\vspace{4cm} {\Huge\bfseries A Flow-Based SSH \\[0.3cm] Intrusion Detection System}
+
+	\vspace{1cm} {\LARGE\bfseries User Manual}
+\end{center}
+
+\vspace{3cm}
+
+\begin{tabular}{rl}
+	\bfseries Author & Rick Hofstede, Luuk Hendriks \\
+	 & \\
+	\bfseries Address &  University of Twente, The Netherlands \\
+	 & \\
+	\bfseries Date & \today \\
+	 & \\
+	\bfseries Version & 2.3.2
+\end{tabular}
+
+\cleardoublepage
+
+\pdfbookmark[1]{Contents}{pdf_contents}            % link to Contents in pdf bookmarks
+\label{pdf_contents}
+\pagestyle{fancy}
+
+\normalsize
+\tableofcontents
+
+\newpage\cleardoublepage\normalfont
+
+\input{introduction} \newpage
+\input{installation} \newpage
+\input{configuration} \newpage
+\input{using_sshcure}
+\input{troubleshooting}
+\input{license}
+
+\section*{Acknowledgements}
+This work has been supported by SURFnet's GigaPort 3 project on Next-Generation Networks and FLAMINGO, a Network of Excellence 
+project (ICT-318488) supported by the European Commission under its Seventh Framework Programme.
+
+\newpage
+\bibliographystyle{ieeetr}
+\bibliography{sshcure}
+
+\label{totalpages}	% label to count total number of pages in your document, please don't remove it
+\end{document}

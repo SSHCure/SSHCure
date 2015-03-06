@@ -1,0 +1,29 @@
+\section{Introduction}
+\label{sec:introduction}
+
+SSHCure is a flow-based SSH intrusion detection system (IDS). As a plugin for the state-of-the-art flow collector NfSen \cite{nfsen}, it supports and processes any NetFlow \cite{rfc3954} and IPFIX \cite{rfc5470}. sFlow \cite{sflowv5} is currently not supported, as it is not a flow export technology. The core of SSHCure is an algorithm based on the work of Sperotto \textit{et al}., who identify and classify SSH-based dictionary attacks in three phases \cite{sperotto2009}:
+
+\begin{enumerate}
+	\item \textbf{Scan phase} -- This is usually the first phase of an SSH attack, where an attacker performs a horizontal scan over a certain IP address range.
+	
+	\item \textbf{Brute-force phase} -- Either immediately following the scan phase or at a later point in time, an attacker may try to login to a certain host on which it found to have a running SSH daemon. It does so by generating username/password combinations at a usually very high speed.
+	
+	\item \textbf{Die-off phase} -- The last phase of a dictionary attack represents the situation in which the brute-force phase has been successful for the attacker and the attacker managed to login to the target machine. From that moment the time, the target machine has been compromised and is under attacker control.
+\end{enumerate}
+
+SSHCure consists of both a backend that runs the actual IDS and a frontend that aims to give operators and Computer Emergency Response Teams (CERTs) insight into the current state of their networks. This is done by means of several levels: The \textit{Dashboard} gives an overview of attacks, top attackers/targets, etc. for a selected period of time. More details about a selected attack can be obtained from the \textit{Attack Details} page, where a profile of the attack is shown, together with a target overview and the option to analyse the related flow data. Finally, the \textit{Host Details} page shows in which attacks a certain host has participated, either in the role of attacker or target.
+
+SSHCure has been optimized and tested for use in Mozilla FireFox (3+), Apple Safari (4+), Google Chrome (12+) and Microsoft Internet Explorer (7+). The SSHCure source code (and this manual) will always be made available through the SSHCure project's Web page on Sourceforge. This page is reachable by the following URLs:
+
+\begin{itemize}
+	\item SSHCure project main page: \url{http://sshcure.sf.net/}
+	\item SSHCure project download page: \url{http://sourceforge.net/projects/sshcure/files/}
+\end{itemize}
+
+The work on SSHCure has been supported by the following publication(s):
+
+\begin{enumerate}
+	\item Laurens Hellemons, Luuk Hendriks, Rick Hofstede, Anna Sperotto, Ramin Sadre, Aiko Pras. \textit{SSHCure: A Flow-Based SSH Intrusion Detection System}. In: Dependable Networks and Services. Proceedings of the 6th International Conference on Autonomous Infrastructure, Management and Security (AIMS 2012), 4-8 June 2012, Luxembourg, Luxembourg. Lecture Notes in Computer Science, Vol. 7279, ISSN 0302-9743 ISBN 978-3-642-30632-7, pp. 86-97
+\end{enumerate}
+
+The following chapters cover details on the installation and configuration of SSHCure. In particular, Chapter~\ref{sec:installation} includes details on the installation that have been omitted in the readme file. Details on the configuration, combined with best practices, are included in Chapter~\ref{sec:configuration}. After that, Chapter~\ref{sec:using_sshcure} outlines how to use SSHCure. The last chapter of this manual, Chapter~\ref{sec:troubleshooting_faq} explains what to do in case of any problem and discusses some frequently asked questions.
