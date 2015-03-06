@@ -223,10 +223,10 @@ sub merge_targets {
             if ($new_certainty > $_[0]{'targets'}{$target_ip}{'certainty'}) {
                 if ($_[0]{'targets'}{$target_ip}{'certainty'} == $CFG::ALGO{'CERT_BRUTEFORCE_NO_SCAN'}) {
                     # Adapt target certainty if attack certainty implies presence of scan (while scan is not present)
-                    if ($new_certainty == $CFG::ALGO{'CERT_COMPROMISE'}) {
+                    if ($new_certainty == $CFG::ALGO{'CERT_COMPROMISE'} || $new_certainty == $CFG::ALGO{'CERT_COMPROMISE_NO_SCAN'}) {
                         $_[0]{'targets'}{$target_ip}{'certainty'} = $CFG::ALGO{'CERT_COMPROMISE_NO_SCAN'};
                     } else {
-                        $_[0]{'targets'}{$target_ip}{'certainty'} = $new_certainty;
+                        # Do nothing
                     }
                 } elsif ($_[0]{'targets'}{$target_ip}{'certainty'} == $CFG::ALGO{'CERT_COMPROMISE_NO_SCAN'} && $new_certainty == $CFG::ALGO{'CERT_COMPROMISE'}) {
                     # Do nothing
