@@ -226,7 +226,7 @@ sub merge_targets {
                     if ($new_certainty == $CFG::ALGO{'CERT_COMPROMISE'}) {
                         $_[0]{'targets'}{$target_ip}{'certainty'} = $CFG::ALGO{'CERT_COMPROMISE_NO_SCAN'};
                     } else {
-                        # Do nothing
+                        $_[0]{'targets'}{$target_ip}{'certainty'} = $new_certainty;
                     }
                 } elsif ($_[0]{'targets'}{$target_ip}{'certainty'} == $CFG::ALGO{'CERT_COMPROMISE_NO_SCAN'} && $new_certainty == $CFG::ALGO{'CERT_COMPROMISE'}) {
                     # Do nothing
