@@ -1,0 +1,18 @@
+<table class="list">
+    <thead style="position: relative; display: block" >
+        <tr>
+            <td>IP address</td>
+            <td>Attacker</td>
+            <td>Target</td>
+        </tr>
+    </thead>
+    <tbody style="display: block; overflow: auto; height: 500px;">
+    {% for r in results %}
+        <tr>
+            <td>{{ r.label }}</td>
+            <td>{{ r.attacker_count }}</td>
+            <td>{{ r.target_count }}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>

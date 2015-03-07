@@ -45,6 +45,10 @@ var loadPage = function(href, replaceState) {
                 load_attacks_table(OUTGOING);
                 //plot_incoming_attacks_plot(d.internal_networks);
                 break;
+            case "search":
+                console.log("loaded search page");
+                initialize_search();
+                break;
         }
     });
 }
@@ -178,6 +182,24 @@ var loadAttackGraph = function(e) {
         //$('#attack-profile-plot').plot([ data.plot_scan_data, data.plot_bruteforce_data, data.plot_compromise_data ]);
         $('#attack-profile-plot').plot([ data.data.scan, data.data.bruteforce, data.data.dieoff ]);
         console.log("post .plot()");
+    });
+}
+
+
+var initialize_search = function() {
+    console.log("initializing search page");
+    $('#search-button').click(function(e){
+        e.preventDefault();
+        var url = "json/html/get_search_results.php";
+        var params = {
+            'ip':   $('#search-ip').val()
+        }
+        console.log("got params: " + params);
+        $.getJSON(url, params, function(data) {
+            $('#search-results-table').html(data.data);
+        });
+
+
     });
 }
 
