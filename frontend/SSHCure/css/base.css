@@ -160,6 +160,7 @@ div#main {
 div.main-block {
     background-color: white;
     border-bottom: 2.5pt solid #cccccc;
+    margin-bottom: 20px;
 }
 
 div.main-block h1 {

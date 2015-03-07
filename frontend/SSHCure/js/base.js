@@ -202,6 +202,7 @@ var initialize_search = function() {
         console.log("got params: " + params);
         $.getJSON(url, params, function(data) {
             $('#search-results-table').html(data.data);
+            $('#search-results-container').show();
         });
 
 
