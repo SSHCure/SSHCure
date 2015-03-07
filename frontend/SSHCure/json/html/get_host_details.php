@@ -76,7 +76,7 @@
             $record['attacker'] = $row['attacker_ip'];
         }
         
-        $record['start_time'] = $row['start_time'];
+        $record['start_time'] = (int) $row['start_time']; // cast to int to round it, so Twig can use it's date function
         $record['certainty'] = $row['certainty'];
 
         array_push($attacks_attacker, $record);
@@ -116,7 +116,7 @@
             $record['attacker'] = $row['attacker_ip'];
         }
         
-        $record['start_time'] = $row['start_time'];
+        $record['start_time'] = (int)$row['start_time']; // cast to int to round it, so Twig can use it's date function
         $record['certainty'] = $row['certainty'];
 
         array_push($attacks_target, $record);
