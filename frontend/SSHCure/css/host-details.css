@@ -16,19 +16,25 @@ table#overview-table td.field-name {
 
 .nav-tabs > li > a {
     border-radius: 0px;
+    margin-bottom: -1px;
 }
 
+.nav-tabs > li > a:hover {
+    border-bottom: 0px;
+}
 .nav-tabs > li.active > a,
 .nav-tabs > li.active > a:focus,
 .nav-tabs > li.active > a:hover {
     background-color: #D1D1D1;
     color: black;
+    border: 2px solid #D1D1D1;
 }
 
 .nav-tabs > li > a {
     border-color: #D1D1D1;
     border-width: 2px;
     color: #9C9C9C;
+    border-bottom: 0px;
 }
 
 .nav-tabs > li, .nav-pills > li {
