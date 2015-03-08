@@ -14,6 +14,9 @@ var loadPage = function(href, replaceState) {
     action      = $.parseQuery(queryString).action;
     new_title   = "SSHCure | " + action; // TODO capitalize 
 
+    attack_id = $.parseQuery(queryString).attack_id;
+
+
     // TODO: when we get the more complex links (filter_range etc)
     // we should only save those query params that matter for comparison
     if (replaceState) {
@@ -38,7 +41,9 @@ var loadPage = function(href, replaceState) {
                 d.initialize();
                 break;
             case "incoming":
-                load_attacks_table(INCOMING, d.internal_networks);
+                load_attacks_table(INCOMING);
+                loadAttackDetails(href);
+                loadAttackTargets(href);
                 break;
             case "outgoing":
                 console.log("loading outgoing page");
@@ -53,8 +58,8 @@ var loadPage = function(href, replaceState) {
     });
 }
 
-var loadAttackDetails = function(e) {
-    href = e.data('href');
+var loadAttackDetails = function(href) {
+    //href = e.data('href');
     console.log("loadAttackDetails data.href: " + href)
     if (!href.match(/index\.php\?(.*)$/)){
         // something is wrong, we expect index.php urls 
@@ -96,8 +101,8 @@ var loadAttackDetails = function(e) {
    // plot_attack(attack_id);
 }
 
-var loadAttackTargets = function(e) {
-    href = e.data('href');
+var loadAttackTargets = function(href) {
+    //href = e.data('href');
     console.log("loadAttackTargets data.href: " + href)
     if (!href.match(/index\.php\?(.*)$/)){
         // something is wrong, we expect index.php urls 

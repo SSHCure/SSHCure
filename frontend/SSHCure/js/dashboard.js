@@ -10,8 +10,8 @@ Dashboard = function () {
             internal_networks = data;
             add_time_window_control_listeners();
             plot_incoming_attacks_plot(internal_networks);
-            load_attacks_table(INCOMING, internal_networks);
-            load_attacks_table(OUTGOING, internal_networks);
+            load_attacks_table(INCOMING, 1); // second parameter '1' means it's called from dashboard
+            load_attacks_table(OUTGOING, 1); // second parameter '1' means it's called from dashboard
             load_top_targets_table(COMPROMISE);
             load_top_targets_table(BRUTEFORCE);
         });
@@ -50,9 +50,11 @@ function add_time_window_control_listeners () {
     });
 }
 
-function load_attacks_table (type, internal_networks, period) {
+function load_attacks_table (type, calledFromDashboard) {
     var url;
     var action;
+    calledFromDashboard = typeof calledFromDashboard !== 'undefined' ? calledFromDashboard : false;
+    console.log("calledFromDashboard: " + calledFromDashboard);
 
     action = 'incoming';
     url = "json/data/get_attacks.php";
@@ -134,11 +136,16 @@ function load_attacks_table (type, internal_networks, period) {
                     $('<td>').text(this.target_count)
                 ).appendTo(body);
                 tr.data('href', 'index.php?action=' + action + '&attack_id=' + this_attack.attack_id);
+                tr.attr('data-id', this_attack.attack_id);
+                console.log("wrote data-id");
                 tr.click(function () {
-                    loadAttackDetails($(this));   
-                    loadAttackTargets($(this));   
-                    $(this).addClass("selected").siblings().removeClass("selected");
-                    //loadAttackGraph($(this));
+                    if(calledFromDashboard) {
+                        loadPage($(this).data('href'));
+                    } else {
+                        loadAttackDetails($(this).data('href'));   
+                        loadAttackTargets($(this).data('href'));   
+                        $(this).addClass("selected").siblings().removeClass("selected");
+                    }
                 });
             });
         }
@@ -156,6 +163,9 @@ function load_attacks_table (type, internal_networks, period) {
             $('#outgoing-attacks-table ~ div.loading').hide();
             $('#outgoing-attacks-table').show();
             table.appendTo($('#outgoing-attacks-table'));
+        }
+        if (attack_id !== undefined) {
+            $('tr[data-id='+attack_id+']').addClass("selected").siblings().removeClass("selected");
         }
     });
 }
