@@ -115,24 +115,24 @@ function load_attacks_table (type, calledFromDashboard) {
                     $('<td>').append($('<a>')
                             .addClass('ip-addr')
                             //.attr('href', '#')
-                            .text(this.attacker)
-                            .click(function (e) {
-                                e.stopPropagation();
-                                var url = "json/html/get_host_details.php";
-                                var params = {
-                                    'host': $(this).text()
-                                }
-                                $.getJSON(url, params, function (data, textStatus, jqXHR) {
-                                    // Overwrite modal title using Javascript, since Bootstrap uses a completely different element for modal headers and bodies
-                                    $('#host-details h4.modal-title').text("Host details for " + params['host']);
+                            .text(this.attacker)),
+                            //.click(function (e) {
+                            //    e.stopPropagation();
+                            //    var url = "json/html/get_host_details.php";
+                            //    var params = {
+                            //        'host': $(this).text()
+                            //    }
+                            //    $.getJSON(url, params, function (data, textStatus, jqXHR) {
+                            //        // Overwrite modal title using Javascript, since Bootstrap uses a completely different element for modal headers and bodies
+                            //        $('#host-details h4.modal-title').text("Host details for " + params['host']);
 
-                                    // Insert pre-rendered HTML into body
-                                    $('#host-details div.modal-body').html(data.data);
-                                    $('#host-details').modal({
-                                        show: true
-                                    });
-                                });
-                            })),
+                            //        // Insert pre-rendered HTML into body
+                            //        $('#host-details div.modal-body').html(data.data);
+                            //        $('#host-details').modal({
+                            //            show: true
+                            //        });
+                            //    });
+                            //})),
                     $('<td>').text(date.toString("ddd. MMM d, yyyy HH:mm")),
                     $('<td>').text(this.target_count)
                 ).appendTo(body);
@@ -168,8 +168,10 @@ function load_attacks_table (type, calledFromDashboard) {
         if (attack_id !== undefined) {
             $('tr[data-id='+attack_id+']').addClass("selected").siblings().removeClass("selected");
         }
+    attachHostDetailModals();
     });
 }
+
 
 function _handle_get_attack_details (data) {
     $('#attack-details h1').text("Attack details of " + data.data[0]['attacker_ip']);
@@ -218,24 +220,24 @@ function load_top_targets_table (type) {
                 $('<tr>').append(
                     $('<td>').append($('<a>')
                         .addClass('ip-addr')
-                        .attr('href', '#')
-                        .text(this.target))
-                        .click(function () {
-                            var url = "json/html/get_host_details.php";
-                            var params = {
-                                'host': $(this).text()
-                            }
-                            $.getJSON(url, params, function (data, textStatus, jqXHR) {
-                                // Overwrite modal title using Javascript, since Bootstrap uses a completely different element for modal headers and bodies
-                                $('#host-details h4.modal-title').text("Host details for " + params['host']);
+                        //.attr('href', '#')
+                        .text(this.target)),
+                        //.click(function () {
+                        //    var url = "json/html/get_host_details.php";
+                        //    var params = {
+                        //        'host': $(this).text()
+                        //    }
+                        //    $.getJSON(url, params, function (data, textStatus, jqXHR) {
+                        //        // Overwrite modal title using Javascript, since Bootstrap uses a completely different element for modal headers and bodies
+                        //        $('#host-details h4.modal-title').text("Host details for " + params['host']);
 
-                                // Insert pre-rendered HTML into body
-                                $('#host-details div.modal-body').html(data.data);
-                                $('#host-details').modal({
-                                    show: true
-                                });
-                            });
-                        }),
+                        //        // Insert pre-rendered HTML into body
+                        //        $('#host-details div.modal-body').html(data.data);
+                        //        $('#host-details').modal({
+                        //            show: true
+                        //        });
+                        //    });
+                        //}),
                     $('<td>').text(this.attack_count),
                     $('<td>').text(this.compromise_count)
                 ).appendTo(body);
@@ -256,6 +258,7 @@ function load_top_targets_table (type) {
             $('#top-targets-compromise-table').show();
             table.appendTo($('#top-targets-compromise-table'));
         }
+    attachHostDetailModals();
     });
 }
 

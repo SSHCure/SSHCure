@@ -26,7 +26,9 @@ div[id$='-attacks-table'] tr.selected .phase,
     border: 1px solid white;
 }
 
-div[id$='-attacks-table'] a.ip-addr:hover {
+div[id$='-attacks-table'] a.ip-addr:hover,
+div[id='search-results-table'] a.ip-addr:hover,
+div[id^='top-targets-'] a.ip-addr:hover {
     cursor: zoom-in;
     cursor: -webkit-zoom-in;
 }

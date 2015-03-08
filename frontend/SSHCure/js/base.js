@@ -203,9 +203,8 @@ var initialize_search = function() {
         $.getJSON(url, params, function(data) {
             $('#search-results-table').html(data.data);
             $('#search-results-container').show();
+            attachHostDetailModals();
         });
-
-
     });
 }
 
@@ -215,6 +214,27 @@ $(window).bind('popstate', function(event){
         loadPage(event.originalEvent.state.href, false);
     }
 });
+
+var attachHostDetailModals = function() {
+    console.log("attachHostDetailModals called");
+    $('a.ip-addr').click(function (e) {
+        e.stopPropagation();
+        var url = "json/html/get_host_details.php";
+        var params = {
+            'host': $(this).text()
+        }
+        $.getJSON(url, params, function (data, textStatus, jqXHR) {
+            // Overwrite modal title using Javascript, since Bootstrap uses a completely different element for modal headers and bodies
+            $('#host-details h4.modal-title').text("Host details for " + params['host']);
+
+            // Insert pre-rendered HTML into body
+            $('#host-details div.modal-body').html(data.data);
+            $('#host-details').modal({
+                show: true
+            });
+        });
+    });
+}
 
 $(document).ready(function() {
     console.log("document.ready from base.js");
