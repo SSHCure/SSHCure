@@ -116,7 +116,8 @@ function load_attacks_table (type, calledFromDashboard) {
                             .addClass('ip-addr')
                             //.attr('href', '#')
                             .text(this.attacker)
-                            .click(function () {
+                            .click(function (e) {
+                                e.stopPropagation();
                                 var url = "json/html/get_host_details.php";
                                 var params = {
                                     'host': $(this).text()
