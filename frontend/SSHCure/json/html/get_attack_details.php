@@ -60,9 +60,6 @@
         'certainty'     => $row['certainty'], //'TODO',
         'start_time'    => (new DateTime("@" . (int)$row['start_time'] * 1))->format("D. M j, Y H:i"),
         'end_time'      => $end_time,
-        'total_flows'   => 'TODO',
-        'total_packets' => 'TODO',
-        'total_bytes'   => 'TODO',
         'blacklisted'   => $row['attacker_blacklisted']
     ));
 
