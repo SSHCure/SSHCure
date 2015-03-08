@@ -70,6 +70,10 @@ var loadAttackDetails = function(href) {
     queryString  = RegExp.$1;
     // get needed vars from query string
     attack_id      = $.parseQuery(queryString).attack_id;
+    if (typeof attack_id == 'undefined') {
+        console.log("No attack_id, aborting loadAttackDetails");    
+        return;
+    }
     console.log("loadAttackDetails attack_id: " + attack_id);
     // update State
     replaceState = typeof replaceState !== 'undefined' ? replaceState : false;
@@ -113,6 +117,10 @@ var loadAttackTargets = function(href) {
     queryString  = RegExp.$1;
     // get needed vars from query string
     attack_id      = $.parseQuery(queryString).attack_id;
+    if (typeof attack_id == 'undefined') {
+        console.log("No attack_id, aborting loadAttackTargets");    
+        return;
+    }
     console.log("loadAttackTargets attack_id: " + attack_id);
     // update State
     replaceState = typeof replaceState !== 'undefined' ? replaceState : false;

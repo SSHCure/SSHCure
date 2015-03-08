@@ -83,19 +83,19 @@ function load_attacks_table (type, calledFromDashboard) {
             $('<td>').text('Attacker'),
             $('<td>').text('Start time'),
             $('<td>').text('Targets')
-        ).appendTo(head);
+            ).appendTo(head);
 
         if (data.data.length == 0) {
             $('<tr>').append(
                 $('<td colspan="5" style="font-style: italic;">').text("No data available...")
-            ).appendTo(body);
+                ).appendTo(body);
         } else {
             $.each(data.data, function () {
                 var phases = $('<div>').addClass('phases').append(
                     $('<div>').addClass('phase scan'),
                     $('<div>').addClass('phase bruteforce'),
                     $('<div>').addClass('phase compromise')
-                );
+                    );
                 var this_attack = this;
                 // Phases
                 this.certainty = parseFloat(this.certainty);
@@ -116,33 +116,33 @@ function load_attacks_table (type, calledFromDashboard) {
                     active_span = "<span class=\"glyphicon glyphicon-flash\"></span>";
                 }
                 var tr = $('<tr>').append(
-                    $('<td>').append(phases),
-                    //$('<td>').html("<span class=\"glyphicon glyphicon-flash\"></span>"),
-                    $('<td>').addClass('active').html(active_span),
-                    $('<td>').append($('<a>')
+                        $('<td>').append(phases),
+                        //$('<td>').html("<span class=\"glyphicon glyphicon-flash\"></span>"),
+                        $('<td>').addClass('active').html(active_span),
+                        $('<td>').append($('<a>')
                             .addClass('ip-addr')
                             //.attr('href', '#')
                             .text(this.attacker)),
-                            //.click(function (e) {
-                            //    e.stopPropagation();
-                            //    var url = "json/html/get_host_details.php";
-                            //    var params = {
-                            //        'host': $(this).text()
-                            //    }
-                            //    $.getJSON(url, params, function (data, textStatus, jqXHR) {
-                            //        // Overwrite modal title using Javascript, since Bootstrap uses a completely different element for modal headers and bodies
-                            //        $('#host-details h4.modal-title').text("Host details for " + params['host']);
+                        //.click(function (e) {
+                        //    e.stopPropagation();
+                        //    var url = "json/html/get_host_details.php";
+                        //    var params = {
+                        //        'host': $(this).text()
+                        //    }
+                        //    $.getJSON(url, params, function (data, textStatus, jqXHR) {
+                        //        // Overwrite modal title using Javascript, since Bootstrap uses a completely different element for modal headers and bodies
+                        //        $('#host-details h4.modal-title').text("Host details for " + params['host']);
 
-                            //        // Insert pre-rendered HTML into body
-                            //        $('#host-details div.modal-body').html(data.data);
-                            //        $('#host-details').modal({
-                            //            show: true
-                            //        });
-                            //    });
-                            //})),
-                    $('<td>').text(date.toString("ddd. MMM d, yyyy HH:mm")),
-                    $('<td>').text(this.target_count)
-                ).appendTo(body);
+                        //        // Insert pre-rendered HTML into body
+                        //        $('#host-details div.modal-body').html(data.data);
+                        //        $('#host-details').modal({
+                        //            show: true
+                        //        });
+                        //    });
+                        //})),
+                        $('<td>').text(date.toString("ddd. MMM d, yyyy HH:mm")),
+                        $('<td>').text(this.target_count)
+                            ).appendTo(body);
                 tr.data('href', 'index.php?action=' + action + '&attack_id=' + this_attack.attack_id);
                 tr.attr('data-id', this_attack.attack_id);
                 console.log("wrote data-id");
@@ -157,7 +157,7 @@ function load_attacks_table (type, calledFromDashboard) {
                 });
             });
         }
-        
+
         head.appendTo(table);
         body.appendTo(table);
 
@@ -175,8 +175,10 @@ function load_attacks_table (type, calledFromDashboard) {
         if (attack_id !== undefined) {
             $('tr[data-id='+attack_id+']').addClass("selected").siblings().removeClass("selected");
         }
-    attachHostDetailModals();
-    $('div[id$=-attacks-table] tr[data-id='+attack_id+']').ScrollTo();
+        attachHostDetailModals();
+        console.log("pre scrollTo");
+        $('div[id$=-attacks-table] tbody').scrollTo('tr[data-id='+attack_id+']');
+        console.log("post scrollTo");
     });
 }
 
@@ -185,15 +187,15 @@ function _handle_get_attack_details (data) {
     $('#attack-details h1').text("Attack details of " + data.data[0]['attacker_ip']);
     var details_table;
     details_table = "<table>\
-                        <tr>\
-                            <td>Attacker</td><td>derp</td>\
-                            <td>Start time</td><td>nu</td>\
-                            <td>Total flows</td><td>heelveelK</td>\
-                            <td>Total bytes</td><td>meerK</td>\
-                        </tr>\
-                        <tr>\
-                        </tr>\
-                        </table>";
+                     <tr>\
+                     <td>Attacker</td><td>derp</td>\
+                     <td>Start time</td><td>nu</td>\
+                     <td>Total flows</td><td>heelveelK</td>\
+                     <td>Total bytes</td><td>meerK</td>\
+                     </tr>\
+                     <tr>\
+                     </tr>\
+                     </table>";
     $('#attack-details-content').html(details_table);
 
 }
@@ -217,12 +219,12 @@ function load_top_targets_table (type) {
             $('<td>').text('Target'),
             $('<td>').text('Attacks'),
             $('<td>').text('Compromises')
-        ).appendTo(head);
+            ).appendTo(head);
 
         if (data.data.length == 0) {
             $('<tr>').append(
                 $('<td colspan="5" style="font-style: italic;">').text("No data available...")
-            ).appendTo(body);
+                ).appendTo(body);
         } else {
             $.each(data.data, function () {
                 $('<tr>').append(
@@ -230,28 +232,28 @@ function load_top_targets_table (type) {
                         .addClass('ip-addr')
                         //.attr('href', '#')
                         .text(this.target)),
-                        //.click(function () {
-                        //    var url = "json/html/get_host_details.php";
-                        //    var params = {
-                        //        'host': $(this).text()
-                        //    }
-                        //    $.getJSON(url, params, function (data, textStatus, jqXHR) {
-                        //        // Overwrite modal title using Javascript, since Bootstrap uses a completely different element for modal headers and bodies
-                        //        $('#host-details h4.modal-title').text("Host details for " + params['host']);
+                    //.click(function () {
+                    //    var url = "json/html/get_host_details.php";
+                    //    var params = {
+                    //        'host': $(this).text()
+                    //    }
+                    //    $.getJSON(url, params, function (data, textStatus, jqXHR) {
+                    //        // Overwrite modal title using Javascript, since Bootstrap uses a completely different element for modal headers and bodies
+                    //        $('#host-details h4.modal-title').text("Host details for " + params['host']);
 
-                        //        // Insert pre-rendered HTML into body
-                        //        $('#host-details div.modal-body').html(data.data);
-                        //        $('#host-details').modal({
-                        //            show: true
-                        //        });
-                        //    });
-                        //}),
-                    $('<td>').text(this.attack_count),
-                    $('<td>').text(this.compromise_count)
-                ).appendTo(body);
+                    //        // Insert pre-rendered HTML into body
+                    //        $('#host-details div.modal-body').html(data.data);
+                    //        $('#host-details').modal({
+                    //            show: true
+                    //        });
+                    //    });
+                    //}),
+                $('<td>').text(this.attack_count),
+                $('<td>').text(this.compromise_count)
+                    ).appendTo(body);
             });
         }
-        
+
         head.appendTo(table);
         body.appendTo(table);
 
@@ -266,7 +268,7 @@ function load_top_targets_table (type) {
             $('#top-targets-compromise-table').show();
             table.appendTo($('#top-targets-compromise-table'));
         }
-    attachHostDetailModals();
+        attachHostDetailModals();
     });
 }
 
@@ -274,7 +276,7 @@ function plot_incoming_attacks_plot (internal_networks, period) {
     if (typeof(period) === 'undefined') {
         period = 'week';
     }
-    
+
     var url = "json/data/get_incoming_attacks_plot.php";
     var now = parseInt((new Date().getTime()) / 1000);
     var max_start_time = now;
@@ -311,7 +313,7 @@ function plot_incoming_attacks_plot (internal_networks, period) {
         $.each(data.data.bruteforce, function (time, attacks) {
             plot_bruteforce_data['data'].push([time * 1000, attacks]);
         });
-        
+
         // Compromise attacks
         var plot_compromise_data = new Array();
         plot_compromise_data['label'] = "Compromise";
@@ -356,19 +358,19 @@ function plot_incoming_attacks_plot (internal_networks, period) {
                     date.setTime(val);
                     var label = "";
                     var week = (max_start_time - min_start_time >= 604800);
-                    
+
                     // 'date > Dashboard.getStartTime()' is there to make sure that selected date is actually visible
                     if (date.getDate() != last_day && date > min_start_time * 1000) {
                         last_day = date.getDate();
                         var months = [ "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-                                "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" ];
+                            "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" ];
                         label += date.getDate() + " " + months[date.getMonth()];
-                        
+
                         if (!week) {
                             label += ",<br />";
                         }
                     }
-                    
+
                     if (!week) {
                         var minutes = date.getMinutes();
                         if (minutes < 10) {
@@ -376,7 +378,7 @@ function plot_incoming_attacks_plot (internal_networks, period) {
                         }
                         label += date.getHours() + ":" + minutes;
                     }
-                    
+
                     return label;
                 },
                 tickLength: 0
@@ -392,7 +394,7 @@ function plot_incoming_attacks_plot (internal_networks, period) {
         $('#attacks-plot ~ div.loading').hide();
         $('#attacks-plot-header').show();
         $('#attacks-plot').show();
-        
+
         $.plot($('#attacks-plot'),
                 [ plot_scan_data, plot_bruteforce_data, plot_compromise_data ], options);
     });
