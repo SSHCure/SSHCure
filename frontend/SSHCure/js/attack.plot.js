@@ -148,12 +148,6 @@ var plot_attack = function(attack_id) {
             series: {   downsample: {
                             threshold: 1000 }
                         },
-            alegend: {   position: "ne",
-                        noColumns: 4,
-                        margin: [5, 2], // [x-margin, y-margin]
-                        labelFormatter: function(label, series) {
-                            return "<span style=\"padding-right: 3px;\">" + label + '</span>';
-                        }},
             legend: {
                 container: $('#attacks-plot-legend'),
                 noColumns: 3,

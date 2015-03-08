@@ -1,0 +1,31 @@
+#status-info-table td.property {
+    font-weight:                bolder;
+    width:                      250px;
+}
+
+#status-info-table td:nth-child(1) {
+    text-align: right;
+}
+
+#status-info-table td:nth-child(2) {
+    text-align: left;
+    padding-left: 30px;
+}
+
+#db-size-plot, #target-count-plot, #performance-plot {
+    width:      95%;
+    height:     200px;
+    margin-top: 30px;
+    margin:     25px 10px 25px 20px;
+}
+
+div[id$='-legend'] {
+    float: left;
+    margin-left: 30px;
+    margin-top: 0px;
+}
+div[id$='-legend'] .legendLabel span {
+    font-size: 9pt;
+    margin-left: 3px;
+    margin-right: 10px;
+}

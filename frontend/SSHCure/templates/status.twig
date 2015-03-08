@@ -6,7 +6,24 @@
             <div class="col-sm-12 col-md-12">
                 <div id="status" class="main-block">
                     <h1>Status</h1>
-                    <p>Text...</p>
+                    <div id="status-info">
+                        <table id="status-info-table" class="property-table">
+                            <tr id="backend-init-time" style="display:none"><td class="property">Backend initialization time</td><td class="value"></td></tr>
+                            <tr id="backend-response-time" style="display:none"><td class="property">Backend response time</td><td class="value"></td></tr>
+                            <tr id="backend-profile" style="display:none"><td class="property">Backend profile</td><td class="value"></td></tr>
+                            <tr id="backend-sources" style="display:none"><td class="property">Backend sources</td><td class="value"></td></tr>
+                            <tr id="active-notification-configs" style="display:none"><td class="property">Active notification configurations</td><td class="value"></td></tr>
+                        </table>
+                    </div>
+                    <h1>Database size</h1>
+                    <div id="db-size-legend"></div>
+                    <div id="db-size-plot"></div>
+                    <h1>Targets in database</h1>
+                    <div id="target-count-legend"></div>
+                    <div id="target-count-plot"></div>
+                    <h1>Backend performance</h1>
+                    <div id="performance-legend"></div>
+                    <div id="performance-plot"></div>
                 </div>
             </div>
         </div>
