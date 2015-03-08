@@ -128,7 +128,8 @@ foreach($db_result as &$row) {
 unset($row);
 
 function sort_by_ranking($a,$b) {
-	return $b['ranking'] - $a['ranking'];
+	//return $b['ranking'] - $a['ranking'];
+    return $a['ip'] - $b['ip'];
 }
 
 usort($ret,'sort_by_ranking');

@@ -1,3 +1,5 @@
+{% if results %}
+
 <table class="list">
     <thead style="position: relative; display: block" >
         <tr>
@@ -6,7 +8,7 @@
             <td>Target</td>
         </tr>
     </thead>
-    <tbody style="display: block; overflow: auto; height: 500px;">
+    <tbody style="display: block; overflow: auto; max-height: 500px;">
     {% for r in results %}
         <tr>
             <td><a class="ip-addr">{{ r.label }}</a></td>
@@ -16,3 +18,12 @@
     {% endfor %}
     </tbody>
 </table>
+
+
+{% else %}
+
+<div style="margin: 8px">
+    <span class="notice">No search results</span>
+</div>
+
+{% endif %}
