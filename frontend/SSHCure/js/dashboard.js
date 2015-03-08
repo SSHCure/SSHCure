@@ -60,8 +60,8 @@ function load_attacks_table (type, calledFromDashboard) {
     url = "json/data/get_attacks.php";
 
     var params = {};
-    if (!calledFromDashboard) {
-        params['limit'] = 50;    
+    if (calledFromDashboard) {
+        params['dashboard'] = 1;
     }
     if (type != INCOMING) {
         params['outgoing'] = 1;
