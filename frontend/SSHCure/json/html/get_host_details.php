@@ -96,7 +96,7 @@
     SELECT      a.id,
                 a.attacker_ip,
                 a.start_time,
-                a.certainty,
+                t.certainty,
                 a.direction
     FROM        attack a
     INNER JOIN  target t
