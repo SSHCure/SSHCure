@@ -48,6 +48,8 @@ var loadPage = function(href, replaceState) {
             case "outgoing":
                 console.log("loading outgoing page");
                 load_attacks_table(OUTGOING);
+                loadAttackDetails(href);
+                loadAttackTargets(href);
                 break;
             case "search":
                 console.log("loaded search page");
@@ -231,6 +233,28 @@ var attachHostDetailModals = function() {
             $('#host-details').modal({
                 show: true
             });
+
+            $('#host-details div.modal-body a.ip-addr').click(function (e) {
+                console.log("inception attach");
+                e.stopPropagation();
+                var url = "json/html/get_host_details.php";
+                var params = {
+                    'host': $(this).text()
+                }
+                $.getJSON(url, params, function (data, textStatus, jqXHR) {
+                    // Overwrite modal title using Javascript, since Bootstrap uses a completely different element for modal headers and bodies
+                    $('#host-details h4.modal-title').text("Host details for " + params['host']);
+
+                    // Insert pre-rendered HTML into body
+                    $('#host-details div.modal-body').html(data.data);
+                    $('#host-details').modal({
+                        show: true
+                    });
+
+
+                });
+            });
+
         });
     });
 }

@@ -42,7 +42,7 @@
                                         {% endif %}
                                     </div>
                                 </td>
-                                <td><a class="ip-addr" href="">{{ attack.attacker }}</a></td>
+                                <td><a class="ip-addr">{{ attack.attacker }}</a></td>
                                 <td>{{ attack.start_time | date("D. M j, Y H:i") }}</td>
                             </tr>
                         {% endfor %}
@@ -82,7 +82,7 @@
                                         {% endif %}
                                     </div>
                                 </td>
-                                <td><a class="ip-addr" href="">{{ attack.attacker }}</a></td>
+                                <td><a class="ip-addr">{{ attack.attacker }}</a></td>
                                 <td>{{ attack.start_time | date("D. M j, Y H:i")}}</td>
                             </tr>
                         {% endfor %}

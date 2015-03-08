@@ -176,6 +176,7 @@ function load_attacks_table (type, calledFromDashboard) {
             $('tr[data-id='+attack_id+']').addClass("selected").siblings().removeClass("selected");
         }
     attachHostDetailModals();
+    $('div[id$=-attacks-table] tr[data-id='+attack_id+']').ScrollTo();
     });
 }
 

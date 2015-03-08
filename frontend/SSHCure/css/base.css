@@ -187,6 +187,21 @@ hr.modal-hr {
     height:             2px;
     width:              95%;
     margin:             -7px 15px 0px;
+    border:             0px;
+}
+
+
+div.modal-body {
+    padding: 0px;
+}
+
+div.modal-body a[role='tab'] {
+    outline: none;
+}
+
+div.tab-content {
+    padding: 15px;
+    background-color: #D1D1D1;
 }
 
 /* Tables */

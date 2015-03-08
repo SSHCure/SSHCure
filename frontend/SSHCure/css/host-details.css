@@ -3,6 +3,7 @@
 table#overview-table {
     font-size: 10pt;
     text-align: left;
+    margin: 15px;
 }
 
 table#overview-table td.field-name {
@@ -63,6 +64,6 @@ table#overview-table td.field-name {
 /* Content tables */
 #attacks-target-table, #attacks-attacker-table {
     display: block;
-    height: 600px;
+    max-height: 300px;
     overflow-y: scroll;
 }
