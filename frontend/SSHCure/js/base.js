@@ -278,6 +278,11 @@ var attachHostDetailModals = function() {
                 });
             });
 
+        // attach events on tr to go to actual attack pages
+            $('#host-details table[id^=attacks-] tr').click(function () {
+                loadPage($(this).data('href'));
+                $('#host-details').modal('hide');
+            });
         });
     });
 }

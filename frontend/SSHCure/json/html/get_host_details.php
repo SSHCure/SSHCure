@@ -55,7 +55,8 @@
     SELECT      a.id,
                 a.attacker_ip,
                 a.start_time,
-                a.certainty
+                a.certainty,
+                a.direction
     FROM        attack a
     WHERE       a.attacker_ip = :attacker_ip
     LIMIT       100";
@@ -77,8 +78,10 @@
             $record['attacker'] = $row['attacker_ip'];
         }
         
-        $record['start_time'] = (int) $row['start_time']; // cast to int to round it, so Twig can use it's date function
-        $record['certainty'] = $row['certainty'];
+        $record['start_time']   = (int) $row['start_time']; // cast to int to round it, so Twig can use it's date function
+        $record['certainty']    = $row['certainty'];
+        $record['id']    = $row['id'];
+        $record['direction']    = ($row['direction'] == 0) ? 'incoming' : 'outgoing';
 
         array_push($attacks_attacker, $record);
     }
@@ -93,7 +96,8 @@
     SELECT      a.id,
                 a.attacker_ip,
                 a.start_time,
-                a.certainty
+                a.certainty,
+                a.direction
     FROM        attack a
     INNER JOIN  target t
             ON  a.id = t.attack_id
@@ -117,8 +121,10 @@
             $record['attacker'] = $row['attacker_ip'];
         }
         
-        $record['start_time'] = (int)$row['start_time']; // cast to int to round it, so Twig can use it's date function
-        $record['certainty'] = $row['certainty'];
+        $record['start_time']   = (int)$row['start_time']; // cast to int to round it, so Twig can use it's date function
+        $record['certainty']    = $row['certainty'];
+        $record['id']    = $row['id'];
+        $record['direction']    = ($row['direction'] == 0) ? 'incoming' : 'outgoing';
 
         array_push($attacks_target, $record);
     }
