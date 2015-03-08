@@ -28,6 +28,7 @@ div[id$='-attacks-table'] tr.selected .phase,
 
 div[id$='-attacks-table'] a.ip-addr:hover {
     cursor: zoom-in;
+    cursor: -webkit-zoom-in;
 }
 
 #attack-profile-plot-container {
