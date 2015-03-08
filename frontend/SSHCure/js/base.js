@@ -439,7 +439,7 @@ var initialize_status = function() {
                             position:   'right',
                             min: 0,
                             tickFormatter: function formatter(v, axis) {
-                                return v.toFixed(0) + " s"
+                                return v.toFixed(0) + "&nbsp;s"
                             }} ]
         };
         
