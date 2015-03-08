@@ -7,9 +7,8 @@
 
     // Parse and process parameters
     $attack_id = $_GET['attack_id'];
-
     
-    $query = "SELECT * FROM target t WHERE t.attack_id = ? ORDER BY certainty DESC LIMIT 1000";
+    $query = "SELECT * FROM target t WHERE t.attack_id = ? ORDER BY certainty DESC, t.target_ip DESC LIMIT 1000";
 
     $db = new PDO($config['database.dsn']);
 
