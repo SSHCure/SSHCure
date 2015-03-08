@@ -48,7 +48,6 @@ var loadPage = function(href, replaceState) {
             case "outgoing":
                 console.log("loading outgoing page");
                 load_attacks_table(OUTGOING);
-                //plot_incoming_attacks_plot(d.internal_networks);
                 break;
             case "search":
                 console.log("loaded search page");
