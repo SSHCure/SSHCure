@@ -33,6 +33,7 @@
 
     /* Perform geolocation */
     $geo_record = geoip_record_by_addr($geo_db_handle, $host);
+    //TODO let this timeout or something (check Surfmap code)
     $country = $geo_record->country_name;
 
     if (isset($geo_record->country_name)) {
