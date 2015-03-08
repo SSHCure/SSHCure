@@ -199,7 +199,7 @@ table.list tbody td {
 }
 
 table.list tbody tr {
-    line-height: 25px;
+    line-height: 30px;
 }
 
 table.list tbody tr td:first-child {
@@ -251,4 +251,15 @@ div.phase.bruteforce.on {
 div.phase.compromise.on {
     background-color: #DC0008;
     border: 0px solid;
+}
+
+
+thead.fixed-header {
+    position:   relative;
+    display:    block;
+}
+tbody.scrollable {
+    display:    block;
+    overflow:   auto;
+    /* height should be defined ! */
 }

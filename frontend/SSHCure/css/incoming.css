@@ -101,20 +101,15 @@ div[id^='top-targets-'] a.ip-addr:hover {
 
 
 
-div[id$='-attacks-table'] td.active {
-    text-align: center;
-    width: 30px;
-}
-
-div[id$='-attacks-table'] td.active span {
-    vertical-align: middle;
-}
 
 #targets-overview-table td.blocked {
     color: #61a900;
     text-align: center;
 }
 
+#incoming-attacks {
+    margin-bottom: 0px;
+}
 
 #incoming-attacks-page #incoming-attacks table.list td:first-child,
 #incoming-attacks-page #incoming-attacks h1
@@ -131,6 +126,28 @@ div[id$='-attacks-table'] td.active span {
     padding: 0;
 }
 
+div[id$='-attacks-page'] div[id$='-attacks-table'] td:nth-child(1) {
+    width: 100px;
+}
+div[id$='-attacks-page'] div[id$='-attacks-table'] td:nth-child(2) {
+    width: 60px;
+    text-align: center; /* active lightning glyphicon */
+}
+div[id$='-attacks-page'] div[id$='-attacks-table'] td:nth-child(3) {
+    width: 200px;
+}
+div[id$='-attacks-page'] div[id$='-attacks-table'] td:nth-child(4) {
+    width: 300px;
+}
+div[id$='-attacks-page'] div[id$='-attacks-table'] td:nth-child(5) {
+    width: 100px;
+}
+div[id$='-attacks-table'] td.active {
+    text-align: center; /* active lightning glyphicon */
+}
+div[id$='-attacks-table'] td.active span {
+    vertical-align: middle;
+}
 
 /* TODO: is this really the right place to do this/ */
 html {

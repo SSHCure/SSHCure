@@ -5,6 +5,8 @@
 
     // Parse and process parameters
     $direction = isset($_GET['outgoing']) ? 1 : 0;
+    $limit = isset($_GET['limit']) ? $_GET['limit'] : 5;
+
 
     $query = "
         SELECT      a.id AS id,
@@ -18,12 +20,12 @@
         ORDER BY    a.certainty DESC,
                     a.start_time DESC,
                     a.target_count DESC
-        LIMIT       5";
+        LIMIT       ?";
 
     $db = new PDO($config['database.dsn']);
 
     $stmnt = $db->prepare($query);
-    $stmnt->execute([$direction]);
+    $stmnt->execute([$direction, $limit]);
 
     $db_result = $stmnt->fetchAll(PDO::FETCH_ASSOC);
     unset($stmnt);

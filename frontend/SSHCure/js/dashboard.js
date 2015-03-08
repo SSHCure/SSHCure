@@ -60,6 +60,9 @@ function load_attacks_table (type, calledFromDashboard) {
     url = "json/data/get_attacks.php";
 
     var params = {};
+    if (!calledFromDashboard) {
+        params['limit'] = 50;    
+    }
     if (type != INCOMING) {
         params['outgoing'] = 1;
         action = 'outgoing';
@@ -70,6 +73,10 @@ function load_attacks_table (type, calledFromDashboard) {
         var table = $('<table>').addClass('list');
         var head = $('<thead>');
         var body = $('<tbody>');
+        if(!calledFromDashboard) {
+            head.addClass('fixed-header');
+            body.addClass('scrollable').css('height', '156px');
+        }
         head.append(
             $('<td>').text('Phases'),
             $('<td>').text('Active'),
