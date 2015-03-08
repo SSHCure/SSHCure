@@ -21,7 +21,7 @@
                     <table id="target-table" class="list">
                         <tbody style="display: block; overflow-y: auto; height: 200px">
                             {% for target in targets %}
-                                <tr data-href="index.php?action=incoming&attack_id={{target.attack_id}}&target_ip={{target.target_ip}}">
+                                <tr data-id="{{target.raw_ip}}" data-href="index.php?action=incoming&attack_id={{target.attack_id}}&target_ip={{target.target_ip}}">
                                     <td>{{ helper.phases(target.certainty) }}</td>
                                     <td class="blocked">
                                     {% if target.is_host_blocked %}

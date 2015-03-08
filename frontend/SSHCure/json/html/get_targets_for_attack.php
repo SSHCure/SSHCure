@@ -29,6 +29,7 @@
     $result['data'] = [];
 
     foreach ($db_result as &$row) {
+        $row['raw_ip'] = $row['target_ip'];
         $row['target_ip'] = long2ip($row['target_ip']);
     }
     unset($row);
