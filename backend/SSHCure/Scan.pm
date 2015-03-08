@@ -32,7 +32,7 @@ sub scan_detection {
     # Find all sources of SSH traffic
     my @cmd = (@cmd_base, "-M", "${sources_path}${sources}",
             split(" ", "-r nfcapd.$timeslot -t $timeslot_interval -A srcip,dstip -o pipe"),
-            ("proto tcp and dst port 22 and packets < ".($CFG::ALGO{'SCAN_MAX_PPF'} + 1)));
+            ("proto tcp and dst port 22 and flags S and packets < ".($CFG::ALGO{'SCAN_MAX_PPF'} + 1)));
     
     $SSHCure::loop->run_child_future(
         command => \@cmd,
@@ -64,9 +64,9 @@ sub scan_detection {
             # Check whether current attacker (src IP address in current flow record; $flow_record[4]) contacted more than 'SCAN_MIN_TARGETS' targets
             my $src_ip = @$flow_record[4];
             if ($attackers{$src_ip}->{'target_count'} > $CFG::ALGO{'SCAN_MIN_TARGETS'}) {
-                my $fl_etime = @$flow_record[2];
+                my $fl_stime = @$flow_record[1];
                 my $dst_ip = @$flow_record[6];
-                $attackers{$src_ip}->{'targets'}->{$dst_ip}->{'last_act'} = $fl_etime;
+                $attackers{$src_ip}->{'targets'}->{$dst_ip}->{'last_act'} = $fl_stime;
             }
         }
 
