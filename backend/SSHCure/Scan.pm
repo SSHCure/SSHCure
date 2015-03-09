@@ -32,7 +32,7 @@ sub scan_detection {
     # Find all sources of SSH traffic
     my @cmd = (@cmd_base, "-M", "${sources_path}${sources}",
             split(" ", "-r nfcapd.$timeslot -t $timeslot_interval -A srcip,dstip -o pipe"),
-            ("proto tcp and dst port 22 and packets < ".($CFG::ALGO{'SCAN_MAX_PPF'} + 1)));
+            ("proto tcp and dst port 22 and flags S and packets < ".($CFG::ALGO{'SCAN_MAX_PPF'} + 1)));
     
     $SSHCure::loop->run_child_future(
         command => \@cmd,
