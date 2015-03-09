@@ -196,7 +196,8 @@ fi
 # Check whether an old SSHCure version was found and ask whether backend configuration and data structures should be retained
 if [ $INSTALL_BACKEND = 1 -a -d ${SSHCURE_BACKUPDIR_BACKEND} ]; then
     OLD_VER=$(cat ${SSHCURE_BACKUPDIR_BACKEND}/../SSHCure.pm | grep -m 1 SSHCURE_VERSION | cut -d"\"" -f2)
-    if [ ${OLD_VER} = ${VERSION} ]; then
+    NEW_VER=$(cat ${BACKEND_DIR}/SSHCure.pm | grep -m 1 SSHCURE_VERSION | cut -d"\"" -f2)
+    if [ ${OLD_VER} = ${NEW_VER} ]; then
         while true; do
             read -p "Do you wish to keep the backend configuration and data structures from your previous installation [y,n] (default: y)? " input
             case $input in
@@ -222,9 +223,7 @@ fi
 # Update plugin configuration file - config.php. We use ',' as sed delimiter instead of escaping all '/' to '\/'.
 if [ $INSTALL_FRONTEND = 1 ]; then
     echo "Updating plugin configuration file ${SSHCURE_CONF}"
-    LINE=$(grep nfsen.config-file ${SSHCURE_CONF} | awk '{ START=index($0,"="); LENGTH=length($0)-START; print substr($0,START,LENGTH) }' | cut -d"'" -f2)
-    sed -i.tmp "s,$LINE,${NFSEN_CONF},g" ${SSHCURE_CONF}
-
+    
     # Since "$config['backend.path']" is also used in "$config['database.dsn']", we have to search (grep) for "'backend.path'] ="
     LINE=$(grep "'backend.path'] =" ${SSHCURE_CONF} | awk '{ START=index($0,"="); LENGTH=length($0)-START; print substr($0,START,LENGTH) }' | cut -d"'" -f2)
     sed -i.tmp "s,$LINE,${BACKEND_PLUGINDIR}/SSHCure/,g" ${SSHCURE_CONF}
