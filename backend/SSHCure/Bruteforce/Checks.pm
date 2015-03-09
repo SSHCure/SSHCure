@@ -153,16 +153,20 @@ sub check_instant_logout_abort_dictionary {
             push(@other_targets_to_consider, @lower_target_ips[(-1 * scalar @lower_target_ips)..-1]);
         }
         
-        # Try to take up to 3 targets that are just above the considered target in the IP address space.
+        # Try to take up to 3 targets that are just above the considered target in the IP address space
         my @higher_target_ips = (grep $_ > $target_ip, sort @bruteforce_targets);
         if (scalar @higher_target_ips >= 3) {
             push(@other_targets_to_consider, @higher_target_ips[-3..-1]);
         } elsif (scalar @lower_target_ips > 0) {
             push(@other_targets_to_consider, @higher_target_ips[(-1 * scalar @higher_target_ips)..-1]);
         }
+    } elsif ($ip_version == 6 && scalar @bruteforce_targets > $CFG::ALGO{'BRUTEFORCE_MIN_TARGET_COMPARISON_COUNT'}) {
+        # FIXME
+    } else {
+        # Do nothing
     }
     
-    # Convert the IP address of all close targets in the IP address space.
+    # Convert the IP address of all close targets in the IP address space
     foreach my $other_target (@other_targets_to_consider) {
         $other_target = dec2ip($other_target);
     }
