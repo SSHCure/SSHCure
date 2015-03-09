@@ -217,6 +217,10 @@ var loadAttackGraph = function(e) {
 
 var initialize_search = function() {
     console.log("initializing search page");
+
+    // Set focus on input field
+    $('input#search-ip').focus();
+
     $('#search-button').click(function(e){
         e.preventDefault();
         var url = "json/html/get_search_results.php";
