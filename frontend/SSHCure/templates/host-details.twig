@@ -20,7 +20,7 @@
                     </thead>
                     <tbody>
                         {% for attack in attacks_target %}
-                            <tr>
+                            <tr data-href="index.php?action={{attack.direction}}&attack_id={{attack.id}}">
                                 <td>
                                     <div class="phases">
                                         {% if attack.certainty in [ 0.25, 0.5, 0.75 ] %}
@@ -60,7 +60,7 @@
                     </thead>
                     <tbody>
                         {% for attack in attacks_attacker %}
-                            <tr>
+                            <tr data-href="index.php?action={{attack.direction}}&attack_id={{attack.id}}">
                                 <td>
                                     <div class="phases">
                                         {% if attack.certainty in [ 0.25, 0.5, 0.75 ] %}

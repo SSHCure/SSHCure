@@ -5,13 +5,13 @@
         <th>Attacker</th><td>{{attacker}}</td>
         <th>Start time</th><td>{{start_time}}</td>
         <th>Blacklisted</th><td>{% if blacklisted %}<span class="glyphicon glyphicon-ok-circle"></span>{% endif %}</td>
-        <th>Total bytes</th><td>{{total_bytes}}</td>
+        <th>Total bytes</th><td id="attack-details-bytes"></td>
     </tr>
     <tr>
         <th>Phases</th><td>{{phases(certainty)}}</td>
         <th>End time</th><td>{{end_time}}</td>
-        <th>Total packets</th><td>{{total_packets}}</td>
-        <th>Total flows</th><td>{{total_flows}}</td>
+        <th>Total packets</th><td id="attack-details-packets"></td>
+        <th>Total flows</th><td id="attack-details-flows"></td>
     </tr>
 </table>
 

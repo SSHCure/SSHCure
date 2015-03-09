@@ -1,5 +1,7 @@
 div[id$='-attacks-table'] tr:hover ,
 div[id$='-attacks-table'] tr.selected,
+#attacks-attacker-table tbody tr:hover, /* host-details modals */
+#attacks-target-table tbody tr:hover, /* host-details modals */
 #target-table tr:hover,
 #target-table tr.selected
 {
@@ -12,6 +14,8 @@ div[id$='-attacks-table'] tr.selected,
 
 div[id$='-attacks-table'] tr:hover a.ip-addr,
 div[id$='-attacks-table'] tr.selected a.ip-addr,
+#attacks-attacker-table tr:hover a.ip-addr, /* host-details modals */
+#attacks-target-table tr:hover a.ip-addr, /* host-details modals */
 #target-table tr:hover a.ip-addr,
 #target-table tr.selected a.ip-addr
 {
@@ -20,6 +24,8 @@ div[id$='-attacks-table'] tr.selected a.ip-addr,
 
 div[id$='-attacks-table'] tr:hover .phase,
 div[id$='-attacks-table'] tr.selected .phase,
+#attacks-attacker-table tr:hover .phase, /* host-details modals */
+#attacks-target-table tr:hover .phase, /* host-details modals */
 #target-table tr:hover .phase,
 #target-table tr.selected .phase
 {

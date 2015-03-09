@@ -273,9 +273,16 @@ var plot_attack = function(attack_id) {
             }
         }).bind('plotclick', function (event, pos, item) {
             var hover_ip = item.datapoint[1] + ip_min;
-            var url = SSHCure.urlForAction('host', {'id': hover_ip});
-            SSHCure.showLoadingDialog();
-            window.location.assign(url);
+            console.log(hover_ip);
+            $('#target-table tbody').scrollTo($('tr[data-id='+hover_ip+']'));
+            console.log("post scroll from click on plot");
+            // trigger click event on that tr
+            $('#target-table tbody tr[data-id='+hover_ip+']').addClass("selected").siblings().removeClass("selected"); //.click();
+            $('#target-table tbody tr[data-id='+hover_ip+']').click();
+            
+            //var url = SSHCure.urlForAction('host', {'id': hover_ip});
+            //SSHCure.showLoadingDialog();
+            //window.location.assign(url);
         });
     });
     

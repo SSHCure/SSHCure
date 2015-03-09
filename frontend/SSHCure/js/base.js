@@ -87,6 +87,7 @@ var loadAttackDetails = function(href) {
     $.getJSON(url, params, function(data) {
         $('#attack-details').html(data.data);
         plot_attack(attack_id);
+        loadAttackStatistics(attack_id);
     });
     console.log("filled #attack-details");
     if (replaceState) {
@@ -104,6 +105,20 @@ var loadAttackDetails = function(href) {
     //    $('#attack-details-graph').plot([ data.plot_scan_data, data.plot_bruteforce_data, data.plot_compromise_data ]);
     //});
    // plot_attack(attack_id);
+}
+
+var loadAttackStatistics = function(attack_id) {
+    var url = "json/rpc/get_attack_flows.php";
+    var params = {
+        'attack_id': attack_id,
+    }
+    $.getJSON(url, params, function(data) {
+        console.log("got attack statistics");
+        console.log(data.flows.info);
+        $('#attack-details-flows').html(data.flows.info['total flows']);
+        $('#attack-details-bytes').html(data.flows.info['total bytes']);
+        $('#attack-details-packets').html(data.flows.info['total packets']);
+    });
 }
 
 var loadAttackTargets = function(href) {
@@ -202,6 +217,10 @@ var loadAttackGraph = function(e) {
 
 var initialize_search = function() {
     console.log("initializing search page");
+
+    // Set focus on input field
+    $('input#search-ip').focus();
+
     $('#search-button').click(function(e){
         e.preventDefault();
         var url = "json/html/get_search_results.php";
@@ -263,6 +282,11 @@ var attachHostDetailModals = function() {
                 });
             });
 
+        // attach events on tr to go to actual attack pages
+            $('#host-details table[id^=attacks-] tr').click(function () {
+                loadPage($(this).data('href'));
+                $('#host-details').modal('hide');
+            });
         });
     });
 }
