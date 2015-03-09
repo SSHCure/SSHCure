@@ -225,7 +225,7 @@ if [ $INSTALL_FRONTEND = 1 ]; then
     echo "Updating plugin configuration file ${SSHCURE_CONF}"
     
     # Since "$config['backend.path']" is also used in "$config['database.dsn']", we have to search (grep) for "'backend.path'] ="
-    LINE=$(grep "'backend.path'] =" ${SSHCURE_CONF} | awk '{ START=index($0,"="); LENGTH=length($0)-START; print substr($0,START,LENGTH) }' | cut -d"'" -f2)
+    LINE=$(grep backend.path ${SSHCURE_CONF} | grep -v sqlite3 | awk '{ START=index($0,"="); LENGTH=length($0)-START; print substr($0,START,LENGTH) }' | cut -d"'" -f2)
     sed -i.tmp "s,$LINE,${BACKEND_PLUGINDIR}/SSHCure/,g" ${SSHCURE_CONF}
 fi
 
