@@ -112,7 +112,7 @@ cat ${NFSEN_CONF} | grep -v \# | egrep '\$BASEDIR|\$BINDIR|\$LIBEXECDIR|\$HTMLDI
 . ${NFSEN_VARFILE}
 rm -rf ${NFSEN_VARFILE}
 
-SSHCURE_CONF=${FRONTEND_PLUGINDIR}/SSHCure/config/config.php
+SSHCURE_CONF=${FRONTEND_PLUGINDIR}/SSHCure/config.php
 
 # Check Perl dependencies
 printf "Checking Perl dependencies...\n\n"
