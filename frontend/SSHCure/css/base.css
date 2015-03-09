@@ -33,6 +33,14 @@ span.text-compromise {
     color: #DC0008;
 }
 
+span.notice {
+    font-style: italic;
+}
+span.notice-center {
+    display: block;
+    text-align: center;
+
+}
 /* Loading indicator */
 .loading {
     text-align: center;
@@ -152,6 +160,7 @@ div#main {
 div.main-block {
     background-color: white;
     border-bottom: 2.5pt solid #cccccc;
+    margin-bottom: 20px;
 }
 
 div.main-block h1 {
@@ -173,6 +182,28 @@ div.modal-content {
     border-radius: 0px;
 }
 
+hr.modal-hr {
+    background-color:   #333;
+    height:             2px;
+    width:              95%;
+    margin:             -7px 15px 0px;
+    border:             0px;
+}
+
+
+div.modal-body {
+    padding: 0px;
+}
+
+div.modal-body a[role='tab'] {
+    outline: none;
+}
+
+div.tab-content {
+    padding: 15px;
+    background-color: #D1D1D1;
+}
+
 /* Tables */
 table.list thead {
     font-size: 11pt;
@@ -190,11 +221,7 @@ table.list tbody td {
 }
 
 table.list tbody tr {
-    line-height: 25px;
-}
-
-table.list tbody tr:last-child td {
-    border-bottom: 0;
+    line-height: 30px;
 }
 
 table.list tbody tr td:first-child {
@@ -226,6 +253,11 @@ div.phase {
     margin: 0 2px 0 2px;
     height: 14px;
     width: 14px;
+    background: white;
+}
+
+#attack-details-table .phases .off {
+    border: 1px solid #999;
 }
 
 div.phase.scan.on {
@@ -241,4 +273,15 @@ div.phase.bruteforce.on {
 div.phase.compromise.on {
     background-color: #DC0008;
     border: 0px solid;
+}
+
+
+thead.fixed-header {
+    position:   relative;
+    display:    block;
+}
+tbody.scrollable {
+    display:    block;
+    overflow:   auto;
+    /* height should be defined ! */
 }

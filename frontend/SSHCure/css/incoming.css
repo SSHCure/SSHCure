@@ -6,6 +6,7 @@ div[id$='-attacks-table'] tr.selected,
     background: -moz-linear-gradient(top, #339ef0 0%, #0a83de 100%);
     background: -webkit-linear-gradient(top, #339ef0 0%,#0a83de 100%);
     cursor: pointer;
+    color: white;
 }
 
 
@@ -25,8 +26,12 @@ div[id$='-attacks-table'] tr.selected .phase,
     border: 1px solid white;
 }
 
-#incoming-attacks-table a.ip-addr:hover {
+div[id$='-attacks-table'] a.ip-addr:hover,
+div[id='search-results-table'] a.ip-addr:hover,
+#host-details .tab-content a.ip-addr:hover,
+div[id^='top-targets-'] a.ip-addr:hover {
     cursor: zoom-in;
+    cursor: -webkit-zoom-in;
 }
 
 #attack-profile-plot-container {
@@ -66,10 +71,10 @@ div[id$='-attacks-table'] tr.selected .phase,
     width: 100px;
 }
 #targets-overview-table #attack-flow-data td:nth-child(3) {
-    width: 400px;
+    width: 350px;
 }
 #targets-overview-table #attack-flow-data td:nth-child(4) {
-    width: 70px;
+    width: 150px;
 }
 #targets-overview-table #attack-flow-data td:nth-child(5) {
     width: 70px;
@@ -77,7 +82,9 @@ div[id$='-attacks-table'] tr.selected .phase,
 #targets-overview-table #attack-flow-data td:nth-child(6) {
     width: 70px;
 }
-
+#targets-overview-table #attack-flow-data td:nth-child(7) {
+    width: 70px;
+}
 /* Target list */
 
 #targets-overview-table table.list td:not([colspan="3"]):nth-child(1){
@@ -95,15 +102,15 @@ div[id$='-attacks-table'] tr.selected .phase,
 
 
 
-div[id$='-attacks-table'] td.active {
-    text-align: center;
-    width: 30px;
-}
+
 #targets-overview-table td.blocked {
     color: #61a900;
     text-align: center;
 }
 
+#incoming-attacks {
+    margin-bottom: 0px;
+}
 
 #incoming-attacks-page #incoming-attacks table.list td:first-child,
 #incoming-attacks-page #incoming-attacks h1
@@ -120,6 +127,28 @@ div[id$='-attacks-table'] td.active {
     padding: 0;
 }
 
+div[id$='-attacks-page'] div[id$='-attacks-table'] td:nth-child(1) {
+    width: 100px;
+}
+div[id$='-attacks-page'] div[id$='-attacks-table'] td:nth-child(2) {
+    width: 60px;
+    text-align: center; /* active lightning glyphicon */
+}
+div[id$='-attacks-page'] div[id$='-attacks-table'] td:nth-child(3) {
+    width: 200px;
+}
+div[id$='-attacks-page'] div[id$='-attacks-table'] td:nth-child(4) {
+    width: 300px;
+}
+div[id$='-attacks-page'] div[id$='-attacks-table'] td:nth-child(5) {
+    width: 100px;
+}
+div[id$='-attacks-table'] td.active {
+    text-align: center; /* active lightning glyphicon */
+}
+div[id$='-attacks-table'] td.active span {
+    vertical-align: middle;
+}
 
 /* TODO: is this really the right place to do this/ */
 html {

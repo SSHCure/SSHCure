@@ -1,0 +1,24 @@
+.search-form {
+    padding: 10px;
+}
+
+#search-ip {
+    width: 500px;
+    display: inline-block;
+}
+
+#search-results {
+    /*min-height: 400px;*/
+}
+
+
+
+#search-results-table td:nth-child(1){
+    width: 200px;
+}
+#search-results-table td:nth-child(2) {
+    width: 100px;
+}
+#search-results-table td:nth-child(3) {
+    width: 100px;
+}

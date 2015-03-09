@@ -49,7 +49,7 @@
     require_once(TWIG_PATH.'/Autoloader.php');
 
 
-    $end_time = ($row['end_time'] == 0) ? 'Ongoing' : $row['end_time'];
+    $end_time = ($row['end_time'] == 0) ? 'Ongoing' : (new DateTime("@" . (int)$row['end_time'] * 1))->format("D. M j, Y H:i");
 
     Twig_Autoloader::register();
 
@@ -63,6 +63,7 @@
         'total_flows'   => 'TODO',
         'total_packets' => 'TODO',
         'total_bytes'   => 'TODO',
+        'blacklisted'   => $row['attacker_blacklisted']
     ));
 
     //TODO add also all the points for flot, and return in json

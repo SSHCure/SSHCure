@@ -4,7 +4,9 @@
     header("content-type: application/json");
 
     // Parse and process parameters
+    $dashboard = isset($_GET['dashboard']) ? 1 : 0;
     $direction = isset($_GET['outgoing']) ? 1 : 0;
+    $limit = ($dashboard) ? 5 : 500;
 
     $query = "
         SELECT      a.id AS id,
@@ -14,16 +16,27 @@
                     a.attacker_ip AS attacker,
                     a.target_count AS target_count
         FROM        attack a
-        WHERE       a.direction = ?
+        WHERE       a.direction = ?";
+    if ($dashboard) {
+        $query .= "
         ORDER BY    a.certainty DESC,
                     a.start_time DESC,
-                    a.target_count DESC
-        LIMIT       5";
+                    a.target_count DESC";
+    } else {
+        $query .= "
+        ORDER BY    a.start_time DESC,
+                    a.certainty DESC,
+                    a.target_count DESC";
+    }
+
+    $query .= "
+        LIMIT       ?";
+
 
     $db = new PDO($config['database.dsn']);
 
     $stmnt = $db->prepare($query);
-    $stmnt->execute([$direction]);
+    $stmnt->execute([$direction, $limit]);
 
     $db_result = $stmnt->fetchAll(PDO::FETCH_ASSOC);
     unset($stmnt);

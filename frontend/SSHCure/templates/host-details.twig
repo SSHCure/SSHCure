@@ -42,14 +42,14 @@
                                         {% endif %}
                                     </div>
                                 </td>
-                                <td><a class="ip-addr" href="">{{ attack.attacker }}</a></td>
-                                <td>{{ attack.start_time }}</td>
+                                <td><a class="ip-addr">{{ attack.attacker }}</a></td>
+                                <td>{{ attack.start_time | date("D. M j, Y H:i") }}</td>
                             </tr>
                         {% endfor %}
                     </tbody>
                 </table>
             {% else %}
-                <td style="font-style: italic;" colspan="3">No data available...</td>
+                <td colspan="3"><span class="notice">No data available</span></td>
             {% endif %}
         </div>
         <div class="tab-pane" id="attacks-attacker">
@@ -82,14 +82,14 @@
                                         {% endif %}
                                     </div>
                                 </td>
-                                <td><a class="ip-addr" href="">{{ attack.attacker }}</a></td>
-                                <td>{{ attack.start_time }}</td>
+                                <td><a class="ip-addr">{{ attack.attacker }}</a></td>
+                                <td>{{ attack.start_time | date("D. M j, Y H:i")}}</td>
                             </tr>
                         {% endfor %}
                     </tbody>
                 </table>
             {% else %}
-                <td style="font-style: italic;" colspan="3">No data available...</td>
+                <td colspan="3"><span class="notice">No data available</span></td>
             {% endif %}
         </div>
     </div>

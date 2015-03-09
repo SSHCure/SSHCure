@@ -33,6 +33,7 @@
 
     /* Perform geolocation */
     $geo_record = geoip_record_by_addr($geo_db_handle, $host);
+    //TODO let this timeout or something (check Surfmap code)
     $country = $geo_record->country_name;
 
     if (isset($geo_record->country_name)) {
@@ -76,7 +77,7 @@
             $record['attacker'] = $row['attacker_ip'];
         }
         
-        $record['start_time'] = $row['start_time'];
+        $record['start_time'] = (int) $row['start_time']; // cast to int to round it, so Twig can use it's date function
         $record['certainty'] = $row['certainty'];
 
         array_push($attacks_attacker, $record);
@@ -116,7 +117,7 @@
             $record['attacker'] = $row['attacker_ip'];
         }
         
-        $record['start_time'] = $row['start_time'];
+        $record['start_time'] = (int)$row['start_time']; // cast to int to round it, so Twig can use it's date function
         $record['certainty'] = $row['certainty'];
 
         array_push($attacks_target, $record);
