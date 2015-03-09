@@ -196,7 +196,7 @@ fi
 # Check whether an old SSHCure version was found and ask whether backend configuration and data structures should be retained
 if [ $INSTALL_BACKEND = 1 -a -d ${SSHCURE_BACKUPDIR_BACKEND} ]; then
     OLD_VER=$(cat ${SSHCURE_BACKUPDIR_BACKEND}/../SSHCure.pm | grep -m 1 SSHCURE_VERSION | cut -d"\"" -f2)
-    NEW_VER=$(cat ${BACKEND_DIR}/SSHCure.pm | grep -m 1 SSHCURE_VERSION | cut -d"\"" -f2)
+    NEW_VER=$(cat ${BACKEND_PLUGINDIR}/SSHCure.pm | grep -m 1 SSHCURE_VERSION | cut -d"\"" -f2)
     if [ ${OLD_VER} = ${NEW_VER} ]; then
         while true; do
             read -p "Do you wish to keep the backend configuration and data structures from your previous installation [y,n] (default: y)? " input
