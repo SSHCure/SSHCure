@@ -1,20 +1,12 @@
 
 Dashboard = function () {
-    this.internal_networks = "";
-
     this.initialize = function () {
-        // Retrieve internal domains
-        var url = "json/rpc/get_internal_networks.php";
-        var params = {};
-        $.getJSON(url, params, function (data, textStatus, jqXHR) {
-            internal_networks = data;
-            add_time_window_control_listeners();
-            plot_incoming_attacks_plot(internal_networks);
-            load_attacks_table(INCOMING, 1); // second parameter '1' means it's called from dashboard
-            load_attacks_table(OUTGOING, 1); // second parameter '1' means it's called from dashboard
-            load_top_targets_table(COMPROMISE);
-            load_top_targets_table(BRUTEFORCE);
-        });
+        add_time_window_control_listeners();
+        plot_incoming_attacks_plot();
+        load_attacks_table(INCOMING, 1); // second parameter '1' means it's called from dashboard
+        load_attacks_table(OUTGOING, 1); // second parameter '1' means it's called from dashboard
+        load_top_targets_table(COMPROMISE);
+        load_top_targets_table(BRUTEFORCE);
     };
 
     return this;
@@ -272,7 +264,7 @@ function load_top_targets_table (type) {
     });
 }
 
-function plot_incoming_attacks_plot (internal_networks, period) {
+function plot_incoming_attacks_plot (period) {
     if (typeof(period) === 'undefined') {
         period = 'week';
     }
