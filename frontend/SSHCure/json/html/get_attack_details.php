@@ -7,7 +7,6 @@
 
     // Parse and process parameters
     $attack_id = $_GET['attack_id'];
-
     
     $query = "SELECT * FROM attack a WHERE a.id = ?";
 
@@ -26,28 +25,11 @@
 
     $result['status'] = 0;
     $result['query'] = $query;
-    $result['data'] = [];
+    $result['data'] = array();
 
     $row = $db_result[0];
-    //foreach ($db_result as $row) {
-    //    $record = [];
-    //    $record['start_time'] = $row['start_time'];
-    //    $record['ongoing'] = $row['end_time'] == 0;
-    //    $record['certainty'] = $row['certainty'];
-    //    $record['attacker'] = long2ip($row['attacker']);
-    //    $record['target_count'] = $row['target_count'];
 
-    //    array_push($result['data'], $record);
-    //}
-
-    //$result['data'] = $db_result;
-
-    // instead of returning JSON, we now directly use it
-    // render via twig
-    // and return ready-to-use HTML
-    /* Render page */
     require_once(TWIG_PATH.'/Autoloader.php');
-
 
     $end_time = ($row['end_time'] == 0) ? 'Ongoing' : (new DateTime("@" . (int)$row['end_time'] * 1))->format("D. M j, Y H:i");
 
@@ -64,7 +46,6 @@
     ));
 
     //TODO add also all the points for flot, and return in json
-
  
     echo json_encode($result);
     die();

@@ -25,7 +25,7 @@
 
     $result['status'] = 0;
     $result['query'] = $query;
-    $result['data'] = [];
+    $result['data'] = array();
 
     foreach ($db_result as &$row) {
         $row['raw_ip'] = $row['target_ip'];
@@ -40,28 +40,7 @@
     $attack = $stmnt->fetchAll(PDO::FETCH_ASSOC)[0];
     unset($stmnt);
 
-    //foreach ($db_result as $row) {
-    //    $record = [];
-    //    $record['start_time'] = $row['start_time'];
-    //    $record['ongoing'] = $row['end_time'] == 0;
-    //    $record['certainty'] = $row['certainty'];
-    //    $record['attacker'] = long2ip($row['attacker']);
-    //    $record['target_count'] = $row['target_count'];
-
-    //    array_push($result['data'], $record);
-    //}
-
-    //$result['data'] = $db_result;
-    //echo json_encode($result);
-    //die();
-
-
-    // instead of returning JSON, we now directly use it
-    // render via twig
-    // and return ready-to-use HTML
-    /* Render page */
     require_once(TWIG_PATH.'/Autoloader.php');
-
 
     Twig_Autoloader::register();
 

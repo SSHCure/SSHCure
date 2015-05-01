@@ -36,7 +36,7 @@
     $db = new PDO($config['database.dsn']);
 
     $stmnt = $db->prepare($query);
-    $stmnt->execute([$direction, $limit]);
+    $stmnt->execute(array($direction, $limit));
 
     $db_result = $stmnt->fetchAll(PDO::FETCH_ASSOC);
     unset($stmnt);
@@ -48,10 +48,10 @@
 
     $result['status'] = 0;
     $result['query'] = $query;
-    $result['data'] = [];
+    $result['data'] = array();
 
     foreach ($db_result as $row) {
-        $record = [];
+        $record = array();
         $record['attack_id']    = $row['id'];
         $record['start_time']   = $row['start_time'];
         $record['ongoing']      = $row['end_time'] == 0;

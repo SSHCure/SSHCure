@@ -19,7 +19,7 @@
         }
     }
 
-    $data = [];
+    $data = array();
 
     $out_list = nfsend_query("SSHCure::get_backend_profile", array());
     $data['profile'] = $out_list['backend_profile'];

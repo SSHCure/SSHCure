@@ -13,12 +13,10 @@ define("TWIG_PATH", "../../lib/Twig");
 define("TEMPLATE_PATH", "../../templates");
 header("content-type: application/json");
 
-
 // Prepare IP search string
 $ip_search_string_min = "";
 $ip_search_string_max = $ip_search_string_min;
 $ip = $_GET['ip'];
-//if ($system->getIPVersion($_REQUEST['q']) == 4) { // IPv4
 if (strpos($ip, ':') === false ) { // IPv4
     $octets = explode(".", $ip);
     
@@ -56,8 +54,8 @@ if (strpos($ip, ':') === false ) { // IPv4
     }
 }
 
-
 $db = new PDO($config['database.dsn']);
+
 // Target instances
 $query = "
 SELECT			t.target_ip as ip
@@ -69,9 +67,7 @@ GROUP BY		t.target_ip
 ORDER BY		t.target_ip asc
 LIMIT 1000";
 
-
 $stmnt = $db->prepare($query);
-
 
 $stmnt->execute(array(
 	'ip_min'						=> ip2long($ip_search_string_min),
@@ -128,27 +124,22 @@ foreach($db_result as &$row) {
 unset($row);
 
 function sort_by_ranking($a,$b) {
-	//return $b['ranking'] - $a['ranking'];
     return $a['ip'] - $b['ip'];
 }
 
 usort($ret,'sort_by_ranking');
 
-//$table = $system->generateTableJSON($ret, array('label' => 'Label', 'ranking' => 'Ranking', 'type' => 'Type'));
-//$system->respondJSON(array('error' => 0, 'type' => 'table', 'table' => $table));
+require_once(TWIG_PATH.'/Autoloader.php');
+Twig_Autoloader::register();
+
+$loader = new Twig_Loader_Filesystem(TEMPLATE_PATH);
+$twig = new Twig_Environment($loader, array());
+$result['data'] = $twig->render('search_results.twig', array(
+    'results' => $ret
+));
+
+//TODO add also all the points for flot, and return in json
 
 
-    require_once(TWIG_PATH.'/Autoloader.php');
-    Twig_Autoloader::register();
-
-    $loader = new Twig_Loader_Filesystem(TEMPLATE_PATH);
-    $twig = new Twig_Environment($loader, array());
-    $result['data'] = $twig->render('search_results.twig', array(
-        'results' => $ret
-    ));
-
-    //TODO add also all the points for flot, and return in json
-
- 
-    echo json_encode($result);
-    die();
+echo json_encode($result);
+die();

@@ -70,7 +70,7 @@
 
     $attacks_attacker = array();
     foreach ($db_result_attacks_attacker as $row) {
-        $record = [];
+        $record = array();
 
         if (is_numeric($row['attacker_ip'])) { // IPv4
             $record['attacker'] = long2ip($row['attacker_ip']);
@@ -113,7 +113,7 @@
 
     $attacks_target = array();
     foreach ($db_result_attacks_target as $row) {
-        $record = [];
+        $record = array();
 
         if (is_numeric($row['attacker_ip'])) { // IPv4
             $record['attacker'] = long2ip($row['attacker_ip']);

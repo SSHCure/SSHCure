@@ -64,10 +64,10 @@
 
     $result['status'] = 0;
     $result['query'] = $query;
-    $result['data'] = [];
+    $result['data'] = array();
 
     foreach ($db_result as $row) {
-        $record = [];
+        $record = array();
         $record['attack_id']    = $row['id'];
         $record['start_time']   = $row['start_time'];
         $record['ongoing']      = $row['end_time'] == 0;

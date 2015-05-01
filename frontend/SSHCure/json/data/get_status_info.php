@@ -20,7 +20,7 @@
     }
 
     $db = new PDO($config['profiling-database.dsn']);
-    $data = [];
+    $data = array();
 
     $query = "
         SELECT      p.time AS time,

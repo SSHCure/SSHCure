@@ -29,10 +29,10 @@
 
     $result['status'] = 0;
     $result['query'] = $query;
-    $result['data'] = [];
+    $result['data'] = array();
 
     foreach ($db_result as $row) {
-        $record = [];
+        $record = array();
         $record['target'] = long2ip($row['target']);
         $record['attack_count'] = $row['attack_count'];
         $record['compromise_count'] = $row['compromise_count'];
