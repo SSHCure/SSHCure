@@ -68,7 +68,7 @@ sub handle_notification {
 
     # Generate XML file
     my $output_file = IO::File->new($tmp_xml_file_path, 'w') or log_error("Could not create output file for IODEF XML document (path: $tmp_xml_file_path)");
-    my $doc = new XML::Writer(OUTPUT => $output_file);
+    my $doc = new XML::Writer(OUTPUT => $output_file, DATA_MODE => 1, DATA_INDENT => 2);
     $doc->startTag('xml', 'version' => '1.0', encoding => 'UTF-8');
         $doc->startTag('IODEF-Document', 'version' => '1.00', 'lang' => 'en',
                 'xmlns' => 'urn:ietf:params:xml:ns:iodef-1.0',
