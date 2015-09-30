@@ -74,6 +74,7 @@ $STORE_SCAN_TARGETS = 1;
     #     # Indicates the kind of notification to be sent.
     #     # Supported values:
     #     #   - $CONST{'NOTIFICATIONS'}{'TYPE'}{'EMAIL'}
+    #     #   - $CONST{'NOTIFICATIONS'}{'TYPE'}{'IDMEF'}
     #     #   - $CONST{'NOTIFICATIONS'}{'TYPE'}{'IODEF'}
     #     #   - $CONST{'NOTIFICATIONS'}{'TYPE'}{'LOG'}
     #     #   - $CONST{'NOTIFICATIONS'}{'TYPE'}{'QMANAGE'}
@@ -98,6 +99,15 @@ $STORE_SCAN_TARGETS = 1;
     #     'notification_type'         => $CONST{'NOTIFICATIONS'}{'TYPE'}{'EMAIL'},
     #     'notification_sender'       => 'sshcure@domain.com',
     #     'notification_destination'  => 'admin@domain.com,noc@domain.com'
+    # },
+    # 'NOTIFICATION_CONFIG_EXAMPLE_IDMEF' => {
+    #     'filter'                    => '1.2.3.4/16',
+    #     'filter_type'               => $CONST{'NOTIFICATIONS'}{'FILTER_TYPE'}{'TARGET'},
+    #     'attack_phase'              => $CONST{'NOTIFICATIONS'}{'ATTACK_PHASE'}{'COMPROMISE'},
+    #     'when'                      => $CONST{'NOTIFICATIONS'}{'WHEN'}{'ATTACK_END'},
+    #     'notification_type'         => $CONST{'NOTIFICATIONS'}{'TYPE'}{'IDMEF'},
+    #     'notification_sender'       => 'sshcure@domain.com',
+    #     'notification_destination'  => 'soc@domain.com' 
     # },
     # 'NOTIFICATION_CONFIG_EXAMPLE_IODEF' => {
     #     'filter'                    => '1.2.3.4/16',

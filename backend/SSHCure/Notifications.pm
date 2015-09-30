@@ -15,6 +15,7 @@ use warnings;
 use strict;
 
 use SSHCure::Notifications::Email;
+use SSHCure::Notifications::IDMEF;
 use SSHCure::Notifications::IODEF;
 use SSHCure::Notifications::Log;
 use SSHCure::Notifications::Qmanage;
