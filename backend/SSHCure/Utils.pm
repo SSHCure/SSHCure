@@ -602,7 +602,7 @@ sub config_sanity_check {
                 return 0;
             }
 
-            unless (($$config{'notification_destination'} =~ tr/@//) == ($$config{'notification_destination'} =~ tr/,//) - 1) {
+            unless (($$config{'notification_destination'} =~ tr/@//) == ($$config{'notification_destination'} =~ tr/,//) + 1) {
                 log_error("Syntax error in destination address field of notification configuration '".$notification_id."'");
                 return 0;
             }
